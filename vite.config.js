@@ -8,7 +8,7 @@ export default defineConfig({
         port: 3001,
         proxy: {
             '/api/auth': {
-                target: 'http://localhost:9000',
+                target: 'https://directory-backend-kdhr.onrender.com',
                 changeOrigin: true,
                 secure: false,
             },

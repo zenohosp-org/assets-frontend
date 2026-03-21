@@ -25,7 +25,7 @@ export const getMyProfile = () => api.get('/api/user/me');
 export const logout = () => api.post('/api/auth/logout');
 
 // We are hardcoding the Directory Backend URL here for simplicity. In a real app it would be in an env var.
-export const getDirectoryUsers = (hospitalId) => axios.get(`http://localhost:9000/api/directory/hospitals/${hospitalId}/users`);
+export const getDirectoryUsers = (hospitalId) => axios.get(`https://directory-backend-kdhr.onrender.com/api/directory/hospitals/${hospitalId}/users`);
 
 // ── Assets ──
 export const getAssets = () => api.get('/api/assets');
