@@ -13,17 +13,17 @@ export default defineConfig({
                 secure: false,
             },
             '/api': {
-                target: 'http://localhost:8081',
+                target: 'https://asset-backend-m41v.onrender.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/oauth2': {
-                target: 'http://localhost:8081',
+                target: 'https://asset-backend-m41v.onrender.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/login/oauth2': {
-                target: 'http://localhost:8081',
+                target: 'https://asset-backend-m41v.onrender.com',
                 changeOrigin: true,
                 secure: false,
             }
