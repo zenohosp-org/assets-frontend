@@ -1,38 +1,43 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
+import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
-import TransferLogs from './pages/TransferLogs';
-import Maintenance from './pages/Maintenance';
-import Login from './pages/Login';
-import SsoCallback from './pages/SsoCallback';
-import Vendors from './pages/Vendors';
-import ProductGroups from './pages/ProductGroups';
+//import AssetDetails from '';
 import AssetCategories from './pages/AssetCategories';
-import ProductsMaster from './pages/ProductsMaster';
+import ProductGroups from './pages/ProductGroups';
+import Maintenance from './pages/Maintenance';
+import TransfersLogs from './pages/TransferLogs';
 
 export default function App() {
     return (
         <Router>
-            <Routes>
-                {/* Full-screen pages (no sidebar) */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/sso/callback" element={<SsoCallback />} />
-
-                {/* App pages (with sidebar layout, protected) */}
-                <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
-                <Route path="/assets" element={<ProtectedRoute><Layout><Assets /></Layout></ProtectedRoute>} />
-                <Route path="/transfers" element={<ProtectedRoute><Layout><TransferLogs /></Layout></ProtectedRoute>} />
-                <Route path="/maintenance" element={<ProtectedRoute><Layout><Maintenance /></Layout></ProtectedRoute>} />
-                <Route path="/vendors" element={<ProtectedRoute><Layout><Vendors /></Layout></ProtectedRoute>} />
-                <Route path="/product-groups" element={<ProtectedRoute><Layout><ProductGroups /></Layout></ProtectedRoute>} />
-                <Route path="/asset-categories" element={<ProtectedRoute><Layout><AssetCategories /></Layout></ProtectedRoute>} />
-                <Route path="/products" element={<ProtectedRoute><Layout><ProductsMaster /></Layout></ProtectedRoute>} />
-
-                <Route path="/" element={<Navigate to="/dashboard" />} />
-                <Route path="*" element={<Navigate to="/dashboard" />} />
-            </Routes>
+            <AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route
+                        path="/*"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <Routes>
+                                        <Route path="/dashboard" element={<Dashboard />} />
+                                        <Route path="/assets" element={<Assets />} />
+                                        {/* <Route path="/assets/:id" element={<AssetDetails />} /> */}
+                                        <Route path="/categories" element={<AssetCategories />} />
+                                        <Route path="/product-groups" element={<ProductGroups />} />
+                                        <Route path="/maintenance" element={<Maintenance />} />
+                                        <Route path="/transfers" element={<TransfersLogs />} />
+                                        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                                    </Routes>
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </AuthProvider>
         </Router>
     );
 }

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import api, { getMyProfile } from '../api/client';
+import { getMyProfile, logout as apiLogout } from '../api/client';
 
 const AuthContext = createContext(null);
 
@@ -8,40 +8,25 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('asset_jwt');
-        if (token) {
-            getMyProfile()
-                .then((res) => setUser(res.data.data))
-                .catch(() => localStorage.removeItem('asset_jwt'))
-                .finally(() => setLoading(false));
-        } else {
-            setLoading(false);
-        }
+        // On app load, check if the user is already authenticated via cookie
+        getMyProfile()
+            .then((res) => setUser(res.data.data))
+            .catch(() => setUser(null)) // Could be a 401 if no cookie
+            .finally(() => setLoading(false));
     }, []);
 
-    const login = async (email, password) => {
-        const res = await api.post('/api/auth/login', { email, password });
-        const { token, user: userData } = res.data.data;
-        localStorage.setItem('asset_jwt', token);
-        setUser(userData);
-        return userData;
-    };
-
-    const logout = () => {
-        localStorage.removeItem('asset_jwt');
+    const logout = async () => {
+        try {
+            await apiLogout();
+        } catch (_) {
+            // Ignore logout failures and proceed with client-side cleanup
+        }
         setUser(null);
-    };
-
-    const ssoLogin = (token) => {
-        localStorage.setItem('asset_jwt', token);
-        return getMyProfile().then(res => {
-            setUser(res.data.data);
-            return res.data.data;
-        });
+        window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || 'https://accounts.zenohosp.com/login';
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, ssoLogin }}>
+        <AuthContext.Provider value={{ user, loading, logout }}>
             {children}
         </AuthContext.Provider>
     );

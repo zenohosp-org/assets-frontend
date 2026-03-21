@@ -2,16 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: '/',
-    withCredentials: true,
-});
-
-// Request interceptor to add Bearer token
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('asset_jwt');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+    withCredentials: true, // Send cookies with requests
 });
 
 // Response interceptor to handle 401
@@ -19,16 +10,19 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('asset_jwt');
-            // Optional: redirect to login
+            // User is not authenticated, redirect to login
+            // Note: We can't clear the HttpOnly cookie from here
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
 );
 
 // ── Auth & Directory ──
-export const localLogin = (credentials) => api.post('/api/auth/login', credentials);
 export const getMyProfile = () => api.get('/api/user/me');
+export const logout = () => api.post('/api/auth/logout');
 
 // We are hardcoding the Directory Backend URL here for simplicity. In a real app it would be in an env var.
 export const getDirectoryUsers = (hospitalId) => axios.get(`http://localhost:9000/api/directory/hospitals/${hospitalId}/users`);
