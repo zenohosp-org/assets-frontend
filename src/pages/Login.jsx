@@ -15,8 +15,8 @@ export default function Login() {
     }, [user, loading, navigate]);
 
     const handleLoginClick = () => {
-        // Redirect via Vite proxy → Asset Backend → Directory Backend
-        window.location.href = '/oauth2/authorization/directory';
+        // Redirect to Asset Backend OAuth2 endpoint (absolute URL for production)
+        window.location.href = 'https://api-asset.zenohosp.com/oauth2/authorization/directory';
     };
 
     const error = searchParams.get('error') ? (searchParams.get('error_description') || 'SSO login failed.') : null;
