@@ -8,22 +8,22 @@ export default defineConfig({
         port: 3001,
         proxy: {
             '/api/auth': {
-                target: 'https://directory-backend-kdhr.onrender.com',
+                target: 'https://api-directory.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/api': {
-                target: 'https://asset-backend-m41v.onrender.com',
+                target: 'https://api-asset.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/oauth2': {
-                target: 'https://asset-backend-m41v.onrender.com',
+                target: 'https://api-asset.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/login/oauth2': {
-                target: 'https://asset-backend-m41v.onrender.com',
+                target: 'https://api-asset.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             }

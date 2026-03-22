@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
             // Ignore logout failures and proceed with client-side cleanup
         }
         setUser(null);
-        window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || 'https://accounts.zenohosp.com/login';
+        window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || 'https://directory.zenohosp.com/login';
     };
 
     return (

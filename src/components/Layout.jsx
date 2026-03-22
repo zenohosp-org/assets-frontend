@@ -83,7 +83,7 @@ export default function Layout({ children }) {
 
                 <div className="p-4 border-t border-slate-100 mt-auto">
                     {isAdmin && (
-                        <a href="http://localhost:5173/dashboard" className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-100 font-bold transition-all shadow-sm">
+                        <a href="https://directory.zenohosp.com/dashboard" className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-100 font-bold transition-all shadow-sm">
                             <Globe className="w-5 h-5" />
                             Directory Admin
                         </a>
