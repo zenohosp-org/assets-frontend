@@ -21,11 +21,6 @@ export default defineConfig({
                 target: 'https://api-asset.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
-            },
-            '/login/oauth2': {
-                target: 'https://api-asset.zenohosp.com',
-                changeOrigin: true,
-                secure: false,
             }
         }
     }
