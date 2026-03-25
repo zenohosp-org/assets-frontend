@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import OAuth2Callback from './pages/OAuth2Callback';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
 //import AssetDetails from '';
@@ -17,6 +18,7 @@ export default function App() {
             <AuthProvider>
                 <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/login/oauth2/code/directory" element={<OAuth2Callback />} />
                     <Route
                         path="/*"
                         element={

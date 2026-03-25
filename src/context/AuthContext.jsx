@@ -56,8 +56,32 @@ export function AuthProvider({ children }) {
         window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
     };
 
+    /**
+     * Validate current session — used by OAuth2 callback
+     * Returns true if SSO cookie is valid
+     */
+    const validateSession = async () => {
+        try {
+            const token = SSOCookieManager.getToken();
+            
+            if (!token || SSOCookieManager.isTokenExpired(token)) {
+                return false;
+            }
+            
+            // Verify with backend
+            const res = await getMyProfile();
+            setUser(res.data.data || res.data);
+            return true;
+        } catch (err) {
+            console.error('Session validation failed:', err);
+            SSOCookieManager.clearToken();
+            setUser(null);
+            return false;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, logout }}>
+        <AuthContext.Provider value={{ user, loading, logout, validateSession }}>
             {children}
         </AuthContext.Provider>
     );
