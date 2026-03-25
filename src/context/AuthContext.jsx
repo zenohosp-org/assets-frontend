@@ -10,28 +10,29 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         // Check for valid SSO token in shared cookie
         const token = SSOCookieManager.getToken();
-        console.log('AuthContext: Checking for SSO token...', {
-            token: token ? token.substring(0, 20) + '...' : null,
-            allCookies: document.cookie,
+        console.log('🔍 AuthContext: Checking for SSO token...', {
+            hasToken: !!token,
+            tokenPreview: token ? token.substring(0, 30) + '...' : null,
+            cookieString: document.cookie ? document.cookie.substring(0, 100) : 'no cookies'
         });
         
         if (token && !SSOCookieManager.isTokenExpired(token)) {
-            console.log('✅ Assets: Valid SSO token found, verifying with backend...');
+            console.log('✅ AuthContext: Valid SSO token found, verifying with backend...');
             // Token exists and is valid, verify with backend
             getMyProfile()
                 .then((res) => {
-                    console.log('✅ Assets: Profile loaded successfully', res.data);
+                    console.log('✅ AuthContext: Profile loaded successfully', res.data);
                     setUser(res.data.data || res.data);
                 })
                 .catch((err) => {
-                    console.error('❌ Assets: Profile verification failed', err);
+                    console.error('❌ AuthContext: Profile verification failed', err.response?.status, err.message);
                     // Token invalid, clear it
                     SSOCookieManager.clearToken();
                     setUser(null);
                 })
                 .finally(() => setLoading(false));
         } else {
-            console.warn('⚠️ Assets: No valid SSO token found, user needs to login');
+            console.warn('⚠️ AuthContext: No valid SSO token found in browser cookies');
             // No valid token
             setUser(null);
             setLoading(false);
@@ -39,7 +40,7 @@ export function AuthProvider({ children }) {
         
         // Listen for logout signals from other tabs/windows
         const handleLogout = () => {
-            console.log('Assets: Logout signal from another tab detected');
+            console.log('AuthContext: Logout signal from another tab detected');
             SSOCookieManager.clearToken();
             setUser(null);
             window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
