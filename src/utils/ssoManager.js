@@ -87,12 +87,16 @@ const SSOCookieManager = {
    */
   getToken() {
     const cookies = document.cookie.split(';');
+    console.debug('SSOCookieManager.getToken() - All cookies:', document.cookie);
     for (let cookie of cookies) {
       cookie = cookie.trim();
       if (cookie.startsWith(`${this.COOKIE_NAME}=`)) {
-        return cookie.substring(`${this.COOKIE_NAME}=`.length);
+        const token = cookie.substring(`${this.COOKIE_NAME}=`.length);
+        console.debug('✅ SSOCookieManager: Found SSO token:', token.substring(0, 20) + '...');
+        return token;
       }
     }
+    console.debug('❌ SSOCookieManager: No SSO token found in cookies');
     return null;
   },
   
