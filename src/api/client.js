@@ -1,19 +1,39 @@
 import axios from 'axios';
+import SSOCookieManager from '../utils/ssoManager';
+
+export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL;
+const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL;
 
 const api = axios.create({
-    baseURL: '/',
-    withCredentials: true, // Send cookies with requests
+    baseURL: API_BASE_URL,
+    withCredentials: true,
 });
 
-// Response interceptor to handle 401
+// ── Request interceptor: inject SSO token ──
+api.interceptors.request.use((config) => {
+    const token = SSOCookieManager.getToken();
+    
+    // Only add token if it exists and is not expired
+    if (token && !SSOCookieManager.isTokenExpired(token)) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (err) => {
+    console.error('Request interceptor error', err);
+    return Promise.reject(err);
+});
+
+// ── Response interceptor to handle 401/403 and logout across all apps ──
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // User is not authenticated, redirect to login
-            // Note: We can't clear the HttpOnly cookie from here
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            // Clear SSO token (logs out across all apps)
+            SSOCookieManager.clearToken();
+            SSOCookieManager.signalLogoutAcrossApps();
+            
             if (window.location.pathname !== '/login') {
-                window.location.href = '/login';
+                window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
             }
         }
         return Promise.reject(error);
@@ -24,8 +44,12 @@ api.interceptors.response.use(
 export const getMyProfile = () => api.get('/api/user/me');
 export const logout = () => api.post('/api/auth/logout');
 
-// We are hardcoding the Directory Backend URL here for simplicity. In a real app it would be in an env var.
-export const getDirectoryUsers = (hospitalId) => axios.get(`https://api-directory.zenohosp.com/api/directory/hospitals/${hospitalId}/users`);
+// Use Directory API URL from environment variables
+export const getDirectoryUsers = (hospitalId) => axios.get(`${DIRECTORY_API_URL}/api/directory/hospitals/${hospitalId}/users`, {
+    headers: {
+        'Authorization': `Bearer ${SSOCookieManager.getToken()}`
+    }
+});
 
 // ── Assets ──
 export const getAssets = () => api.get('/api/assets');
@@ -44,3 +68,4 @@ export const getTransferLogs = () => api.get('/api/transfers');
 export const createTransferLog = (data) => api.post('/api/transfers', data);
 
 export default api;
+export { SSOCookieManager };
