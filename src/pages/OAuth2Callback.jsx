@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { SSOCookieManager } from '../api/client';
 
 /**
  * OAuth2 Callback Handler
@@ -24,6 +25,7 @@ export default function OAuth2Callback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        const token = searchParams.get('token');
         const code = searchParams.get('code');
         const state = searchParams.get('state');
         const errorParam = searchParams.get('error');
@@ -35,15 +37,26 @@ export default function OAuth2Callback() {
           return;
         }
 
-        // Validate code and state (CSRF protection)
-        if (!code) {
-          setError('Invalid callback: missing authorization code');
+        // Support backend success-handler flow: /sso/callback?token=...
+        if (token) {
+          SSOCookieManager.setToken(token);
+        }
+
+        // Support directory redirect flow: /login/oauth2/code/directory?code=...&state=...
+        if (!token && !code) {
+          setError('Invalid callback: missing authorization code or token');
           setTimeout(() => navigate('/login'), 3000);
           return;
         }
 
-        // Log successful callback
-        console.log('✅ OAuth2 callback received with code:', code.substring(0, 8) + '...');
+        if (code) {
+          // Keep a minimal callback log for troubleshooting
+          console.log('✅ OAuth2 callback received with code:', code.substring(0, 8) + '...');
+          // state is intentionally read for CSRF diagnostics even when cookie-based flow is used
+          if (!state) {
+            console.warn('OAuth2 callback received without state parameter');
+          }
+        }
 
         // SSO cookie should now be set by Directory backend
         // Validate that we have an active session

@@ -66,9 +66,15 @@ const SSOCookieManager = {
     const secure = options.secure !== undefined ? options.secure : this.isSecure();
     const maxAge = options.maxAge || 86400; // 1 day default
     const sameSite = options.sameSite || 'Lax';
-    
-    // Set cookie with proper domain for cross-app access
-    document.cookie = `${this.COOKIE_NAME}=${token}; domain=${domain}; path=/; max-age=${maxAge}; secure=${secure}; samesite=${sameSite}`;
+
+    // Browsers expect Secure as a flag (not secure=true), and localhost should not use Domain.
+    const normalizedDomain = (domain || '').trim();
+    const isLocalDomain = normalizedDomain === 'localhost' || normalizedDomain === '127.0.0.1';
+    const domainAttr = normalizedDomain && !isLocalDomain ? `; domain=${normalizedDomain}` : '';
+    const secureAttr = secure ? '; Secure' : '';
+
+    // Set cookie with proper attributes for cross-subdomain SSO.
+    document.cookie = `${this.COOKIE_NAME}=${token}${domainAttr}; path=/; max-age=${maxAge}; SameSite=${sameSite}${secureAttr}`;
     
     // Store token expiry in sessionStorage (for checking expiration without decoding)
     try {
@@ -162,8 +168,13 @@ const SSOCookieManager = {
    */
   clearToken() {
     const domain = this.getCookieDomain();
+    const normalizedDomain = (domain || '').trim();
+    const isLocalDomain = normalizedDomain === 'localhost' || normalizedDomain === '127.0.0.1';
+    const domainAttr = normalizedDomain && !isLocalDomain ? `; domain=${normalizedDomain}` : '';
+    const secureAttr = this.isSecure() ? '; Secure' : '';
+
     // Clear via cookie (set expiry to past)
-    document.cookie = `${this.COOKIE_NAME}=; domain=${domain}; path=/; max-age=0; secure=${this.isSecure()}; samesite=Lax`;
+    document.cookie = `${this.COOKIE_NAME}=${domainAttr}; path=/; max-age=0; SameSite=Lax${secureAttr}`;
     
     // Clear expiry from sessionStorage
     sessionStorage.removeItem(this.TOKEN_EXPIRY_KEY);

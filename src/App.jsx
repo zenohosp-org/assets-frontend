@@ -19,6 +19,7 @@ export default function App() {
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/login/oauth2/code/directory" element={<OAuth2Callback />} />
+                    <Route path="/sso/callback" element={<OAuth2Callback />} />
                     <Route
                         path="/*"
                         element={
