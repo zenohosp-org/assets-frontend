@@ -8,35 +8,17 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for valid SSO token in shared cookie
-        const token = SSOCookieManager.getToken();
-        console.log('🔍 AuthContext: Checking for SSO token...', {
-            hasToken: !!token,
-            tokenPreview: token ? token.substring(0, 30) + '...' : null,
-            cookieString: document.cookie ? document.cookie.substring(0, 100) : 'no cookies'
-        });
-        
-        if (token && !SSOCookieManager.isTokenExpired(token)) {
-            console.log('✅ AuthContext: Valid SSO token found, verifying with backend...');
-            // Token exists and is valid, verify with backend
-            getMyProfile()
-                .then((res) => {
-                    console.log('✅ AuthContext: Profile loaded successfully', res.data);
-                    setUser(res.data.data || res.data);
-                })
-                .catch((err) => {
-                    console.error('❌ AuthContext: Profile verification failed', err.response?.status, err.message);
-                    // Token invalid, clear it
-                    SSOCookieManager.clearToken();
-                    setUser(null);
-                })
-                .finally(() => setLoading(false));
-        } else {
-            console.warn('⚠️ AuthContext: No valid SSO token found in browser cookies');
-            // No valid token
-            setUser(null);
-            setLoading(false);
-        }
+        // HttpOnly cookies are not readable from JS; verify session by backend call.
+        getMyProfile()
+            .then((res) => {
+                console.log('✅ AuthContext: Profile loaded successfully', res.data);
+                setUser(res.data.data || res.data);
+            })
+            .catch((err) => {
+                console.warn('⚠️ AuthContext: No active backend session', err.response?.status, err.message);
+                setUser(null);
+            })
+            .finally(() => setLoading(false));
         
         // Listen for logout signals from other tabs/windows
         const handleLogout = () => {
@@ -71,19 +53,12 @@ export function AuthProvider({ children }) {
      */
     const validateSession = async () => {
         try {
-            const token = SSOCookieManager.getToken();
-            
-            if (!token || SSOCookieManager.isTokenExpired(token)) {
-                return false;
-            }
-            
-            // Verify with backend
+            // Verify with backend using credentials (HttpOnly cookie)
             const res = await getMyProfile();
             setUser(res.data.data || res.data);
             return true;
         } catch (err) {
             console.error('Session validation failed:', err);
-            SSOCookieManager.clearToken();
             setUser(null);
             return false;
         }
