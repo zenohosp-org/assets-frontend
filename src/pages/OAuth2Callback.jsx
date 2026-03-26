@@ -25,6 +25,7 @@ export default function OAuth2Callback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        const callbackPath = window.location.pathname;
         const token = searchParams.get('token');
         const code = searchParams.get('code');
         const state = searchParams.get('state');
@@ -43,7 +44,9 @@ export default function OAuth2Callback() {
         }
 
         // Support directory redirect flow: /login/oauth2/code/directory?code=...&state=...
-        if (!token && !code) {
+        // Also allow cookie-only completion on /sso/callback.
+        const isCookieOnlyCallback = callbackPath === '/sso/callback';
+        if (!token && !code && !isCookieOnlyCallback) {
           setError('Invalid callback: missing authorization code or token');
           setTimeout(() => navigate('/login'), 3000);
           return;
