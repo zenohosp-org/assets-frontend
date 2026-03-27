@@ -4,6 +4,9 @@ import { Shield, Globe, Box, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../api/client';
 
+const AUTO_SSO_LAST_ATTEMPT_KEY = 'asset_auto_sso_last_attempt';
+const AUTO_SSO_COOLDOWN_MS = 15000;
+
 export default function Login() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -12,6 +15,7 @@ export default function Login() {
 
     useEffect(() => {
         if (!loading && user) {
+            sessionStorage.removeItem(AUTO_SSO_LAST_ATTEMPT_KEY);
             navigate('/dashboard', { replace: true });
         }
     }, [user, loading, navigate]);
@@ -26,12 +30,20 @@ export default function Login() {
             return;
         }
 
+        const now = Date.now();
+        const lastAttempt = Number(sessionStorage.getItem(AUTO_SSO_LAST_ATTEMPT_KEY) || 0);
+        if (lastAttempt > 0 && now - lastAttempt < AUTO_SSO_COOLDOWN_MS) {
+            return;
+        }
+
         ssoAttemptedRef.current = true;
+        sessionStorage.setItem(AUTO_SSO_LAST_ATTEMPT_KEY, String(now));
         window.location.href = `${API_BASE_URL}/oauth2/authorization/directory`;
     }, [loading, user, searchParams]);
 
     const handleLoginClick = () => {
         // Redirect to Asset Backend OAuth2 endpoint using environment variable
+        sessionStorage.setItem(AUTO_SSO_LAST_ATTEMPT_KEY, String(Date.now()));
         window.location.href = `${API_BASE_URL}/oauth2/authorization/directory`;
     };
 

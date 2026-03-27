@@ -34,7 +34,7 @@ export default function OAuth2Callback() {
         // Check for error from Directory
         if (errorParam) {
           setError(`Login failed: ${errorParam}`);
-          setTimeout(() => navigate('/login'), 3000);
+          setTimeout(() => navigate(`/login?error=${encodeURIComponent(errorParam)}`), 3000);
           return;
         }
 
@@ -48,7 +48,7 @@ export default function OAuth2Callback() {
         const isCookieOnlyCallback = callbackPath === '/sso/callback';
         if (!token && !code && !isCookieOnlyCallback) {
           setError('Invalid callback: missing authorization code or token');
-          setTimeout(() => navigate('/login'), 3000);
+          setTimeout(() => navigate('/login?error=invalid_callback'), 3000);
           return;
         }
 
@@ -70,12 +70,12 @@ export default function OAuth2Callback() {
           navigate('/dashboard', { replace: true });
         } else {
           setError('Session validation failed. Please login again.');
-          setTimeout(() => navigate('/login'), 3000);
+          setTimeout(() => navigate('/login?error=session_validation_failed'), 3000);
         }
       } catch (err) {
         console.error('OAuth2 callback error:', err);
         setError('An error occurred during login');
-        setTimeout(() => navigate('/login'), 3000);
+        setTimeout(() => navigate('/login?error=callback_exception'), 3000);
       } finally {
         setLoading(false);
       }

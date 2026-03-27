@@ -38,8 +38,11 @@ api.interceptors.response.use(
             // Clear SSO token (logs out across all apps)
             SSOCookieManager.clearToken();
             SSOCookieManager.signalLogoutAcrossApps();
-            
-            if (window.location.pathname !== '/login') {
+
+            const path = window.location.pathname;
+            // Avoid recursive redirects while callback/login pages are already handling auth errors.
+            const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+            if (!isAuthFlowPath) {
                 window.location.href = getGlobalAuthRedirectUrl();
             }
         }
