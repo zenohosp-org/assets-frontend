@@ -9,6 +9,13 @@ const api = axios.create({
     withCredentials: true,
 });
 
+const getGlobalAuthRedirectUrl = () => {
+    if (API_BASE_URL) {
+        return `${API_BASE_URL}/oauth2/authorization/directory`;
+    }
+    return import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
+};
+
 // ── Request interceptor: inject SSO token ──
 api.interceptors.request.use((config) => {
     const token = SSOCookieManager.getToken();
@@ -33,7 +40,7 @@ api.interceptors.response.use(
             SSOCookieManager.signalLogoutAcrossApps();
             
             if (window.location.pathname !== '/login') {
-                window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
+                window.location.href = getGlobalAuthRedirectUrl();
             }
         }
         return Promise.reject(error);

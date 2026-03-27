@@ -3,6 +3,14 @@ import { getMyProfile, logout as apiLogout, SSOCookieManager } from '../api/clie
 
 const AuthContext = createContext(null);
 
+const getGlobalAuthRedirectUrl = () => {
+    const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL;
+    if (apiBaseUrl) {
+        return `${apiBaseUrl}/oauth2/authorization/directory`;
+    }
+    return import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
+};
+
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -25,7 +33,7 @@ export function AuthProvider({ children }) {
             console.log('AuthContext: Logout signal from another tab detected');
             SSOCookieManager.clearToken();
             setUser(null);
-            window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
+            window.location.href = getGlobalAuthRedirectUrl();
         };
         
         window.addEventListener('sso-logout', handleLogout);
@@ -44,7 +52,7 @@ export function AuthProvider({ children }) {
         SSOCookieManager.signalLogoutAcrossApps();
         
         setUser(null);
-        window.location.href = import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
+        window.location.href = getGlobalAuthRedirectUrl();
     };
 
     /**

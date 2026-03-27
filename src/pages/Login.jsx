@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Shield, Globe, Box, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -8,12 +8,27 @@ export default function Login() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { user, loading } = useAuth();
+    const ssoAttemptedRef = useRef(false);
 
     useEffect(() => {
         if (!loading && user) {
             navigate('/dashboard', { replace: true });
         }
     }, [user, loading, navigate]);
+
+    useEffect(() => {
+        if (loading || user || ssoAttemptedRef.current) {
+            return;
+        }
+
+        // Avoid immediate retry loops when login error is already present.
+        if (searchParams.get('error')) {
+            return;
+        }
+
+        ssoAttemptedRef.current = true;
+        window.location.href = `${API_BASE_URL}/oauth2/authorization/directory`;
+    }, [loading, user, searchParams]);
 
     const handleLoginClick = () => {
         // Redirect to Asset Backend OAuth2 endpoint using environment variable
