@@ -33,7 +33,11 @@ export function AuthProvider({ children }) {
             console.log('AuthContext: Logout signal from another tab detected');
             SSOCookieManager.clearToken();
             setUser(null);
-            window.location.href = getGlobalAuthRedirectUrl();
+            const path = window.location.pathname;
+            const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+            if (!isAuthFlowPath) {
+                window.location.href = getGlobalAuthRedirectUrl();
+            }
         };
         
         window.addEventListener('sso-logout', handleLogout);

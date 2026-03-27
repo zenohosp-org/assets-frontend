@@ -34,14 +34,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        const path = window.location.pathname;
+        const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+
         if (error.response?.status === 401 || error.response?.status === 403) {
             // Clear SSO token (logs out across all apps)
             SSOCookieManager.clearToken();
-            SSOCookieManager.signalLogoutAcrossApps();
+            // Avoid cross-tab logout cascades while callback/login pages are handling auth.
+            if (!isAuthFlowPath) {
+                SSOCookieManager.signalLogoutAcrossApps();
+            }
 
-            const path = window.location.pathname;
             // Avoid recursive redirects while callback/login pages are already handling auth errors.
-            const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
             if (!isAuthFlowPath) {
                 window.location.href = getGlobalAuthRedirectUrl();
             }
