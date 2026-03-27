@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getMyProfile, logout as apiLogout, SSOCookieManager } from '../api/client';
 
 const AuthContext = createContext(null);
+const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
 
 const getGlobalAuthRedirectUrl = () => {
     const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL;
@@ -20,6 +21,7 @@ export function AuthProvider({ children }) {
         getMyProfile()
             .then((res) => {
                 console.log('✅ AuthContext: Profile loaded successfully', res.data);
+                sessionStorage.removeItem(AUTH_REDIRECT_LOCK_KEY);
                 setUser(res.data.data || res.data);
             })
             .catch((err) => {
@@ -67,6 +69,7 @@ export function AuthProvider({ children }) {
         try {
             // Verify with backend using credentials (HttpOnly cookie)
             const res = await getMyProfile();
+            sessionStorage.removeItem(AUTH_REDIRECT_LOCK_KEY);
             setUser(res.data.data || res.data);
             return true;
         } catch (err) {

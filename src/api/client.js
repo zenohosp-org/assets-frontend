@@ -9,11 +9,24 @@ const api = axios.create({
     withCredentials: true,
 });
 
+const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
+const AUTH_REDIRECT_COOLDOWN_MS = 10000;
+
 const getGlobalAuthRedirectUrl = () => {
     if (API_BASE_URL) {
         return `${API_BASE_URL}/oauth2/authorization/directory`;
     }
     return import.meta.env.VITE_ACCOUNTS_LOGIN_URL || '/login';
+};
+
+const shouldTriggerAuthRedirect = () => {
+    const now = Date.now();
+    const last = Number(sessionStorage.getItem(AUTH_REDIRECT_LOCK_KEY) || 0);
+    if (last > 0 && now - last < AUTH_REDIRECT_COOLDOWN_MS) {
+        return false;
+    }
+    sessionStorage.setItem(AUTH_REDIRECT_LOCK_KEY, String(now));
+    return true;
 };
 
 // ── Request interceptor: inject SSO token ──
@@ -36,13 +49,16 @@ api.interceptors.response.use(
     (error) => {
         const path = window.location.pathname;
         const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+        const requestUrl = (error.config?.url || '').toString();
+        const isSessionCheckRequest = requestUrl.includes('/api/user/me');
 
         if (error.response?.status === 401 || error.response?.status === 403) {
             // Do not clear shared cookie on generic auth failures.
             // A 401 during callback/bootstrap can be transient and clearing the cookie causes loops.
 
-            // Avoid recursive redirects while callback/login pages are already handling auth errors.
-            if (!isAuthFlowPath) {
+            // Only trigger global auth when session bootstrap/check fails.
+            // For business endpoints, surface the error to page-level logic without forcing re-login loops.
+            if (isSessionCheckRequest && !isAuthFlowPath && shouldTriggerAuthRedirect()) {
                 window.location.href = getGlobalAuthRedirectUrl();
             }
         }
