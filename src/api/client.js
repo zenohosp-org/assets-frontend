@@ -38,12 +38,8 @@ api.interceptors.response.use(
         const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
 
         if (error.response?.status === 401 || error.response?.status === 403) {
-            // Clear SSO token (logs out across all apps)
-            SSOCookieManager.clearToken();
-            // Avoid cross-tab logout cascades while callback/login pages are handling auth.
-            if (!isAuthFlowPath) {
-                SSOCookieManager.signalLogoutAcrossApps();
-            }
+            // Do not clear shared cookie on generic auth failures.
+            // A 401 during callback/bootstrap can be transient and clearing the cookie causes loops.
 
             // Avoid recursive redirects while callback/login pages are already handling auth errors.
             if (!isAuthFlowPath) {
