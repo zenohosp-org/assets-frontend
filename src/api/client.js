@@ -69,6 +69,9 @@ api.interceptors.response.use(
 // ── Auth & Directory ──
 export const getMyProfile = () => api.get('/api/user/me');
 export const logout = () => api.post('/api/auth/logout');
+export const logoutFromDirectory = () => axios.post(`${DIRECTORY_API_URL}/api/auth/logout`, {}, {
+    withCredentials: true,
+});
 
 // Use Directory API URL from environment variables
 export const getDirectoryUsers = (hospitalId) => axios.get(`${DIRECTORY_API_URL}/api/directory/hospitals/${hospitalId}/users`, {

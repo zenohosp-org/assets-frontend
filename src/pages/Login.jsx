@@ -25,6 +25,10 @@ export default function Login() {
             return;
         }
 
+        if (searchParams.get('logged_out') === '1') {
+            return;
+        }
+
         // Avoid immediate retry loops when login error is already present.
         if (searchParams.get('error')) {
             return;

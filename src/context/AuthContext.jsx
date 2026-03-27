@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getMyProfile, logout as apiLogout, SSOCookieManager } from '../api/client';
+import { getMyProfile, logout as apiLogout, logoutFromDirectory, SSOCookieManager } from '../api/client';
 
 const AuthContext = createContext(null);
 const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
             const path = window.location.pathname;
             const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
             if (!isAuthFlowPath) {
-                window.location.href = getGlobalAuthRedirectUrl();
+                window.location.href = '/login?logged_out=1';
             }
         };
         
@@ -47,18 +47,17 @@ export function AuthProvider({ children }) {
     }, []);
 
     const logout = async () => {
-        try {
-            await apiLogout();
-        } catch (_) {
-            // Ignore logout failures and proceed with client-side cleanup
-        }
+        await Promise.allSettled([
+            apiLogout(),
+            logoutFromDirectory(),
+        ]);
         
         // Clear shared SSO cookie (logs out ACROSS ALL APPS)
         SSOCookieManager.clearToken();
         SSOCookieManager.signalLogoutAcrossApps();
         
         setUser(null);
-        window.location.href = getGlobalAuthRedirectUrl();
+        window.location.href = '/login?logged_out=1';
     };
 
     /**
