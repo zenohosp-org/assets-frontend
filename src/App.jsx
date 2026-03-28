@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import OAuth2Callback from './pages/OAuth2Callback';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
+import Vendors from './pages/Vendors';
 //import AssetDetails from '';
 import AssetCategories from './pages/AssetCategories';
 import ProductGroups from './pages/ProductGroups';
