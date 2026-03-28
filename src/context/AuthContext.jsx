@@ -27,6 +27,23 @@ export function AuthProvider({ children }) {
             .catch((err) => {
                 console.warn('⚠️ AuthContext: No active backend session', err.response?.status, err.message);
                 setUser(null);
+
+                // If initial session check fails while user is on a protected route,
+                // ensure we navigate to the login page rather than leaving a blank app.
+                const path = window.location.pathname;
+                const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+                const isLoginPath = path === '/login';
+                // Only redirect when not on auth-related paths to avoid interfering with active SSO flows.
+                if (!isAuthFlowPath && !isLoginPath) {
+                    // Preserve explicit logged_out query if present; otherwise navigate to login.
+                    const search = new URLSearchParams(window.location.search || '');
+                    const loggedOut = search.get('logged_out');
+                    if (loggedOut === '1') {
+                        window.location.href = '/login?logged_out=1';
+                    } else {
+                        window.location.href = '/login';
+                    }
+                }
             })
             .finally(() => setLoading(false));
         
