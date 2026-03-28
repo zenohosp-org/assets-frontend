@@ -29,10 +29,11 @@ export default function App() {
                                         <Route path="/dashboard" element={<Dashboard />} />
                                         <Route path="/assets" element={<Assets />} />
                                         {/* <Route path="/assets/:id" element={<AssetDetails />} /> */}
-                                        <Route path="/categories" element={<AssetCategories />} />
+                                        <Route path="/asset-categories" element={<AssetCategories />} />
                                         <Route path="/product-groups" element={<ProductGroups />} />
                                         <Route path="/maintenance" element={<Maintenance />} />
                                         <Route path="/transfers" element={<TransfersLogs />} />
+                                        <Route path="/vendors" element={<Vendors/>}/>
                                         <Route path="*" element={<Navigate to="/dashboard" replace />} />
                                     </Routes>
                                 </Layout>
