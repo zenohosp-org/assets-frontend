@@ -96,5 +96,17 @@ export const createMaintenanceRecord = (data) => api.post('/api/maintenance', da
 export const getTransferLogs = () => api.get('/api/transfers');
 export const createTransferLog = (data) => api.post('/api/transfers', data);
 
+// ── Asset Categories ──
+export const getAssetCategories = () => api.get('/api/asset-categories');
+export const createAssetCategory = (data) => api.post('/api/asset-categories', data);
+
+// ── Product Groups ──
+export const getProductGroups = () => api.get('/api/product-groups');
+export const createProductGroup = (data) => api.post('/api/product-groups', data);
+
+// ── Vendors ──
+export const getVendors = () => api.get('/api/vendors');
+export const createVendor = (data) => api.post('/api/vendors', data);
+
 export default api;
 export { SSOCookieManager };

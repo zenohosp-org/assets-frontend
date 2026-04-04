@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Plus } from 'lucide-react';
+import { getVendors, createVendor } from '../api/client';
 
 export default function Vendors() {
     const [vendors, setVendors] = useState([]);
@@ -9,6 +9,7 @@ export default function Vendors() {
     const [vendorGst, setVendorGst] = useState('');
     const [vendorPhone, setVendorPhone] = useState('');
     const [vendorEmail, setVendorEmail] = useState('');
+    const [error, setError] = useState('');
     const [vendorSupplyFlags, setVendorSupplyFlags] = useState({
         medicines: false,
         inventory: false,
@@ -21,21 +22,19 @@ export default function Vendors() {
     }, []);
 
     const fetchVendors = () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        axios.get('/api/vendors', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        getVendors()
             .then(res => setVendors(res.data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('Error fetching vendors:', err);
+                setError('Failed to load vendors');
+            });
     };
 
     const handleCreateVendor = (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
+        setError('');
 
-        axios.post('/api/vendors', {
+        createVendor({
             name: vendorName,
             details: vendorDetails,
             gstNumber: vendorGst,
@@ -46,8 +45,6 @@ export default function Vendors() {
             suppliesEquipment: vendorSupplyFlags.equipment,
             providesServices: vendorSupplyFlags.services,
             hospitalId: localStorage.getItem('hospital_id')
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
         })
             .then(() => {
                 fetchVendors();
@@ -58,7 +55,10 @@ export default function Vendors() {
                 setVendorEmail('');
                 setVendorSupplyFlags({ medicines: false, inventory: false, equipment: false, services: false });
             })
-            .catch(err => alert("Error: " + (err.response?.data?.message || err.message)));
+            .catch(err => {
+                console.error('Error creating vendor:', err);
+                setError(err.response?.data?.message || err.message || 'Failed to create vendor');
+            });
     };
 
     return (
@@ -67,6 +67,7 @@ export default function Vendors() {
 
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-xl font-semibold mb-4">Add Vendor</h2>
+                {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
                 <form onSubmit={handleCreateVendor} className="space-y-4 mb-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Vendor Name</label>

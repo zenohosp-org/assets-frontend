@@ -1,41 +1,41 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Plus } from 'lucide-react';
+import { getAssetCategories, createAssetCategory } from '../api/client';
 
 export default function AssetCategories() {
     const [categories, setCategories] = useState([]);
     const [categoryName, setCategoryName] = useState('');
+    const [error, setError] = useState('');
 
     useEffect(() => {
         fetchCategories();
     }, []);
 
     const fetchCategories = () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        axios.get('/api/asset-categories', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        getAssetCategories()
             .then(res => setCategories(res.data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('Error fetching categories:', err);
+                setError('Failed to load categories');
+            });
     };
 
     const handleCreateCategory = (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
+        setError('');
 
-        axios.post('/api/asset-categories', {
+        createAssetCategory({
             name: categoryName,
             hospitalId: localStorage.getItem('hospital_id')
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
         })
             .then(() => {
                 fetchCategories();
                 setCategoryName('');
             })
-            .catch(err => alert("Error: " + (err.response?.data?.message || err.message)));
+            .catch(err => {
+                console.error('Error creating category:', err);
+                setError(err.response?.data?.message || err.message || 'Failed to create category');
+            });
     };
 
     return (
@@ -44,6 +44,7 @@ export default function AssetCategories() {
 
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-xl font-semibold mb-4">Add Asset Category</h2>
+                {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
                 <form onSubmit={handleCreateCategory} className="space-y-4 mb-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Category Name</label>

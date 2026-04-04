@@ -26,10 +26,10 @@ export default function Layout({ children }) {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="flex min-h-screen bg-slate-50">
             {/* Sidebar */}
-            <aside className="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen">
-                <div className="p-8 border-b border-slate-100 italic font-black text-2xl text-primary flex items-center gap-2">
+            <aside className="sticky top-0 flex-col hidden h-screen bg-white border-r w-72 border-slate-200 lg:flex">
+                <div className="flex items-center gap-2 p-8 text-2xl italic font-black border-b border-slate-100 text-primary">
                     <Tag className="w-8 h-8" />
                     <span>ZenoAssets</span>
                 </div>
@@ -62,7 +62,7 @@ export default function Layout({ children }) {
                         </button>
 
                         {isMastersOpen && (
-                            <div className="mt-1 ml-4 pl-4 border-l-2 border-slate-100 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                            <div className="pl-4 mt-1 ml-4 space-y-1 duration-200 border-l-2 border-slate-100 animate-in slide-in-from-top-2">
                                 {masterItems.map((item) => (
                                     <Link
                                         key={item.path}
@@ -81,16 +81,16 @@ export default function Layout({ children }) {
                     </div>
                 </nav>
 
-                <div className="p-4 border-t border-slate-100 mt-auto">
+                <div className="p-4 mt-auto border-t border-slate-100">
                     {isAdmin && (
-                        <a href="https://directory.zenohosp.com/dashboard" className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-100 font-bold transition-all shadow-sm">
+                        <a href="https://directory.zenohosp.com/dashboard" className="flex items-center gap-3 px-4 py-3 mb-2 font-bold text-indigo-700 transition-all border border-indigo-100 shadow-sm rounded-xl bg-indigo-50 hover:bg-indigo-100">
                             <Globe className="w-5 h-5" />
                             Directory Admin
                         </a>
                     )}
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 font-bold transition-all shadow-sm"
+                        className="flex items-center w-full gap-3 px-4 py-3 font-bold text-red-600 transition-all border border-red-100 shadow-sm rounded-xl bg-red-50 hover:bg-red-100"
                     >
                         <LogOut className="w-5 h-5" />
                         Sign Out
@@ -103,7 +103,7 @@ export default function Layout({ children }) {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 min-w-0 flex flex-col">
+            <main className="flex flex-col flex-1 min-w-0">
                 {children}
             </main>
         </div>
