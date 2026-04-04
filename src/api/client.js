@@ -29,14 +29,12 @@ const shouldTriggerAuthRedirect = () => {
     return true;
 };
 
-// ── Request interceptor: inject SSO token ──
+// ── Request interceptor: Cookie-based SSO ──
+// Browser automatically sends HttpOnly cookies when withCredentials: true
+// No need to manually inject Authorization header
 api.interceptors.request.use((config) => {
-    const token = SSOCookieManager.getToken();
-    
-    // Only add token if it exists and is not expired
-    if (token && !SSOCookieManager.isTokenExpired(token)) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+    // withCredentials is already set on axios instance
+    // Cookies will be sent automatically by the browser
     return config;
 }, (err) => {
     console.error('Request interceptor error', err);

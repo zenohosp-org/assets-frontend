@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { SSOCookieManager } from '../api/client';
 
 /**
  * OAuth2 Callback Handler
  * 
  * Flow:
  * 1. User logs in at Directory → Directory sets SSO cookie on zenohosp.com
- * 2. Directory redirects to /login/oauth2/code/directory?code=...&state=...
- * 3. This component validates the code (CSRF protection)
- * 4. Checks if SSO cookie is present
+ * 2. Directory redirects to /sso/callback (Backend OAuth2SsoSuccessHandler)
+ * 3. This component validates the session with the backend
+ * 4. Backend reads SSO cookie automatically (HttpOnly)
  * 5. Redirects to dashboard
  * 
- * No token exchange needed — cookie is already set by Directory backend
+ * Cookie is already set by Directory backend — no manual token handling needed
  */
 export default function OAuth2Callback() {
   const navigate = useNavigate();
@@ -25,10 +24,6 @@ export default function OAuth2Callback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const callbackPath = window.location.pathname;
-        const token = searchParams.get('token');
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
         const errorParam = searchParams.get('error');
 
         // Check for error from Directory
@@ -38,31 +33,10 @@ export default function OAuth2Callback() {
           return;
         }
 
-        // Support backend success-handler flow: /sso/callback?token=...
-        if (token) {
-          SSOCookieManager.setToken(token);
-        }
-
-        // Support directory redirect flow: /login/oauth2/code/directory?code=...&state=...
-        // Also allow cookie-only completion on /sso/callback.
-        const isCookieOnlyCallback = callbackPath === '/sso/callback';
-        if (!token && !code && !isCookieOnlyCallback) {
-          setError('Invalid callback: missing authorization code or token');
-          setTimeout(() => navigate('/login?error=invalid_callback'), 3000);
-          return;
-        }
-
-        if (code) {
-          // Keep a minimal callback log for troubleshooting
-          console.log('✅ OAuth2 callback received with code:', code.substring(0, 8) + '...');
-          // state is intentionally read for CSRF diagnostics even when cookie-based flow is used
-          if (!state) {
-            console.warn('OAuth2 callback received without state parameter');
-          }
-        }
+        console.log('✅ OAuth2 callback received, validating session with backend');
 
         // SSO cookie should now be set by Directory backend
-        // Validate that we have an active session
+        // Validate that we have an active session using the HttpOnly cookie
         const hasValidSession = await validateSession();
 
         if (hasValidSession) {

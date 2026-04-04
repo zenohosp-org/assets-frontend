@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getMyProfile, logout as apiLogout, logoutFromDirectory, SSOCookieManager } from '../api/client';
+import { getMyProfile, logout as apiLogout, logoutFromDirectory } from '../api/client';
 
 const AuthContext = createContext(null);
 const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // HttpOnly cookies are not readable from JS; verify session by backend call.
+        // Verify session using HttpOnly cookie (browser sends automatically with withCredentials)
         getMyProfile()
             .then((res) => {
                 console.log('✅ AuthContext: Profile loaded successfully', res.data);
@@ -50,7 +50,6 @@ export function AuthProvider({ children }) {
         // Listen for logout signals from other tabs/windows
         const handleLogout = () => {
             console.log('AuthContext: Logout signal from another tab detected');
-            SSOCookieManager.clearToken();
             setUser(null);
             const path = window.location.pathname;
             const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
@@ -64,14 +63,18 @@ export function AuthProvider({ children }) {
     }, []);
 
     const logout = async () => {
-        await Promise.allSettled([
-            apiLogout(),
-            logoutFromDirectory(),
-        ]);
+        try {
+            // Call backend logout endpoints (backend clears HttpOnly cookie)
+            await Promise.allSettled([
+                apiLogout(),
+                logoutFromDirectory(),
+            ]);
+        } catch (err) {
+            console.warn('Logout API call failed:', err);
+        }
         
-        // Clear shared SSO cookie (logs out ACROSS ALL APPS)
-        SSOCookieManager.clearToken();
-        SSOCookieManager.signalLogoutAcrossApps();
+        // Signal other tabs/windows
+        window.dispatchEvent(new Event('sso-logout'));
         
         setUser(null);
         window.location.href = '/login?logged_out=1';
