@@ -12,6 +12,7 @@ import AssetCategories from './pages/AssetCategories';
 import ProductGroups from './pages/ProductGroups';
 import Maintenance from './pages/Maintenance';
 import TransfersLogs from './pages/TransferLogs';
+import ProductsMaster from './pages/ProductsMaster';
 
 export default function App() {
     return (
@@ -36,6 +37,7 @@ export default function App() {
                                         <Route path="/transfers" element={<TransfersLogs />} />
                                         <Route path="/vendors" element={<Vendors/>}/>
                                         <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                                        <Route path="products" element={<ProductsMaster/>}/>
                                     </Routes>
                                 </Layout>
                             </ProtectedRoute>
