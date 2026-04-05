@@ -104,35 +104,28 @@ export function AuthProvider({ children }) {
     }, [user]);
 
     const logout = async () => {
-        console.log('🔴 Logout triggered');
-        
-        // Call backend logout endpoints (backend clears HttpOnly cookie)
-        Promise.allSettled([
-            apiLogout(),
-            logoutFromDirectory(),
-        ]).catch(err => {
-            console.warn('Logout API call failed:', err);
-        });
+        console.log('🔴 Logout initiated');
         
         // Clear local state immediately
         setUser(null);
-        console.log('✅ User state cleared');
+        console.log('✅ Local state cleared');
         
-        // Signal other tabs/windows and cross-app communication
+        // Call API endpoints in background (don't wait)
+        apiLogout().catch(err => console.warn('Assets logout failed:', err));
+        logoutFromDirectory().catch(err => console.warn('Directory logout failed:', err));
+        
+        // Signal to other tabs
         try {
-            const signal = `logout-${Date.now()}`;
-            localStorage.setItem('sso-logout', signal);
+            localStorage.setItem('sso-logout', `${Date.now()}`);
+            window.dispatchEvent(new Event('sso-logout'));
             console.log('✅ Logout signal broadcast');
         } catch (e) {
-            console.warn('Failed to signal logout to other tabs', e);
+            console.warn('Failed to broadcast logout:', e);
         }
-        window.dispatchEvent(new Event('sso-logout'));
         
-        // Redirect to login
-        console.log('🔄 Redirecting to /login');
-        setTimeout(() => {
-            window.location.href = '/login?logged_out=1';
-        }, 100);
+        // Redirect immediately
+        console.log('🔄 Redirecting to login');
+        window.location.href = '/login?logged_out=1';
     };
 
     /**
