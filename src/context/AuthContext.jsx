@@ -117,7 +117,7 @@ export function AuthProvider({ children }) {
         // Signal other tabs/windows and cross-app communication
         try {
             const signal = `logout-${Date.now()}`;
-            sessionStorage.setItem('sso-logout', signal);
+            localStorage.setItem('sso-logout', signal);
         } catch (e) {
             console.warn('Failed to signal logout to other tabs', e);
         }
