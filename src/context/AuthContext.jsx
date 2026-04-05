@@ -57,9 +57,26 @@ export function AuthProvider({ children }) {
                 window.location.href = '/login?logged_out=1';
             }
         };
+
+        // Listen to storage changes from other tabs/windows (same domain)
+        const handleStorageChange = (event) => {
+            if (event.key === 'sso-logout') {
+                console.log('AuthContext: SSO logout signal from storage detected');
+                setUser(null);
+                const path = window.location.pathname;
+                const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+                if (!isAuthFlowPath) {
+                    window.location.href = '/login?logged_out=1';
+                }
+            }
+        };
         
         window.addEventListener('sso-logout', handleLogout);
-        return () => window.removeEventListener('sso-logout', handleLogout);
+        window.addEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('sso-logout', handleLogout);
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
     // When the window/tab regains focus, verify session with backend.
@@ -97,7 +114,13 @@ export function AuthProvider({ children }) {
             console.warn('Logout API call failed:', err);
         }
         
-        // Signal other tabs/windows
+        // Signal other tabs/windows and cross-app communication
+        try {
+            const signal = `logout-${Date.now()}`;
+            sessionStorage.setItem('sso-logout', signal);
+        } catch (e) {
+            console.warn('Failed to signal logout to other tabs', e);
+        }
         window.dispatchEvent(new Event('sso-logout'));
         
         setUser(null);
