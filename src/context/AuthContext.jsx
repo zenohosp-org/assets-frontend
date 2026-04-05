@@ -62,6 +62,30 @@ export function AuthProvider({ children }) {
         return () => window.removeEventListener('sso-logout', handleLogout);
     }, []);
 
+    // When the window/tab regains focus, verify session with backend.
+    // This detects logouts performed in other apps (cross-subdomain) where
+    // the server-side cookie may have been cleared.
+    useEffect(() => {
+        const verifyOnFocus = async () => {
+            if (!user) return;
+            try {
+                await getMyProfile();
+                // still valid — nothing to do
+            } catch (err) {
+                // Session invalidated on server; clear local state and redirect to login
+                setUser(null);
+                const path = window.location.pathname;
+                const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+                if (!isAuthFlowPath) {
+                    window.location.href = '/login?logged_out=1';
+                }
+            }
+        };
+
+        window.addEventListener('focus', verifyOnFocus);
+        return () => window.removeEventListener('focus', verifyOnFocus);
+    }, [user]);
+
     const logout = async () => {
         try {
             // Call backend logout endpoints (backend clears HttpOnly cookie)
