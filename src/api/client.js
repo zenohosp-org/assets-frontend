@@ -98,6 +98,12 @@ export const createTransferLog = (data) => api.post('/api/transfers', data);
 export const getAssetCategories = () => api.get('/api/asset-categories');
 export const createAssetCategory = (data) => api.post('/api/asset-categories', data);
 
+// ── Products ──
+export const getProducts = () => api.get('/api/products');
+export const getProductById = (id) => api.get(`/api/products/${id}`);
+export const createProduct = (data) => api.post('/api/products', data);
+export const updateProduct = (id, data) => api.put(`/api/products/${id}`, data);
+
 // ── Product Groups ──
 export const getProductGroups = () => api.get('/api/product-groups');
 export const createProductGroup = (data) => api.post('/api/product-groups', data);
