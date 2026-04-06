@@ -1,22 +1,54 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Shield, Globe, Box, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../api/client';
+
+const AUTO_SSO_LAST_ATTEMPT_KEY = 'asset_auto_sso_last_attempt';
+const AUTO_SSO_COOLDOWN_MS = 15000;
 
 export default function Login() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { user, loading } = useAuth();
+    const ssoAttemptedRef = useRef(false);
 
     useEffect(() => {
         if (!loading && user) {
+            sessionStorage.removeItem(AUTO_SSO_LAST_ATTEMPT_KEY);
             navigate('/dashboard', { replace: true });
         }
     }, [user, loading, navigate]);
 
+    useEffect(() => {
+        if (loading || user || ssoAttemptedRef.current) {
+            return;
+        }
+
+        if (searchParams.get('logged_out') === '1') {
+            return;
+        }
+
+        // Avoid immediate retry loops when login error is already present.
+        if (searchParams.get('error')) {
+            return;
+        }
+
+        const now = Date.now();
+        const lastAttempt = Number(sessionStorage.getItem(AUTO_SSO_LAST_ATTEMPT_KEY) || 0);
+        if (lastAttempt > 0 && now - lastAttempt < AUTO_SSO_COOLDOWN_MS) {
+            return;
+        }
+
+        ssoAttemptedRef.current = true;
+        sessionStorage.setItem(AUTO_SSO_LAST_ATTEMPT_KEY, String(now));
+        window.location.href = `${API_BASE_URL}/oauth2/authorization/directory`;
+    }, [loading, user, searchParams]);
+
     const handleLoginClick = () => {
-        // Redirect via Vite proxy → Asset Backend → Directory Backend
-        window.location.href = '/oauth2/authorization/directory';
+        // Redirect to Asset Backend OAuth2 endpoint using environment variable
+        sessionStorage.setItem(AUTO_SSO_LAST_ATTEMPT_KEY, String(Date.now()));
+        window.location.href = `${API_BASE_URL}/oauth2/authorization/directory`;
     };
 
     const error = searchParams.get('error') ? (searchParams.get('error_description') || 'SSO login failed.') : null;

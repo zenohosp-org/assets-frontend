@@ -1,40 +1,40 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Plus } from 'lucide-react';
+import { getProductGroups, createProductGroup } from '../api/client';
 
 export default function ProductGroups() {
     const [groups, setGroups] = useState([]);
     const [groupName, setGroupName] = useState('');
+    const [error, setError] = useState('');
 
     useEffect(() => {
         fetchGroups();
     }, []);
 
     const fetchGroups = () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        axios.get('/api/product-groups', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        getProductGroups()
             .then(res => setGroups(res.data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('Error fetching groups:', err);
+                setError('Failed to load product groups');
+            });
     };
 
     const handleCreateGroup = (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
+        setError('');
 
-        axios.post('/api/product-groups', {
+        createProductGroup({
             name: groupName
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
         })
             .then(() => {
                 fetchGroups();
                 setGroupName('');
             })
-            .catch(err => alert("Error: " + (err.response?.data?.message || err.message)));
+            .catch(err => {
+                console.error('Error creating group:', err);
+                setError(err.response?.data?.message || err.message || 'Failed to create product group');
+            });
     };
 
     return (
@@ -43,6 +43,7 @@ export default function ProductGroups() {
 
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-xl font-semibold mb-4">Add Product Group</h2>
+                {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
                 <form onSubmit={handleCreateGroup} className="space-y-4 mb-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Group Name</label>

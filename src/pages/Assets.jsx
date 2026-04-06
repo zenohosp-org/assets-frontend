@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail } from 'lucide-react';
-import { getAssets, createAsset, updateAsset, deleteAsset } from '../api/client';
+import { getAssets, createAsset, updateAsset, deleteAsset, getProducts, getVendors, getAssetCategories } from '../api/client';
 
 export default function Assets() {
     const [assets, setAssets] = useState([]);
@@ -36,61 +36,28 @@ export default function Assets() {
         assignedTo: ''
     });
 
-    const fetchAssets = () => {
-        setLoading(true);
-        getAssets()
-            .then(res => setAssets(res.data))
-            .catch(err => console.error(err))
-            .finally(() => setLoading(false));
-    };
-
-    const fetchProducts = async () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        try {
-            const res = await fetch('/api/products', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-            setProducts(data);
-        } catch (err) {
-            console.error('Failed to fetch products', err);
-        }
-    };
-
-    const fetchVendors = async () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        try {
-            const res = await fetch('/api/vendors', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-            setVendors(data);
-        } catch (err) {
-            console.error('Failed to fetch vendors', err);
-        }
-    };
-
-    const fetchCategories = async () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        try {
-            const res = await fetch('/api/asset-categories', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-            setCategories(data);
-        } catch (err) {
-            console.error('Failed to fetch categories', err);
-        }
-    };
 
     useEffect(() => {
-        fetchAssets();
-        fetchProducts();
-        fetchVendors();
-        fetchCategories();
+        const loadAllData = async () => {
+            setLoading(true);
+            try {
+                const [assetsRes, productsRes, vendorsRes, categoriesRes] = await Promise.all([
+                    getAssets(),
+                    getProducts(),
+                    getVendors(),
+                    getAssetCategories()
+                ]);
+                setAssets(assetsRes.data);
+                setProducts(productsRes.data);
+                setVendors(vendorsRes.data);
+                setCategories(categoriesRes.data);
+            } catch (err) {
+                console.error('Failed to load data:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadAllData();
     }, []);
 
     const resetForm = () => {
@@ -170,7 +137,17 @@ export default function Assets() {
             } else {
                 await createAsset(payload);
             }
-            fetchAssets();
+            // Refresh all data in parallel
+            const [assetsRes, productsRes, vendorsRes, categoriesRes] = await Promise.all([
+                getAssets(),
+                getProducts(),
+                getVendors(),
+                getAssetCategories()
+            ]);
+            setAssets(assetsRes.data);
+            setProducts(productsRes.data);
+            setVendors(vendorsRes.data);
+            setCategories(categoriesRes.data);
             handleCloseModal();
         } catch (error) {
             console.error('Failed to save asset:', error);
@@ -185,7 +162,17 @@ export default function Assets() {
         if (window.confirm('Are you sure you want to delete this asset?')) {
             try {
                 await deleteAsset(id);
-                fetchAssets();
+                // Refresh all data in parallel
+                const [assetsRes, productsRes, vendorsRes, categoriesRes] = await Promise.all([
+                    getAssets(),
+                    getProducts(),
+                    getVendors(),
+                    getAssetCategories()
+                ]);
+                setAssets(assetsRes.data);
+                setProducts(productsRes.data);
+                setVendors(vendorsRes.data);
+                setCategories(categoriesRes.data);
             } catch (error) {
                 console.error('Failed to delete asset:', error);
                 alert('Failed to delete asset.');
@@ -208,8 +195,8 @@ export default function Assets() {
     );
 
     return (
-        <div className="p-6 md:p-10 space-y-8 relative">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative p-6 space-y-8 md:p-10">
+            <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900">Asset Inventory</h1>
                     <p className="text-slate-500 text-sm mt-0.5">Manage all institutional physical hardware.</p>
@@ -224,26 +211,26 @@ export default function Assets() {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                <div className="p-5 bg-white border shadow-sm rounded-2xl border-slate-200">
                     <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Total Inventory</div>
                     <div className="text-3xl font-black text-slate-900">{assets.length}</div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-5 bg-white border shadow-sm rounded-2xl border-slate-200">
                     <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Medical Equipment</div>
                     <div className="text-3xl font-black text-blue-600">{assets.filter(a => a.category?.name?.includes('MEDICAL')).length}</div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-5 bg-white border shadow-sm rounded-2xl border-slate-200">
                     <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Warranty Active</div>
                     <div className="text-3xl font-black text-emerald-600">{assets.filter(a => a.warrantyExpiry && new Date(a.warrantyExpiry) > new Date()).length}</div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-5 bg-white border shadow-sm rounded-2xl border-slate-200">
                     <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">In Maintenance</div>
                     <div className="text-3xl font-black text-purple-600">{assets.filter(a => a.status === 'MAINTENANCE').length}</div>
                 </div>
             </div>
 
-            <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+            <div className="flex items-center gap-3 p-2 bg-white border shadow-sm rounded-2xl border-slate-200">
                 <div className="pl-3">
                     <Search className="w-5 h-5 text-slate-400" />
                 </div>
@@ -256,16 +243,16 @@ export default function Assets() {
                 />
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="overflow-hidden bg-white border shadow-sm rounded-2xl border-slate-200">
                 <div className="overflow-x-auto min-h-[400px]">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Asset Info</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Type</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Code / Serial</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Warranty Info</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="border-b bg-slate-50/50 border-slate-100">
+                                <th className="px-6 py-4 text-xs font-bold tracking-widest uppercase text-slate-500">Asset Info</th>
+                                <th className="px-6 py-4 text-xs font-bold tracking-widest uppercase text-slate-500">Type</th>
+                                <th className="px-6 py-4 text-xs font-bold tracking-widest uppercase text-slate-500">Code / Serial</th>
+                                <th className="px-6 py-4 text-xs font-bold tracking-widest uppercase text-slate-500">Warranty Info</th>
+                                <th className="px-6 py-4 text-xs font-bold tracking-widest text-right uppercase text-slate-500">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -273,8 +260,8 @@ export default function Assets() {
                                 <tr>
                                     <td colSpan="5" className="px-6 py-20 text-center">
                                         <div className="flex flex-col items-center justify-center gap-3 text-slate-400">
-                                            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                                            <p className="font-medium text-sm animate-pulse">Loading asset database...</p>
+                                            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                                            <p className="text-sm font-medium animate-pulse">Loading asset database...</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -282,7 +269,7 @@ export default function Assets() {
                                 <tr>
                                     <td colSpan="5" className="px-6 py-20 text-center">
                                         <div className="flex flex-col items-center justify-center gap-3 text-slate-400">
-                                            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100 mb-2">
+                                            <div className="flex items-center justify-center w-16 h-16 mb-2 border rounded-full bg-slate-50 border-slate-100">
                                                 <HardDrive className="w-8 h-8 text-slate-300" />
                                             </div>
                                             <p className="font-medium text-slate-600">No assets found</p>
@@ -291,9 +278,9 @@ export default function Assets() {
                                     </td>
                                 </tr>
                             ) : filteredAssets.map((asset) => (
-                                <tr key={asset.assetId} className="hover:bg-slate-50/80 transition-colors group">
+                                <tr key={asset.assetId} className="transition-colors hover:bg-slate-50/80 group">
                                     <td className="px-6 py-4">
-                                        <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{asset.assetName}</div>
+                                        <div className="font-bold transition-colors text-slate-900 group-hover:text-blue-600">{asset.assetName}</div>
                                         <div className="text-xs text-slate-500 mt-1 flex items-center gap-1.5 border border-slate-200 inline-flex px-2 py-0.5 rounded-md bg-white">
                                             <Tag className="w-3 h-3" /> {asset.vendor?.name || 'Unknown Vendor'}
                                         </div>
@@ -319,26 +306,26 @@ export default function Assets() {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right relative">
+                                    <td className="relative px-6 py-4 text-right">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setActiveDropdown(activeDropdown === asset.assetId ? null : asset.assetId);
                                             }}
-                                            className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                                            className="p-2 transition-all rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100"
                                         >
                                             <MoreVertical className="w-5 h-5" />
                                         </button>
 
                                         {activeDropdown === asset.assetId && (
-                                            <div className="absolute right-8 top-10 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-10 py-1 origin-top-right animate-in fade-in slide-in-from-top-2">
+                                            <div className="absolute z-10 w-48 py-1 origin-top-right bg-white border shadow-xl right-8 top-10 border-slate-200 rounded-xl animate-in fade-in slide-in-from-top-2">
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleOpenModal(asset); }}
                                                     className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
                                                 >
                                                     <Edit2 className="w-4 h-4 text-blue-500" /> Edit Details
                                                 </button>
-                                                <div className="h-px bg-slate-100 my-1"></div>
+                                                <div className="h-px my-1 bg-slate-100"></div>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleDelete(asset.assetId); }}
                                                     className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 font-medium"
@@ -361,22 +348,22 @@ export default function Assets() {
                     <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[2px] transition-opacity" onClick={handleCloseModal}></div>
 
                     <div className="bg-white shadow-2xl w-full md:w-[600px] h-full flex flex-col relative z-10 animate-in slide-in-from-right duration-300">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-20">
+                        <div className="sticky top-0 z-20 flex items-center justify-between p-6 bg-white border-b border-slate-100">
                             <h2 className="text-xl font-bold text-slate-900">
                                 {editingAsset ? 'Edit Asset Details' : 'Add New Asset'}
                             </h2>
-                            <button onClick={handleCloseModal} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
+                            <button onClick={handleCloseModal} className="p-2 transition-colors text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         <div className="p-6 overflow-y-auto">
                             <form id="asset-form" onSubmit={handleSubmit} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     {/* Primary Info */}
                                     <div className="space-y-4 md:col-span-2">
-                                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-2">Primary Info</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <h3 className="pb-2 mb-2 text-xs font-bold tracking-widest uppercase border-b text-slate-400 border-slate-100">Primary Info</h3>
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Asset Name *</label>
                                                 <input required type="text" value={formData.assetName} onChange={(e) => setFormData({ ...formData, assetName: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300" placeholder="e.g. MRI Scanner Model X" />
@@ -437,8 +424,8 @@ export default function Assets() {
 
                                     {/* Identification */}
                                     <div className="space-y-4 md:col-span-2">
-                                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-2">Identification</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <h3 className="pb-2 mb-2 text-xs font-bold tracking-widest uppercase border-b text-slate-400 border-slate-100">Identification</h3>
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Make / Brand</label>
                                                 <input type="text" value={formData.make} onChange={(e) => setFormData({ ...formData, make: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300" placeholder="e.g. GE Healthcare" />
@@ -460,8 +447,8 @@ export default function Assets() {
 
                                     {/* Maintenance */}
                                     <div className="space-y-4 md:col-span-2">
-                                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-2">Maintenance & Warranty</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <h3 className="pb-2 mb-2 text-xs font-bold tracking-widest uppercase border-b text-slate-400 border-slate-100">Maintenance & Warranty</h3>
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Warranty Expiry</label>
                                                 <input type="date" value={formData.warrantyExpiry} onChange={(e) => setFormData({ ...formData, warrantyExpiry: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
@@ -473,7 +460,7 @@ export default function Assets() {
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1.5">AMC Cost (Annual)</label>
                                                 <div className="relative">
-                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                                                    <span className="absolute font-medium -translate-y-1/2 left-4 top-1/2 text-slate-400">$</span>
                                                     <input type="number" step="0.01" value={formData.amcCost} onChange={(e) => setFormData({ ...formData, amcCost: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 pl-8 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300" placeholder="0.00" />
                                                 </div>
                                             </div>
@@ -482,16 +469,16 @@ export default function Assets() {
 
                                     {/* Other */}
                                     <div className="space-y-4 md:col-span-2">
-                                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-100 pb-2">Additional Notes</h3>
+                                        <h3 className="pb-2 mb-2 text-xs font-bold tracking-widest uppercase border-b text-slate-400 border-slate-100">Additional Notes</h3>
                                         <div>
-                                            <textarea rows="3" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300 resize-none" placeholder="Add any special instructions, condition notes, or specifications here..."></textarea>
+                                            <textarea rows="3" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="w-full px-4 py-3 transition-all border outline-none resize-none border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-300" placeholder="Add any special instructions, condition notes, or specifications here..."></textarea>
                                         </div>
                                     </div>
                                 </div>
                             </form>
                         </div>
 
-                        <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 sticky bottom-0">
+                        <div className="sticky bottom-0 flex justify-end gap-3 p-6 border-t border-slate-100 bg-slate-50/50">
                             <button type="button" onClick={handleCloseModal} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">
                                 Close
                             </button>
