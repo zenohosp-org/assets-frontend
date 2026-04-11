@@ -1,5 +1,4 @@
 import axios from 'axios';
-import SSOCookieManager from '../utils/ssoManager';
 
 export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL;
 const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL;
@@ -72,11 +71,12 @@ export const logoutFromDirectory = () => axios.post(`${DIRECTORY_API_URL}/api/au
 });
 
 // Use Directory API URL from environment variables
-export const getDirectoryUsers = (hospitalId) => axios.get(`${DIRECTORY_API_URL}/api/directory/hospitals/${hospitalId}/users`, {
-    headers: {
-        'Authorization': `Bearer ${SSOCookieManager.getToken()}`
+export const getDirectoryUsers = (hospitalId) => axios.get(
+    `${DIRECTORY_API_URL}/api/directory/hospitals/${hospitalId}/users`,
+    {
+        withCredentials: true,
     }
-});
+);
 
 // ── Assets ──
 export const getAssets = () => api.get('/api/assets');
@@ -113,4 +113,3 @@ export const getVendors = () => api.get('/api/vendors');
 export const createVendor = (data) => api.post('/api/vendors', data);
 
 export default api;
-export { SSOCookieManager };
