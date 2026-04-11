@@ -17,11 +17,13 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(!user); // if user exists, don't need to load
 
     useEffect(() => {
-        if (localStorage.getItem(LOGOUT_FLAG_KEY)) {
+        const justLoggedOut = localStorage.getItem(LOGOUT_FLAG_KEY);
+        if (justLoggedOut) {
+            localStorage.removeItem(LOGOUT_FLAG_KEY); // clear it immediately, only blocks once
             setLoading(false);
             return;
         }
-        if (!user && loading) {
+        if (!user) {
             getMyProfile()
                 .then((res) => {
                     const userData = res.data.data || res.data;
