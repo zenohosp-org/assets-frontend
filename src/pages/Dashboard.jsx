@@ -1,17 +1,38 @@
 import { useState, useEffect } from 'react';
-import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package } from 'lucide-react';
+import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package, XCircle } from 'lucide-react';
 import api, { getAssets } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
+    const { user, loading: authLoading } = useAuth();
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [ssoError, setSsoError] = useState(null);
 
     const [transferLogs, setTransferLogs] = useState([]);
     const [maintenanceRecords, setMaintenanceRecords] = useState([]);
 
-    if(!SSO) navigate('/login'); // Redirect to login if not authenticated
-
+    // Validate SSO authentication
     useEffect(() => {
+        if (authLoading) return;
+
+        if (!user) {
+            setSsoError('Your session has expired. Please log in again.');
+            setLoading(false);
+            return;
+        }
+
+        setSsoError(null);
+    }, [user, authLoading]);
+
+    // Fetch dashboard data
+    useEffect(() => {
+        // Only fetch if user is authenticated and no SSO error
+        if (!user || ssoError) {
+            setLoading(false);
+            return;
+        }
+
         Promise.all([
             getAssets(),
             api.get('/api/transfers'),
@@ -22,9 +43,16 @@ export default function Dashboard() {
                 setTransferLogs(transfersRes.data);
                 setMaintenanceRecords(maintRes.data);
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err);
+                if (err.response?.status === 401) {
+                    setSsoError('Unauthorized. Please log in again.');
+                } else {
+                    setSsoError('Failed to load dashboard data.');
+                }
+            })
             .finally(() => setLoading(false));
-    }, []);
+    }, [user, ssoError]);
 
     const maintenanceCount = assets.filter(a => a.status === 'MAINTENANCE').length;
     const reliability = assets.length > 0 ? (100 - (maintenanceCount / assets.length * 100)).toFixed(0) + '%' : '100%';
@@ -54,9 +82,28 @@ export default function Dashboard() {
 
     return (
         <div className="p-6 space-y-10 md:p-10">
+            {ssoError && (
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
+                    <XCircle className="flex-shrink-0 w-5 h-5 text-red-600 mt-0.5" />
+                    <div className="flex-1">
+                        <h3 className="font-semibold text-red-900">{ssoError}</h3>
+                        <p className="text-sm text-red-800 mt-1">
+                            <a href="/login" className="underline font-medium hover:no-underline">
+                                Return to login
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            )}
+
             <header>
                 <h1 className="text-3xl font-black tracking-tight text-slate-900">System Overview</h1>
-                <p className="font-medium text-slate-500">Real-time health and distribution metrics for institutional assets.</p>
+                {user && (
+                    <p className="font-medium text-slate-500">Welcome, {user.firstName || user.email}. Real-time health and distribution metrics for institutional assets.</p>
+                )}
+                {!user && !authLoading && (
+                    <p className="font-medium text-slate-500">Real-time health and distribution metrics for institutional assets.</p>
+                )}
             </header>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -68,7 +115,7 @@ export default function Dashboard() {
                             </div>
                             <div>
                                 <p className="text-xs font-black tracking-widest uppercase text-slate-400">{stat.label}</p>
-                                <p className="mt-1 text-3xl font-black text-slate-900">{loading ? '...' : stat.value}</p>
+                                <p className="mt-1 text-3xl font-black text-slate-900">{loading || authLoading ? '...' : stat.value}</p>
                             </div>
                         </div>
                     </div>
