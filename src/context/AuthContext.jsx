@@ -6,38 +6,33 @@ const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
 const LOGOUT_FLAG_KEY = 'sso_logout_flag';
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(() => {
-        try {
-            const stored = sessionStorage.getItem('asset_user');
-            return stored ? JSON.parse(stored) : null;
-        } catch {
-            return null;
-        }
-    });
-    const [loading, setLoading] = useState(!user); // if user exists, don't need to load
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const justLoggedOut = localStorage.getItem(LOGOUT_FLAG_KEY);
         if (justLoggedOut) {
-            localStorage.removeItem(LOGOUT_FLAG_KEY); // clear it immediately, only blocks once
+            localStorage.removeItem(LOGOUT_FLAG_KEY);
+            sessionStorage.removeItem('asset_user');
+            setUser(null);
             setLoading(false);
             return;
         }
-        if (!user) {
-            getMyProfile()
-                .then((res) => {
-                    const userData = res.data.data || res.data;
-                    sessionStorage.setItem('asset_user', JSON.stringify(userData));
-                    setUser(userData);
-                })
-                .catch(() => {
-                    sessionStorage.removeItem('asset_user');
-                    setUser(null);
-                })
-                .finally(() => setLoading(false));
-        } else {
-            setLoading(false);
-        }
+
+        // Always verify with backend — sessionStorage is just a cache,
+        // the HttpOnly cookie is the source of truth
+        setLoading(true);
+        getMyProfile()
+            .then((res) => {
+                const userData = res.data.data || res.data;
+                sessionStorage.setItem('asset_user', JSON.stringify(userData));
+                setUser(userData);
+            })
+            .catch(() => {
+                sessionStorage.removeItem('asset_user');
+                setUser(null);
+            })
+            .finally(() => setLoading(false));
     }, []);
     // When the window/tab regains focus, verify session with backend.
     // This detects logouts performed in other apps (cross-subdomain) where
