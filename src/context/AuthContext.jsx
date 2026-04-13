@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { getMyProfile, logout as apiLogout, logoutFromDirectory } from '../api/client';
+import { getMyProfile, logout as apiLogout, logoutFromDirectory, logoutFromInventory } from '../api/client';
 
 const AuthContext = createContext(null);
 const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
@@ -98,13 +98,16 @@ export function AuthProvider({ children }) {
             window.dispatchEvent(new Event('sso-logout'));
         } catch (e) {}
 
-        // Clear cookies on both backends before redirecting
+        // Clear cookies on all backends before redirecting
         try {
             await Promise.all([
-                apiLogout(),           // clears sso_token on api-asset.zenohosp.com
-                logoutFromDirectory()  // clears sso_token on api-directory.zenohosp.com
+                apiLogout(),
+                logoutFromDirectory(),
+                logoutFromInventory()
             ]);
-        } catch (e) {}
+        } catch (e) {
+            console.error("SSO logout failed", e);
+        }
 
         window.location.href = '/login?logged_out=1';
     }, []);

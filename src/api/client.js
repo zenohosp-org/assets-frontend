@@ -2,6 +2,7 @@ import axios from 'axios';
 
 export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL;
 const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL;
+const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL;
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -67,6 +68,9 @@ api.interceptors.response.use(
 export const getMyProfile = () => api.get('/api/user/me');
 export const logout = () => api.post('/api/auth/logout');
 export const logoutFromDirectory = () => axios.post(`${DIRECTORY_API_URL}/api/auth/logout`, {}, {
+    withCredentials: true,
+});
+export const logoutFromInventory = () => axios.post(`${INVENTORY_API_URL}/api/auth/logout`, {}, {
     withCredentials: true,
 });
 
