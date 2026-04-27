@@ -44,8 +44,8 @@ export default function TransferLogs() {
                 getTransferLogs(),
                 getAssets()
             ]);
-            setLogs(logsRes.data);
-            setAssets(assetsRes.data);
+            setLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
+            setAssets(Array.isArray(assetsRes.data) ? assetsRes.data : []);
 
             if (user?.hospitalId) {
                 try {
@@ -96,16 +96,21 @@ export default function TransferLogs() {
         setFormData(prev => ({ ...prev, asset: { assetId }, fromEntityName: fromName }));
     };
 
+    const userName = (u) => [u.firstName, u.lastName].filter(Boolean).join(' ');
+    const userRole = (u) => u.role?.displayName || u.role?.name || '';
+
     const handleUserPick = (u) => {
-        setFormData(prev => ({ ...prev, toUserId: u.id, toEntityName: u.name }));
-        setUserSearch(u.name);
+        const name = userName(u);
+        setFormData(prev => ({ ...prev, toUserId: u.id, toEntityName: name }));
+        setUserSearch(name);
         setUserDropdownOpen(false);
     };
 
-    const filteredUsers = users.filter(u =>
-        u.name?.toLowerCase().includes(userSearch.toLowerCase()) ||
-        u.role?.toLowerCase().includes(userSearch.toLowerCase())
-    );
+    const filteredUsers = users.filter(u => {
+        const term = userSearch.toLowerCase();
+        return userName(u).toLowerCase().includes(term) ||
+            userRole(u).toLowerCase().includes(term);
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -338,8 +343,8 @@ export default function TransferLogs() {
                                                             onClick={() => handleUserPick(u)}
                                                             className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors border-b border-slate-50 last:border-0"
                                                         >
-                                                            <p className="text-sm font-medium text-slate-900">{u.name}</p>
-                                                            <p className="text-xs text-slate-400 capitalize">{u.role}</p>
+                                                            <p className="text-sm font-medium text-slate-900">{userName(u)}</p>
+                                                            <p className="text-xs text-slate-400">{userRole(u)}</p>
                                                         </button>
                                                     ))}
                                                 </div>
