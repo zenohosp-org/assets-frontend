@@ -21,7 +21,7 @@ export default function Layout({ children }) {
 
     const masterItems = [
         { label: 'Vendors', path: '/vendors', icon: Users },
-        { label: 'Asset Categories', path: '/asset-categories', icon: Layers },
+        { label: 'Asset Categories', path: '/asset-categories', icon: Layers }
     ];
 
     return (

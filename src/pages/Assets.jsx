@@ -124,6 +124,8 @@ export default function Assets() {
         // Backend (Spring) will throw 400 if it gets "" for these types
         const payload = {
             ...formData,
+            assetCode: formData.assetCode === '' ? null : formData.assetCode,
+            serialNumber: formData.serialNumber === '' ? null : formData.serialNumber,
             amcCost: formData.amcCost === '' ? null : parseFloat(formData.amcCost),
             purchasePrice: formData.purchasePrice === '' ? null : parseFloat(formData.purchasePrice),
             warrantyExpiry: formData.warrantyExpiry === '' ? null : formData.warrantyExpiry,
