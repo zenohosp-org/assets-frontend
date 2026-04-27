@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail } from 'lucide-react';
-import { getAssets, createAsset, updateAsset, deleteAsset, getProducts, getVendors, getAssetCategories } from '../api/client';
 import '../styles/common.css';
 import '../styles/buttons.css';
 import '../styles/cards.css';
@@ -8,10 +6,11 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/assets.css';
+import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail } from 'lucide-react';
+import { getAssets, createAsset, updateAsset, deleteAsset, getVendors, getAssetCategories } from '../api/client';
 
 export default function Assets() {
     const [assets, setAssets] = useState([]);
-    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -28,7 +27,6 @@ export default function Assets() {
         assetName: '',
         category: null,
         vendor: null,
-        product: null,
         assetCode: '',
         serialNumber: '',
         make: '',
@@ -48,14 +46,12 @@ export default function Assets() {
         const loadAllData = async () => {
             setLoading(true);
             try {
-                const [assetsRes, productsRes, vendorsRes, categoriesRes] = await Promise.all([
+                const [assetsRes, vendorsRes, categoriesRes] = await Promise.all([
                     getAssets(),
-                    getProducts(),
                     getVendors(),
                     getAssetCategories()
                 ]);
                 setAssets(assetsRes.data);
-                setProducts(productsRes.data);
                 setVendors(vendorsRes.data);
                 setCategories(categoriesRes.data);
             } catch (err) {
@@ -72,7 +68,6 @@ export default function Assets() {
             assetName: '',
             category: null,
             vendor: null,
-            product: null,
             assetCode: '',
             serialNumber: '',
             make: '',
@@ -96,7 +91,6 @@ export default function Assets() {
                 assetName: asset.assetName || '',
                 category: asset.category ? { id: asset.category.id } : null,
                 vendor: asset.vendor ? { id: asset.vendor.id } : null,
-                product: asset.product ? { id: asset.product.id } : null,
                 assetCode: asset.assetCode || '',
                 serialNumber: asset.serialNumber || '',
                 make: asset.make || '',
@@ -144,15 +138,12 @@ export default function Assets() {
             } else {
                 await createAsset(payload);
             }
-            // Refresh all data in parallel
-            const [assetsRes, productsRes, vendorsRes, categoriesRes] = await Promise.all([
+            const [assetsRes, vendorsRes, categoriesRes] = await Promise.all([
                 getAssets(),
-                getProducts(),
                 getVendors(),
                 getAssetCategories()
             ]);
             setAssets(assetsRes.data);
-            setProducts(productsRes.data);
             setVendors(vendorsRes.data);
             setCategories(categoriesRes.data);
             handleCloseModal();
@@ -169,15 +160,12 @@ export default function Assets() {
         if (window.confirm('Are you sure you want to delete this asset?')) {
             try {
                 await deleteAsset(id);
-                // Refresh all data in parallel
-                const [assetsRes, productsRes, vendorsRes, categoriesRes] = await Promise.all([
+                const [assetsRes, vendorsRes, categoriesRes] = await Promise.all([
                     getAssets(),
-                    getProducts(),
                     getVendors(),
                     getAssetCategories()
                 ]);
                 setAssets(assetsRes.data);
-                setProducts(productsRes.data);
                 setVendors(vendorsRes.data);
                 setCategories(categoriesRes.data);
             } catch (error) {
@@ -396,33 +384,6 @@ export default function Assets() {
                                                     <option value="">Select Vendor</option>
                                                     {vendors.map(v => (
                                                         <option key={v.id} value={v.id}>{v.name}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div className="md:col-span-2">
-                                                <label className="app-label">Link to Product Master (Optional)</label>
-                                                <select
-                                                    value={formData.product?.id || ''}
-                                                    onChange={(e) => {
-                                                        const pId = e.target.value;
-                                                        if (!pId) {
-                                                            setFormData({ ...formData, product: null });
-                                                            return;
-                                                        }
-                                                        const p = products.find(x => x.id === pId);
-                                                        if (p) {
-                                                            setFormData({
-                                                                ...formData,
-                                                                product: { id: p.id },
-                                                                assetName: formData.assetName || p.name,
-                                                                vendor: formData.vendor || (p.vendor ? p.vendor.name : '')
-                                                            });
-                                                        }
-                                                    }}
-                                                    className="app-input">
-                                                    <option value="">-- Custom Asset --</option>
-                                                    {products.map(p => (
-                                                        <option key={p.id} value={p.id}>{p.name} ({p.productGroup?.name})</option>
                                                     ))}
                                                 </select>
                                             </div>

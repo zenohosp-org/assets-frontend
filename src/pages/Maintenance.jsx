@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMaintenanceRecords, createMaintenanceRecord, getAssets } from '../api/client';
+import { getMaintenanceRecords, createMaintenanceRecord, getAssets, getVendors } from '../api/client';
 import { Activity, AlertCircle, Wrench, Calendar, Tag, DollarSign, Search, Plus, X, Loader2 } from 'lucide-react';
 import '../styles/common.css';
 import '../styles/buttons.css';
@@ -35,11 +35,11 @@ export default function Maintenance() {
             const [mRes, aRes, vRes] = await Promise.all([
                 getMaintenanceRecords(),
                 getAssets(),
-                fetch('/api/vendors', { headers: { Authorization: `Bearer ${localStorage.getItem('asset_jwt')}` } }).then(r => r.json())
+                getVendors()
             ]);
             setRecords(mRes.data);
             setAssets(aRes.data);
-            setVendors(vRes);
+            setVendors(vRes.data);
         } catch (err) {
             console.error(err);
         } finally {
