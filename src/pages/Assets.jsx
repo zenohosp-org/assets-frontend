@@ -117,6 +117,8 @@ export default function Assets() {
         // Backend (Spring) will throw 400 if it gets "" for these types
         const payload = {
             ...formData,
+            assetCode: formData.assetCode === '' ? null : formData.assetCode,
+            serialNumber: formData.serialNumber === '' ? null : formData.serialNumber,
             amcCost: formData.amcCost === '' ? null : parseFloat(formData.amcCost),
             purchasePrice: formData.purchasePrice === '' ? null : parseFloat(formData.purchasePrice),
             warrantyExpiry: formData.warrantyExpiry === '' ? null : formData.warrantyExpiry,
@@ -421,7 +423,7 @@ export default function Assets() {
                                             <div>
                                                 <label className="block text-sm font-medium text-slate-700 mb-1.5">AMC Cost (Annual)</label>
                                                 <div className="relative">
-                                                    <span className="absolute font-medium -translate-y-1/2 left-4 top-1/2 text-slate-400">$</span>
+                                                    <span className="absolute font-medium -translate-y-1/2 left-4 top-1/2 text-slate-400">₹</span>
                                                     <input type="number" step="0.01" value={formData.amcCost} onChange={(e) => setFormData({ ...formData, amcCost: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 pl-8 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300" placeholder="0.00" />
                                                 </div>
                                             </div>
