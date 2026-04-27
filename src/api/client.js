@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL;
-const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL;
-const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL;
+export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'https://api-asset.zenohosp.com';
+const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL || 'https://api-directory.zenohosp.com';
+const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL || 'https://api-inventory.zenohosp.com';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -31,15 +31,19 @@ const shouldTriggerAuthRedirect = () => {
 
 // ── Request interceptor: Cookie-based SSO ──
 // Browser automatically sends HttpOnly cookies when withCredentials: true
-// No need to manually inject Authorization header
 api.interceptors.request.use((config) => {
-    // withCredentials is already set on axios instance
-    // Cookies will be sent automatically by the browser
     return config;
 }, (err) => {
-    console.error('Request interceptor error', err);
     return Promise.reject(err);
 });
+
+// Inject real JWT on all requests when mock auth is enabled (local dev only)
+if (import.meta.env.VITE_DEV_MOCK_AUTH === 'true' && import.meta.env.VITE_MOCK_JWT) {
+    api.interceptors.request.use((config) => {
+        config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
+        return config;
+    });
+}
 
 // ── Response interceptor to handle 401/403 and logout across all apps ──
 api.interceptors.response.use(
@@ -102,18 +106,10 @@ export const createTransferLog = (data) => api.post('/api/transfers', data);
 export const getAssetCategories = () => api.get('/api/asset-categories');
 export const createAssetCategory = (data) => api.post('/api/asset-categories', data);
 
-// ── Products ──
-export const getProducts = () => api.get('/api/products');
-export const getProductById = (id) => api.get(`/api/products/${id}`);
-export const createProduct = (data) => api.post('/api/products', data);
-export const updateProduct = (id, data) => api.put(`/api/products/${id}`, data);
-
-// ── Product Groups ──
-export const getProductGroups = () => api.get('/api/product-groups');
-export const createProductGroup = (data) => api.post('/api/product-groups', data);
-
 // ── Vendors ──
 export const getVendors = () => api.get('/api/vendors');
 export const createVendor = (data) => api.post('/api/vendors', data);
+export const updateVendor = (id, data) => api.put(`/api/vendors/${id}`, data);
+export const deleteVendor = (id) => api.delete(`/api/vendors/${id}`);
 
 export default api;

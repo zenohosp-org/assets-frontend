@@ -7,12 +7,9 @@ import OAuth2Callback from './pages/OAuth2Callback';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
 import Vendors from './pages/Vendors';
-//import AssetDetails from '';
 import AssetCategories from './pages/AssetCategories';
-import ProductGroups from './pages/ProductGroups';
 import Maintenance from './pages/Maintenance';
 import TransfersLogs from './pages/TransferLogs';
-import ProductsMaster from './pages/ProductsMaster';
 
 export default function App() {
     return (
@@ -30,14 +27,11 @@ export default function App() {
                                     <Routes>
                                         <Route path="/dashboard" element={<Dashboard />} />
                                         <Route path="/assets" element={<Assets />} />
-                                        {/* <Route path="/assets/:id" element={<AssetDetails />} /> */}
                                         <Route path="/asset-categories" element={<AssetCategories />} />
-                                        <Route path="/product-groups" element={<ProductGroups />} />
                                         <Route path="/maintenance" element={<Maintenance />} />
                                         <Route path="/transfers" element={<TransfersLogs />} />
-                                        <Route path="/vendors" element={<Vendors/>}/>
+                                        <Route path="/vendors" element={<Vendors />} />
                                         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                                        <Route path="products" element={<ProductsMaster/>}/>
                                     </Routes>
                                 </Layout>
                             </ProtectedRoute>
