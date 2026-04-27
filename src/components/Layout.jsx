@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, History, Activity, Settings, LayoutDashboard, Tag, FileText, Globe, LogOut, ChevronDown, ChevronRight, Layers, Package, Users } from 'lucide-react';
+import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, LogOut, ChevronDown, ChevronRight, Layers, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Layout({ children }) {
@@ -9,7 +9,7 @@ export default function Layout({ children }) {
 
     // Check if user has an admin role
     const [isAdmin, setIsAdmin] = useState(user?.role === 'hospital_admin' || user?.role === 'super_admin' || user?.role?.toLowerCase() === 'admin');
-    const [isMastersOpen, setIsMastersOpen] = useState(location.pathname.startsWith('/vendors') || location.pathname.startsWith('/products') || location.pathname.startsWith('/product-groups') || location.pathname.startsWith('/asset-categories'));
+    const [isMastersOpen, setIsMastersOpen] = useState(location.pathname.startsWith('/vendors') || location.pathname.startsWith('/asset-categories'));
 
     const navItems = [
         { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -20,7 +20,6 @@ export default function Layout({ children }) {
 
     const masterItems = [
         { label: 'Vendors', path: '/vendors', icon: Users },
-        { label: 'Product Groups', path: '/product-groups', icon: Package },
         { label: 'Asset Categories', path: '/asset-categories', icon: Layers },
         { label: 'Products Master', path: '/products', icon: Settings },
     ];

@@ -25,8 +25,7 @@ export default function AssetCategories() {
         setError('');
 
         createAssetCategory({
-            name: categoryName,
-            hospitalId: localStorage.getItem('hospital_id')
+            name: categoryName
         })
             .then(() => {
                 fetchCategories();
