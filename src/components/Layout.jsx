@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, LogOut, ChevronDown, ChevronRight, Layers, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import '../styles/layout.css';
 
 export default function Layout({ children }) {
     const location = useLocation();
@@ -24,25 +25,22 @@ export default function Layout({ children }) {
     ];
 
     return (
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="app-layout">
             {/* Sidebar */}
-            <aside className="sticky top-0 flex-col hidden h-screen bg-white border-r w-72 border-slate-200 lg:flex">
-                <div className="flex items-center gap-2 p-8 text-2xl italic font-black border-b border-slate-100 text-primary">
-                    <Tag className="w-8 h-8" />
+            <aside className="app-sidebar">
+                <div className="app-sidebar-header">
+                    <Tag />
                     <span>ZenoAssets</span>
                 </div>
 
-                <nav className="flex-1 p-6 space-y-2">
+                <nav className="app-sidebar-nav">
                     {navItems.map((item) => (
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${location.pathname === item.path
-                                ? 'bg-primary/10 text-primary shadow-sm'
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                                }`}
+                            className={`app-sidebar-link ${location.pathname === item.path ? 'active' : 'inactive'}`}
                         >
-                            <item.icon className="w-5 h-5" />
+                            <item.icon />
                             {item.label}
                         </Link>
                     ))}
@@ -50,27 +48,24 @@ export default function Layout({ children }) {
                     <div className="pt-2">
                         <button
                             onClick={() => setIsMastersOpen(!isMastersOpen)}
-                            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isMastersOpen ? 'text-slate-900 bg-slate-50/50' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
+                            className={`app-sidebar-dropdown-trigger ${isMastersOpen ? 'open' : 'closed'}`}
                         >
-                            <div className="flex items-center gap-3">
-                                <Settings className="w-5 h-5 text-slate-400" />
+                            <div className="app-sidebar-dropdown-trigger-content">
+                                <Settings />
                                 <span>Masters</span>
                             </div>
-                            {isMastersOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                            {isMastersOpen ? <ChevronDown /> : <ChevronRight />}
                         </button>
 
                         {isMastersOpen && (
-                            <div className="pl-4 mt-1 ml-4 space-y-1 duration-200 border-l-2 border-slate-100 animate-in slide-in-from-top-2">
+                            <div className="app-sidebar-dropdown-menu">
                                 {masterItems.map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
-                                        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${location.pathname === item.path
-                                            ? 'text-primary bg-primary/5'
-                                            : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
-                                            }`}
+                                        className={`app-sidebar-sublink ${location.pathname === item.path ? 'active' : 'inactive'}`}
                                     >
-                                        <item.icon className="w-4 h-4" />
+                                        <item.icon />
                                         {item.label}
                                     </Link>
                                 ))}
@@ -79,29 +74,29 @@ export default function Layout({ children }) {
                     </div>
                 </nav>
 
-                <div className="p-4 mt-auto border-t border-slate-100">
+                <div className="app-sidebar-footer">
                     {isAdmin && (
-                        <a href="https://directory.zenohosp.com/dashboard" className="flex items-center gap-3 px-4 py-3 mb-2 font-bold text-indigo-700 transition-all border border-indigo-100 shadow-sm rounded-xl bg-indigo-50 hover:bg-indigo-100">
-                            <Globe className="w-5 h-5" />
+                        <a href="https://directory.zenohosp.com/dashboard" className="app-sidebar-btn admin">
+                            <Globe />
                             Directory Admin
                         </a>
                     )}
                     <button
                         onClick={logout}
-                        className="flex items-center w-full gap-3 px-4 py-3 font-bold text-red-600 transition-all border border-red-100 shadow-sm rounded-xl bg-red-50 hover:bg-red-100"
+                        className="app-sidebar-btn logout"
                     >
-                        <LogOut className="w-5 h-5" />
+                        <LogOut />
                         Sign Out
                     </button>
                 </div>
 
-                <div className="p-4 border-t border-slate-100 italic text-slate-400 text-[10px] font-black uppercase tracking-widest text-center">
+                <div className="app-sidebar-copyright">
                     &copy; 2026 Institutional Asset Manager
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex flex-col flex-1 min-w-0">
+            <main className="app-main">
                 {children}
             </main>
         </div>

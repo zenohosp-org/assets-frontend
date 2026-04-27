@@ -111,7 +111,7 @@ export function AuthProvider({ children }) {
         try {
             localStorage.setItem('sso-logout', `${Date.now()}`);
             window.dispatchEvent(new Event('sso-logout'));
-        } catch (e) {}
+        } catch (e) { }
 
         // Clear cookies on all backends before redirecting
         try {
@@ -147,10 +147,10 @@ export function AuthProvider({ children }) {
         }
     }, []);
 
-    const isSuperAdmin   = user?.role?.toLowerCase() === 'super_admin';
+    const isSuperAdmin = user?.role?.toLowerCase() === 'super_admin';
     const isHospitalAdmin = user?.role?.toLowerCase() === 'hospital_admin';
-    const isDoctor       = user?.role?.toLowerCase() === 'doctor';
-    const isStaff        = user?.role?.toLowerCase() === 'staff';
+    const isDoctor = user?.role?.toLowerCase() === 'doctor';
+    const isStaff = user?.role?.toLowerCase() === 'staff';
 
     return (
         <AuthContext.Provider

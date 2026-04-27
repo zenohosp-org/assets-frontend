@@ -1,0 +1,131 @@
+.maintenance-stat-card-orange,
+.maintenance-stat-card-blue {
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+    transition: box-shadow 150ms ease;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.maintenance-stat-card-orange:hover,
+.maintenance-stat-card-blue:hover {
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.08);
+}
+
+.maintenance-stat-icon-wrapper-orange,
+.maintenance-stat-icon-wrapper-blue {
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: transparent;
+    border-radius: 0;
+}
+
+.maintenance-stat-icon-wrapper-orange {
+    color: #f97316;
+}
+
+.maintenance-stat-icon-wrapper-blue {
+    color: #2563eb;
+}
+
+.maintenance-stat-label-orange,
+.maintenance-stat-label-blue {
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.maintenance-stat-value-orange,
+.maintenance-stat-value-blue {
+    margin-top: 18px;
+    font-size: 36px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: #000000;
+}
+
+.maintenance-stat-value-orange {
+    color: #000000;
+}
+
+.maintenance-stat-value-blue {
+    color: #000000;
+}
+
+.maintenance-asset-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.maintenance-asset-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.maintenance-asset-name {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.maintenance-asset-code {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.maintenance-date-cell {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    color: #475569;
+}
+
+.maintenance-type-badge-repair,
+.maintenance-type-badge-maintenance {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.maintenance-type-badge-repair {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.maintenance-type-badge-maintenance {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+
+.maintenance-vendor-name {
+    font-weight: 500;
+    color: #334155;
+}
+
+.maintenance-vendor-cost {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.maintenance-details-cell {
+    max-width: 300px;
+    font-size: 14px;
+    color: #475569;
+}

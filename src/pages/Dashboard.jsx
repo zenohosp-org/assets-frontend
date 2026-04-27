@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package, XCircle } from 'lucide-react';
 import api, { getAssets } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import '../styles/common.css';
+import '../styles/cards.css';
+import '../styles/pages/dashboard.css';
 
 export default function Dashboard() {
     const { user, loading: authLoading } = useAuth();
@@ -58,10 +61,10 @@ export default function Dashboard() {
     const reliability = assets.length > 0 ? (100 - (maintenanceCount / assets.length * 100)).toFixed(0) + '%' : '100%';
 
     const stats = [
-        { label: 'Total Assets', value: assets.length, icon: Package, color: 'text-primary', bg: 'bg-primary/10' },
-        { label: 'Assigned', value: assets.filter(a => a.assignedTo).length, icon: User, color: 'text-secondary', bg: 'bg-secondary/10' },
-        { label: 'In Maintenance', value: maintenanceCount, icon: AlertCircle, color: 'text-orange-500', bg: 'bg-orange-50' },
-        { label: 'Reliability', value: reliability, icon: Activity, color: 'text-green-500', bg: 'bg-green-50' },
+        { label: 'Total Assets', value: assets.length, icon: Package, variant: 'primary' },
+        { label: 'Assigned', value: assets.filter(a => a.assignedTo).length, icon: User, variant: 'secondary' },
+        { label: 'In Maintenance', value: maintenanceCount, icon: AlertCircle, variant: 'warning' },
+        { label: 'Reliability', value: reliability, icon: Activity, variant: 'success' },
     ];
 
     // Combine recent activities
@@ -81,14 +84,14 @@ export default function Dashboard() {
     ].sort((a, b) => b.rawDate - a.rawDate).slice(0, 5);
 
     return (
-        <div className="p-6 space-y-10 md:p-10">
+        <div className="app-page">
             {ssoError && (
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
-                    <XCircle className="flex-shrink-0 w-5 h-5 text-red-600 mt-0.5" />
-                    <div className="flex-1">
-                        <h3 className="font-semibold text-red-900">{ssoError}</h3>
-                        <p className="text-sm text-red-800 mt-1">
-                            <a href="/login" className="underline font-medium hover:no-underline">
+                <div className="dashboard-alert">
+                    <XCircle className="dashboard-alert-icon" />
+                    <div className="dashboard-alert-body">
+                        <h3 className="dashboard-alert-title">{ssoError}</h3>
+                        <p className="dashboard-alert-text">
+                            <a href="/login" className="dashboard-alert-link">
                                 Return to login
                             </a>
                         </p>
@@ -96,38 +99,38 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <header>
-                <h1 className="text-3xl font-black tracking-tight text-slate-900">System Overview</h1>
+            <header className="app-page-title-wrapper">
+                <h1 className="app-page-title">System Overview</h1>
                 {user && (
-                    <p className="font-medium text-slate-500">Welcome, {user.firstName || user.email}. Real-time health and distribution metrics for institutional assets.</p>
+                    <p className="app-page-subtitle">Welcome, {user.firstName || user.email}. Real-time health and distribution metrics for institutional assets.</p>
                 )}
                 {!user && !authLoading && (
-                    <p className="font-medium text-slate-500">Real-time health and distribution metrics for institutional assets.</p>
+                    <p className="app-page-subtitle">Real-time health and distribution metrics for institutional assets.</p>
                 )}
             </header>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="app-stats-grid">
                 {stats.map((stat) => (
-                    <div key={stat.label} className="p-6 transition-all bg-white border shadow-sm rounded-3xl border-slate-200 hover:shadow-xl group">
-                        <div className="flex flex-col gap-4">
-                            <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center transition-transform group-hover:scale-110`}>
-                                <stat.icon className="w-6 h-6" />
+                    <div key={stat.label} className="dashboard-stat-card group">
+                        <div className="dashboard-stat-content">
+                            <div className={`dashboard-stat-icon-wrapper dashboard-stat-icon-wrapper--${stat.variant}`}>
+                                <stat.icon className="dashboard-stat-icon" />
                             </div>
                             <div>
-                                <p className="text-xs font-black tracking-widest uppercase text-slate-400">{stat.label}</p>
-                                <p className="mt-1 text-3xl font-black text-slate-900">{loading || authLoading ? '...' : stat.value}</p>
+                                <p className="dashboard-stat-label">{stat.label}</p>
+                                <p className="dashboard-stat-value">{loading || authLoading ? '...' : stat.value}</p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <div className="p-8 bg-white border shadow-sm rounded-3xl border-slate-200">
-                    <h2 className="flex items-center gap-2 mb-6 text-xl font-bold text-slate-900">
-                        <TrendingUp className="text-primary" /> Assets Added (Last 7 Days)
+            <div className="dashboard-charts-layout">
+                <div className="app-card dashboard-chart-card">
+                    <h2 className="dashboard-chart-title">
+                        <TrendingUp className="dashboard-chart-title-icon--primary" /> Assets Added (Last 7 Days)
                     </h2>
-                    <div className="flex items-end justify-between h-64 gap-2 px-4">
+                    <div className="dashboard-chart-bars">
                         {(() => {
                             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                             const today = new Date();
@@ -144,14 +147,14 @@ export default function Dashboard() {
                             const max = Math.max(...counts, 5); // Default scale to 5 if no data
 
                             return last7Days.map((date, i) => (
-                                <div key={i} className="relative flex-1 bg-slate-50 rounded-t-xl group">
+                                <div key={i} className="dashboard-chart-bar-wrapper group">
                                     <div
-                                        className="absolute bottom-0 left-0 right-0 flex items-center justify-center transition-all bg-primary/20 rounded-t-xl group-hover:bg-primary/40"
-                                        style={{ height: `${(counts[i] / max) * 100}%`, minHeight: counts[i] > 0 ? '10%' : '0%' }}
+                                        className="dashboard-chart-bar-fill"
+                                        style={{ height: `${(counts[i] / max) * 100}%`, minHeight: counts[i] > 0 ? '10px' : '0px' }}
                                     >
-                                        {counts[i] > 0 && <span className="text-[10px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity">{counts[i]}</span>}
+                                        {counts[i] > 0 && <span className="dashboard-chart-bar-label">{counts[i]}</span>}
                                     </div>
-                                    <div className="absolute -bottom-6 left-0 right-0 text-center text-[10px] font-black text-slate-400">
+                                    <div className="dashboard-chart-bar-day">
                                         {days[date.getDay()]}
                                     </div>
                                 </div>
@@ -160,22 +163,22 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <div className="p-8 bg-white border shadow-sm rounded-3xl border-slate-200">
-                    <h2 className="flex items-center gap-2 mb-6 text-xl font-bold text-slate-900">
-                        <Clock className="text-secondary" /> Recent Activity
+                <div className="app-card dashboard-chart-card">
+                    <h2 className="dashboard-chart-title">
+                        <Clock className="dashboard-chart-title-icon--secondary" /> Recent Activity
                     </h2>
-                    <div className="space-y-6">
+                    <div className="dashboard-activity-list">
                         {loading ? (
-                            <p className="text-sm italic text-slate-400">Loading activity...</p>
+                            <p className="dashboard-activity-loading">Loading activity...</p>
                         ) : recentActivity.length === 0 ? (
-                            <p className="text-sm italic text-slate-400">No recent activity recorded.</p>
+                            <p className="dashboard-activity-empty">No recent activity recorded.</p>
                         ) : recentActivity.map((activity, i) => (
-                            <div key={i} className="flex items-center justify-between pb-4 border-b border-slate-50 last:border-0 last:pb-0">
+                            <div key={i} className="dashboard-activity-item">
                                 <div>
-                                    <p className="font-bold text-slate-900">{activity.action}</p>
-                                    <p className="text-sm text-slate-500">{activity.item}</p>
+                                    <p className="dashboard-activity-action">{activity.action}</p>
+                                    <p className="dashboard-activity-target">{activity.item}</p>
                                 </div>
-                                <span className="text-[10px] font-black text-slate-400 uppercase">{activity.time}</span>
+                                <span className="dashboard-activity-time">{activity.time}</span>
                             </div>
                         ))}
                     </div>

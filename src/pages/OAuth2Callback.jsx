@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/common.css';
+import '../styles/pages/oauth2-callback.css';
 
 /**
  * OAuth2 Callback Handler
@@ -60,63 +62,27 @@ export default function OAuth2Callback() {
 
   if (error) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: '#f5f5f5',
-      }}>
-        <div style={{
-          padding: '40px',
-          borderRadius: '8px',
-          backgroundColor: '#fff',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          textAlign: 'center',
-          maxWidth: '400px',
-        }}>
-          <h2 style={{ color: '#d32f2f' }}>Login Error</h2>
-          <p>{error}</p>
-          <p style={{ fontSize: '0.9em', color: '#666' }}>Redirecting to login...</p>
+      <div className="oauth2-callback-page">
+        <div className="oauth2-callback-card">
+          <h2 className="oauth2-callback-error-title">Login Error</h2>
+          <p className="oauth2-callback-text">{error}</p>
+          <p className="oauth2-callback-subtext">Redirecting to login...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      backgroundColor: '#f5f5f5',
-    }}>
-      <div style={{
-        padding: '40px',
-        borderRadius: '8px',
-        backgroundColor: '#fff',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        textAlign: 'center',
-      }}>
-        <h2>Completing Login...</h2>
+    <div className="oauth2-callback-page">
+      <div className="oauth2-callback-card">
+        <h2 className="oauth2-callback-title">Completing Login...</h2>
         {loading && (
-          <div style={{
-            marginTop: '20px',
-            fontSize: '3em',
-            animation: 'spin 1s linear infinite',
-          }}>
+          <div className="oauth2-callback-spinner">
             ⏳
           </div>
         )}
-        <p style={{ color: '#666' }}>Please wait while we verify your session.</p>
+        <p className="oauth2-callback-subtext">Please wait while we verify your session.</p>
       </div>
-      
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

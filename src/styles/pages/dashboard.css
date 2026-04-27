@@ -1,0 +1,248 @@
+.dashboard-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+}
+
+.dashboard-alert-icon {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    color: #dc2626;
+}
+
+.dashboard-alert-body {
+    flex: 1;
+}
+
+.dashboard-alert-title {
+    font-weight: 600;
+    color: #7f1d1d;
+}
+
+.dashboard-alert-text {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #991b1b;
+}
+
+.dashboard-alert-link {
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.dashboard-alert-link:hover {
+    text-decoration: none;
+}
+
+.dashboard-stat-card {
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+    transition: box-shadow 150ms ease;
+}
+
+.dashboard-stat-card:hover {
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.08);
+}
+
+.dashboard-stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.dashboard-stat-icon-wrapper {
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: transparent;
+    border-radius: 0;
+}
+
+.group:hover .dashboard-stat-icon-wrapper {
+    transform: none;
+}
+
+.dashboard-stat-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.dashboard-stat-icon-wrapper--primary {
+    color: #16a34a;
+    background: transparent;
+}
+
+.dashboard-stat-icon-wrapper--secondary {
+    color: #2563eb;
+    background: transparent;
+}
+
+.dashboard-stat-icon-wrapper--warning {
+    color: #f97316;
+    background: transparent;
+}
+
+.dashboard-stat-icon-wrapper--success {
+    color: #9333ea;
+    background: transparent;
+}
+
+.dashboard-stat-label {
+    font-size: 24px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.dashboard-stat-value {
+    margin-top: 18px;
+    font-size: 36px;
+    line-height: 1.1;
+    font-weight: 600;
+}
+
+.dashboard-charts-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+    align-items: stretch;
+    flex: 1;
+}
+
+.dashboard-chart-card {
+    padding: 32px;
+    display: flex;
+    flex-direction: column
+}
+
+.dashboard-chart-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.dashboard-chart-title-icon--primary {
+    color: #000000;
+}
+
+.dashboard-chart-title-icon--secondary {
+    color: #059669;
+}
+
+.dashboard-chart-bars {
+    height: 256px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 16px;
+    flex: 1;
+}
+
+.dashboard-chart-bar-wrapper {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    background: #f8fafc;
+    border-radius: 12px 12px 0 0;
+}
+
+.dashboard-chart-bar-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px 12px 0 0;
+    background: rgba(59, 130, 246, 0.2);
+    transition: all 150ms ease;
+}
+
+.group:hover .dashboard-chart-bar-fill {
+    background: rgba(59, 130, 246, 0.4);
+}
+
+.dashboard-chart-bar-label {
+    font-size: 10px;
+    font-weight: 900;
+    color: #000000;
+    opacity: 0;
+    transition: opacity 150ms ease;
+}
+
+.group:hover .dashboard-chart-bar-label {
+    opacity: 1;
+}
+
+.dashboard-chart-bar-day {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -24px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 900;
+    color: #94a3b8;
+}
+
+.dashboard-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+}
+
+.dashboard-activity-loading,
+.dashboard-activity-empty {
+    font-size: 14px;
+    font-style: italic;
+    color: #94a3b8;
+}
+
+.dashboard-activity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.dashboard-activity-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.dashboard-activity-action {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.dashboard-activity-target {
+    margin-top: 2px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.dashboard-activity-time {
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #94a3b8;
+}

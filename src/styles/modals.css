@@ -1,0 +1,90 @@
+.app-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.app-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    transition: opacity 150ms ease;
+}
+
+.app-modal-content {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+    animation: appZoomIn 200ms ease-out;
+    overflow: hidden;
+}
+
+@keyframes appZoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.app-modal-header {
+    padding: 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(248, 250, 252, 0.5);
+}
+
+.app-modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.app-modal-close {
+    padding: 8px;
+    color: #94a3b8;
+    border-radius: 12px;
+    transition: background-color 150ms ease, color 150ms ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-modal-close:hover {
+    color: #334155;
+    background: #f1f5f9;
+}
+
+.app-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.app-modal-footer {
+    padding: 20px;
+    border-top: 1px solid #f1f5f9;
+    background: rgba(248, 250, 252, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}

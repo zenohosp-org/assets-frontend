@@ -1,0 +1,13 @@
+.products-master-td-bold {
+    font-weight: 500;
+    color: #111827;
+}
+
+.products-master-td-wrap {
+    color: #6b7280;
+}
+
+.products-master-empty {
+    color: #6b7280;
+    font-style: italic;
+}

@@ -1,0 +1,28 @@
+.product-groups-list-title {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 18px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.product-groups-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.product-groups-list-item {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.product-groups-empty {
+    font-size: 14px;
+    font-style: italic;
+    color: #6b7280;
+}
