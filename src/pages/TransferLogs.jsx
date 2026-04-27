@@ -37,8 +37,8 @@ export default function TransferLogs() {
                 getTransferLogs(),
                 getAssets()
             ]);
-            setLogs(logsRes.data);
-            setAssets(assetsRes.data);
+            setLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
+            setAssets(Array.isArray(assetsRes.data) ? assetsRes.data : []);
 
             if (user?.hospitalId) {
                 try {

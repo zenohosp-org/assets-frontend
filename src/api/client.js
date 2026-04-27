@@ -79,12 +79,16 @@ export const logoutFromInventory = () => axios.post(`${INVENTORY_API_URL}/api/au
 });
 
 // Use Directory API URL from environment variables
-export const getDirectoryUsers = (hospitalId) => axios.get(
-    `${DIRECTORY_API_URL}/api/directory/hospitals/${hospitalId}/users`,
-    {
-        withCredentials: true,
+export const getDirectoryUsers = (hospitalId) => {
+    const headers = {};
+    if (import.meta.env.VITE_DEV_MOCK_AUTH === 'true' && import.meta.env.VITE_MOCK_JWT) {
+        headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
     }
-);
+    return axios.get(
+        `${DIRECTORY_API_URL}/api/directory/hospitals/${hospitalId}/users`,
+        { withCredentials: true, headers }
+    );
+};
 
 // ── Assets ──
 export const getAssets = () => api.get('/api/assets');
