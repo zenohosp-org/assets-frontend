@@ -3,6 +3,8 @@ import '../styles/common.css';
 import '../styles/buttons.css';
 import '../styles/cards.css';
 import '../styles/forms.css';
+import '../styles/tables.css';
+import '../styles/modals.css';
 import '../styles/pages/vendors.css';
 import { Users, Plus, Edit2, Trash2, X, Search } from 'lucide-react';
 import { getVendors, createVendor, updateVendor, deleteVendor } from '../api/client';
@@ -128,88 +130,86 @@ export default function Vendors() {
         v.city?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const inputCls = 'w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all';
-
     return (
-        <div className="p-6 md:p-10 space-y-6">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <Users className="text-blue-600" /> Vendors
+        <div className="app-page">
+            <header className="app-page-header">
+                <div className="app-page-title-wrapper">
+                    <h1 className="app-page-title">
+                        <Users className="app-page-title-icon" /> Vendors
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1">Manage service vendors for asset maintenance.</p>
+                    <p className="app-page-subtitle">Manage service vendors for asset maintenance.</p>
                 </div>
-                <button onClick={() => handleOpenModal()} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]">
-                    <Plus className="w-4 h-4" /> Add Vendor
+                <button onClick={() => handleOpenModal()} className="app-btn app-btn-primary">
+                    <Plus size={16} /> Add Vendor
                 </button>
             </header>
 
-            <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-                <div className="pl-3">
-                    <Search className="w-5 h-5 text-slate-400" />
+            <div className="app-search-wrapper">
+                <div className="app-search-icon-wrapper">
+                    <Search size={20} />
                 </div>
                 <input
                     type="text"
                     placeholder="Search by name, GST, or city..."
-                    className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 placeholder:text-slate-400 py-2.5 outline-none"
+                    className="app-search-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+            <div className="app-table-wrapper">
+                <div className="app-table-container">
+                    <table className="app-table">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Vendor</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Contact</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">GST Type</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">GST / PAN</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Location</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="app-table-thead-row">
+                                <th className="app-table-th">Vendor</th>
+                                <th className="app-table-th">Contact</th>
+                                <th className="app-table-th">GST Type</th>
+                                <th className="app-table-th">GST / PAN</th>
+                                <th className="app-table-th">Location</th>
+                                <th className="app-table-th">Status</th>
+                                <th className="app-table-th" style={{ textAlign: 'right' }}>Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="app-table-tbody">
                             {loading ? (
-                                <tr><td colSpan="7" className="px-6 py-12 text-center text-slate-400">Loading vendors...</td></tr>
+                                <tr><td colSpan="7"><div className="app-empty">Loading vendors...</div></td></tr>
                             ) : filtered.length === 0 ? (
-                                <tr><td colSpan="7" className="px-6 py-12 text-center text-slate-400">No vendors found.</td></tr>
+                                <tr><td colSpan="7"><div className="app-empty">No vendors found.</div></td></tr>
                             ) : filtered.map((v) => (
-                                <tr key={v.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-6 py-4">
-                                        <p className="font-bold text-slate-900">{v.name}</p>
-                                        {v.email && <p className="text-xs text-slate-400 mt-0.5">{v.email}</p>}
+                                <tr key={v.id} className="app-table-row">
+                                    <td className="app-table-td">
+                                        <p className="vendors-table-name">{v.name}</p>
+                                        {v.email && <p className="vendors-table-subtext">{v.email}</p>}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-600">
-                                        <p>{v.contactName || '-'}</p>
-                                        <p className="text-xs text-slate-400">{v.phone || ''}</p>
+                                    <td className="app-table-td">
+                                        <p className="vendors-table-text">{v.contactName || '-'}</p>
+                                        <p className="vendors-table-subtext">{v.phone || ''}</p>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="app-table-td">
                                         {v.gstRegistrationType
-                                            ? <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-slate-200">{v.gstRegistrationType}</span>
-                                            : <span className="text-slate-300 text-sm">-</span>}
+                                            ? <span className="app-badge app-badge-gray">{v.gstRegistrationType}</span>
+                                            : <span className="vendors-table-subtext">-</span>}
                                     </td>
-                                    <td className="px-6 py-4 text-sm font-mono text-slate-600">
-                                        <p>{v.gstNumber || '-'}</p>
-                                        <p className="text-xs text-slate-400">{v.panNumber || ''}</p>
+                                    <td className="app-table-td">
+                                        <p className="vendors-table-mono">{v.gstNumber || '-'}</p>
+                                        <p className="vendors-table-subtext">{v.panNumber || ''}</p>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-600">
-                                        {[v.city, v.state, v.pincode].filter(Boolean).join(', ') || '-'}
+                                    <td className="app-table-td">
+                                        <p className="vendors-table-text">{[v.city, v.state, v.pincode].filter(Boolean).join(', ') || '-'}</p>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight border ${v.isActive !== false ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-500 border-red-100'}`}>
+                                    <td className="app-table-td">
+                                        <span className={`app-badge ${v.isActive !== false ? 'app-badge-green' : 'app-badge-red'}`}>
                                             {v.isActive !== false ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button onClick={() => handleOpenModal(v)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
-                                                <Edit2 className="w-4 h-4" />
+                                    <td className="app-table-td">
+                                        <div className="vendors-table-actions">
+                                            <button onClick={() => handleOpenModal(v)} className="app-btn-icon" title="Edit">
+                                                <Edit2 size={16} />
                                             </button>
-                                            <button onClick={() => handleDelete(v.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
-                                                <Trash2 className="w-4 h-4" />
+                                            <button onClick={() => handleDelete(v.id)} className="app-btn-icon" title="Delete" style={{ color: '#ef4444' }}>
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </td>
@@ -221,46 +221,46 @@ export default function Vendors() {
             </div>
 
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col relative z-10 animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                            <h2 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Vendor' : 'Add New Vendor'}</h2>
-                            <button onClick={() => setShowModal(false)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
-                                <X className="w-5 h-5" />
+                <div className="app-modal-overlay">
+                    <div className="app-modal-backdrop" onClick={() => setShowModal(false)}></div>
+                    <div className="app-modal-content">
+                        <div className="app-modal-header">
+                            <h2 className="app-modal-title">{editingId ? 'Edit Vendor' : 'Add New Vendor'}</h2>
+                            <button onClick={() => setShowModal(false)} className="app-modal-close">
+                                <X size={20} />
                             </button>
                         </div>
 
-                        <div className="p-6 overflow-y-auto">
-                            <form id="vendor-form" onSubmit={handleSave} className="space-y-4">
+                        <div className="app-modal-body">
+                            <form id="vendor-form" onSubmit={handleSave} className="app-form">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Vendor Name *</label>
-                                    <input type="text" required className={inputCls} value={formData.name}
+                                    <label className="app-label">Vendor Name *</label>
+                                    <input type="text" required className="app-input" value={formData.name}
                                         onChange={set('name')} placeholder="e.g. ABC Medical Supplies Pvt. Ltd." />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="app-form-grid">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Contact Person</label>
-                                        <input type="text" className={inputCls} value={formData.contactName}
+                                        <label className="app-label">Contact Person</label>
+                                        <input type="text" className="app-input" value={formData.contactName}
                                             onChange={set('contactName')} placeholder="Full name" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Phone</label>
-                                        <input type="tel" className={inputCls} value={formData.phone}
+                                        <label className="app-label">Phone</label>
+                                        <input type="tel" className="app-input" value={formData.phone}
                                             onChange={set('phone')} placeholder="+91 98765 43210" />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
-                                    <input type="email" className={inputCls} value={formData.email}
+                                    <label className="app-label">Email</label>
+                                    <input type="email" className="app-input" value={formData.email}
                                         onChange={set('email')} placeholder="vendor@example.com" />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">GST Registration Type</label>
-                                    <select className={inputCls} value={formData.gstRegistrationType}
+                                    <label className="app-label">GST Registration Type</label>
+                                    <select className="app-input" value={formData.gstRegistrationType}
                                         onChange={set('gstRegistrationType')}>
                                         <option value="">Select type...</option>
                                         {GST_TYPES.map(t => (
@@ -269,50 +269,51 @@ export default function Vendors() {
                                     </select>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="app-form-grid">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">GST Number</label>
-                                        <input type="text" className={inputCls} value={formData.gstNumber}
+                                        <label className="app-label">GST Number</label>
+                                        <input type="text" className="app-input" value={formData.gstNumber}
                                             onChange={handleGstChange} placeholder="22AAAAA0000A1Z5" maxLength={15} />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">PAN Number</label>
-                                        <input type="text" className={inputCls} value={formData.panNumber}
+                                        <label className="app-label">PAN Number</label>
+                                        <input type="text" className="app-input" value={formData.panNumber}
                                             onChange={set('panNumber')} placeholder="AAAAA0000A" />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Address</label>
-                                    <textarea className={`${inputCls} resize-none`} rows="2" value={formData.address}
+                                    <label className="app-label">Address</label>
+                                    <textarea className="app-textarea" rows="2" value={formData.address}
                                         onChange={set('address')} placeholder="Street address"></textarea>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="app-form-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">City</label>
-                                        <input type="text" className={inputCls} value={formData.city}
+                                        <label className="app-label">City</label>
+                                        <input type="text" className="app-input" value={formData.city}
                                             onChange={set('city')} placeholder="City" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                                            State {stateAutoFilled && <span className="text-slate-400 font-normal text-xs">(from GST)</span>}
+                                        <label className="app-label">
+                                            State {stateAutoFilled && <span style={{ color: '#94a3b8', fontWeight: 'normal', fontSize: '12px' }}>(from GST)</span>}
                                         </label>
                                         <input type="text"
-                                            className={stateAutoFilled ? `${inputCls} bg-slate-50 cursor-default` : inputCls}
+                                            className="app-input"
+                                            style={stateAutoFilled ? { backgroundColor: '#f8fafc', cursor: 'default' } : {}}
                                             value={formData.state}
                                             readOnly={stateAutoFilled}
                                             onChange={stateAutoFilled ? undefined : set('state')}
                                             placeholder="State" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Pincode</label>
-                                        <input type="text" className={inputCls} value={formData.pincode}
+                                        <label className="app-label">Pincode</label>
+                                        <input type="text" className="app-input" value={formData.pincode}
                                             onChange={set('pincode')} placeholder="600001" maxLength={6} />
                                     </div>
                                 </div>
 
-                                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#334155', cursor: 'pointer' }}>
                                     <input type="checkbox" checked={formData.isActive}
                                         onChange={e => setFormData(prev => ({ ...prev, isActive: e.target.checked }))} />
                                     Mark as Active
@@ -320,11 +321,11 @@ export default function Vendors() {
                             </form>
                         </div>
 
-                        <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
-                            <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">
+                        <div className="app-modal-footer">
+                            <button type="button" onClick={() => setShowModal(false)} className="app-btn app-btn-secondary">
                                 Cancel
                             </button>
-                            <button type="submit" form="vendor-form" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]">
+                            <button type="submit" form="vendor-form" className="app-btn app-btn-primary">
                                 {editingId ? 'Update Vendor' : 'Create Vendor'}
                             </button>
                         </div>

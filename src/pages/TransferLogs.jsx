@@ -293,6 +293,7 @@ export default function TransferLogs() {
                                     </label>
                                     <select
                                         required
+                                        className="app-input"
                                         value={formData.asset.assetId}
                                         onChange={handleAssetSelect}
                                     >
@@ -313,12 +314,13 @@ export default function TransferLogs() {
                                             type="text"
                                             value={formData.fromEntityName}
                                             onChange={(e) => setFormData(prev => ({ ...prev, fromEntityName: e.target.value }))}
-                                            className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-slate-50"
+                                            className="app-input"
+                                            style={{ backgroundColor: '#f8fafc' }}
                                             placeholder="Inventory"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">To (Assignee) *</label>
+                                        <label className="app-label">To (Assignee) *</label>
                                         <div className="relative" ref={userDropdownRef}>
                                             <input
                                                 type="text"
@@ -335,16 +337,16 @@ export default function TransferLogs() {
                                             />
                                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                             {userDropdownOpen && filteredUsers.length > 0 && (
-                                                <div className="absolute z-20 top-full mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                                                <div className="transfer-logs-dropdown-menu">
                                                     {filteredUsers.map(u => (
                                                         <button
                                                             key={u.id}
                                                             type="button"
                                                             onClick={() => handleUserPick(u)}
-                                                            className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors border-b border-slate-50 last:border-0"
+                                                            className="transfer-logs-dropdown-item"
                                                         >
-                                                            <p className="text-sm font-medium text-slate-900">{userName(u)}</p>
-                                                            <p className="text-xs text-slate-400">{userRole(u)}</p>
+                                                            <p className="transfer-logs-dropdown-name">{userName(u)}</p>
+                                                            <p className="transfer-logs-dropdown-role">{userRole(u)}</p>
                                                         </button>
                                                     ))}
                                                 </div>

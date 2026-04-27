@@ -1,6 +1,6 @@
 .app-table-wrapper {
     background: #fff;
-    border-radius: 16px;
+    border-radius: 8px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
@@ -15,6 +15,7 @@
     width: 100%;
     text-align: left;
     border-collapse: collapse;
+    background-color: #fff;
 }
 
 .app-table-thead-row {
@@ -31,7 +32,7 @@
     letter-spacing: 0.1em;
 }
 
-.app-table-tbody > tr + tr {
+.app-table-tbody>tr+tr {
     border-top: 1px solid #f1f5f9;
 }
 

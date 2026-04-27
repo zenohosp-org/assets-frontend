@@ -428,7 +428,7 @@ export default function Assets() {
                                             <div>
                                                 <label className="app-label">AMC Cost (Annual)</label>
                                                 <div className="assets-form-input-currency-wrapper">
-                                                    <span className="assets-form-currency-symbol">$</span>
+                                                    <span className="assets-form-currency-symbol">₹</span>
                                                     <input type="number" step="0.01" value={formData.amcCost} onChange={(e) => setFormData({ ...formData, amcCost: e.target.value })} className="assets-form-input-currency" placeholder="0.00" />
                                                 </div>
                                             </div>

@@ -40,76 +40,90 @@
     text-decoration: none;
 }
 
-.dashboard-stat-card,
-.dashboard-chart-card {
-    padding: 24px;
-    border-radius: 24px;
-}
-
 .dashboard-stat-card {
-    transition: all 150ms ease;
+    padding: 24px;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+    transition: box-shadow 150ms ease;
 }
 
 .dashboard-stat-card:hover {
-    box-shadow: 0 10px 20px rgb(0 0 0 / 0.08);
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.08);
 }
 
 .dashboard-stat-content {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 
 .dashboard-stat-icon-wrapper {
-    width: 48px;
-    height: 48px;
+    width: auto;
+    height: auto;
     display: flex;
     align-items: center;
-    justify-content: center;
-    border-radius: 16px;
-    transition: transform 150ms ease;
+    justify-content: flex-start;
+    background: transparent;
+    border-radius: 0;
 }
 
 .group:hover .dashboard-stat-icon-wrapper {
-    transform: scale(1.1);
-}
-
-.dashboard-stat-icon-wrapper--primary {
-    background: rgba(59, 130, 246, 0.1);
-    color: #2563eb;
-}
-
-.dashboard-stat-icon-wrapper--secondary {
-    background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-}
-
-.dashboard-stat-icon-wrapper--warning {
-    background: #fff7ed;
-    color: #f97316;
-}
-
-.dashboard-stat-icon-wrapper--success {
-    background: #f0fdf4;
-    color: #16a34a;
+    transform: none;
 }
 
 .dashboard-stat-icon {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
+}
+
+.dashboard-stat-icon-wrapper--primary {
+    color: #16a34a;
+    background: transparent;
+}
+
+.dashboard-stat-icon-wrapper--secondary {
+    color: #2563eb;
+    background: transparent;
+}
+
+.dashboard-stat-icon-wrapper--warning {
+    color: #f97316;
+    background: transparent;
+}
+
+.dashboard-stat-icon-wrapper--success {
+    color: #9333ea;
+    background: transparent;
+}
+
+.dashboard-stat-label {
+    font-size: 24px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.dashboard-stat-value {
+    margin-top: 18px;
+    font-size: 36px;
+    line-height: 1.1;
+    font-weight: 600;
 }
 
 .dashboard-charts-layout {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 32px;
+    align-items: stretch;
+    flex: 1;
 }
 
 .dashboard-chart-card {
     padding: 32px;
+    display: flex;
+    flex-direction: column
 }
 
 .dashboard-chart-title {
@@ -123,7 +137,7 @@
 }
 
 .dashboard-chart-title-icon--primary {
-    color: #2563eb;
+    color: #000000;
 }
 
 .dashboard-chart-title-icon--secondary {
@@ -137,11 +151,13 @@
     justify-content: space-between;
     gap: 8px;
     padding: 0 16px;
+    flex: 1;
 }
 
 .dashboard-chart-bar-wrapper {
     position: relative;
     flex: 1;
+    height: 100%;
     background: #f8fafc;
     border-radius: 12px 12px 0 0;
 }
@@ -166,7 +182,7 @@
 .dashboard-chart-bar-label {
     font-size: 10px;
     font-weight: 900;
-    color: #2563eb;
+    color: #000000;
     opacity: 0;
     transition: opacity 150ms ease;
 }
@@ -190,6 +206,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    flex: 1;
 }
 
 .dashboard-activity-loading,

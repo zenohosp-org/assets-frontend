@@ -1,54 +1,64 @@
 .maintenance-stat-card-orange,
 .maintenance-stat-card-blue {
     padding: 24px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+    transition: box-shadow 150ms ease;
     display: flex;
-    align-items: flex-start;
-    gap: 16px;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.maintenance-stat-card-orange:hover,
+.maintenance-stat-card-blue:hover {
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.08);
 }
 
 .maintenance-stat-icon-wrapper-orange,
 .maintenance-stat-icon-wrapper-blue {
-    width: 48px;
-    height: 48px;
+    width: auto;
+    height: auto;
     display: flex;
     align-items: center;
-    justify-content: center;
-    border-radius: 12px;
+    justify-content: flex-start;
+    background: transparent;
+    border-radius: 0;
 }
 
 .maintenance-stat-icon-wrapper-orange {
-    background: #fff7ed;
-    color: #ea580c;
+    color: #f97316;
 }
 
 .maintenance-stat-icon-wrapper-blue {
-    background: #eff6ff;
-    color: #3b82f6;
+    color: #2563eb;
 }
 
 .maintenance-stat-label-orange,
 .maintenance-stat-label-blue {
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.maintenance-stat-value-orange,
+.maintenance-stat-value-blue {
+    margin-top: 18px;
+    font-size: 36px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: #000000;
 }
 
 .maintenance-stat-value-orange {
-    margin-top: 4px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #ea580c;
+    color: #000000;
 }
 
 .maintenance-stat-value-blue {
-    margin-top: 4px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #3b82f6;
+    color: #000000;
 }
 
 .maintenance-asset-cell {

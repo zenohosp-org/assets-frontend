@@ -20,7 +20,7 @@
 }
 
 .assets-stat-value--blue {
-    color: #2563eb;
+    color: #000000;
 }
 
 .assets-stat-value--emerald {
@@ -44,7 +44,7 @@
 
 .app-table-row:hover .assets-item-title,
 .group:hover .assets-item-title {
-    color: #2563eb;
+    color: #000000;
 }
 
 .assets-item-vendor {
@@ -100,7 +100,6 @@
 
 .assets-dropdown {
     position: absolute;
-    top: 40px;
     right: 32px;
     z-index: 10;
     width: 192px;
@@ -176,7 +175,7 @@
 }
 
 .assets-form-input-currency:focus {
-    border-color: #3b82f6;
+    border-color: #000000;
     box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
 }
 

@@ -14,7 +14,7 @@
 .vendors-checkbox-input {
     border: 1px solid #d1d5db;
     border-radius: 4px;
-    accent-color: #2563eb;
+    accent-color: #000000;
 }
 
 .vendors-checkbox-input:focus {
@@ -64,4 +64,33 @@
     font-size: 14px;
     color: #6b7280;
     font-style: italic;
+}
+
+.vendors-table-name {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.vendors-table-subtext {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.vendors-table-text {
+    font-size: 14px;
+    color: #475569;
+}
+
+.vendors-table-mono {
+    font-size: 14px;
+    font-family: monospace;
+    color: #475569;
+}
+
+.vendors-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
 }

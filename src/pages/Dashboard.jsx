@@ -150,7 +150,7 @@ export default function Dashboard() {
                                 <div key={i} className="dashboard-chart-bar-wrapper group">
                                     <div
                                         className="dashboard-chart-bar-fill"
-                                        style={{ height: `${(counts[i] / max) * 100}%`, minHeight: counts[i] > 0 ? '10%' : '0%' }}
+                                        style={{ height: `${(counts[i] / max) * 100}%`, minHeight: counts[i] > 0 ? '10px' : '0px' }}
                                     >
                                         {counts[i] > 0 && <span className="dashboard-chart-bar-label">{counts[i]}</span>}
                                     </div>

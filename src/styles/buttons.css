@@ -3,13 +3,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 150ms ease;
-    font-family: inherit;
-    font-weight: 500;
-    outline: none;
-    border-radius: 12px;
+    border-radius: 8px;
 }
 
 .app-btn:disabled {
@@ -18,15 +12,13 @@
 }
 
 .app-btn-primary {
-    background: #2563eb;
+    background: #000000;
     color: #fff;
-    font-weight: 700;
-    padding: 10px 20px;
-    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+    padding: 8px 16px;
 }
 
 .app-btn-primary:hover:not(:disabled) {
-    background: #1d4ed8;
+    background: #000000;
 }
 
 .app-btn-primary:active:not(:disabled) {
@@ -43,7 +35,7 @@
 .app-btn-secondary:hover:not(:disabled) {
     background: #f8fafc;
     border-color: #cbd5e1;
-    color: #2563eb;
+    color: #000000;
 }
 
 .app-btn-icon {

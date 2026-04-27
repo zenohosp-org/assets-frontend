@@ -45,19 +45,22 @@ export default function AssetCategories() {
     return (
         <div className="app-page">
             <h1 className="app-page-title">Asset Categories</h1>
-
-            <div className="app-card">
+            <div className="app-card asset-categories-card">
                 <h2 className="app-card-title">Add Asset Category</h2>
                 {error && <div className="app-error">{error}</div>}
-                <form onSubmit={handleCreateCategory} className="app-form">
-                    <div>
-                        <label className="app-label">Category Name</label>
-                        <input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} required placeholder="e.g. Imaging, Lab Equipment"
-                            className="app-input" />
+                <form onSubmit={handleCreateCategory} className="app-form asset-categories-form">
+                    <div className="asset-categories-input-wrapper">
+                        <div>
+                            <label className="app-label">Category Name</label>
+                            <input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} required placeholder="e.g. Imaging, Lab Equipment"
+                                className="app-input" />
+                        </div>
+                        <div className="asset-category-right">
+                            <button type="submit" className="app-btn app-btn-primary">
+                                <Plus className="h-5 w-5 mr-2" /> Add Category
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" className="app-btn app-btn-primary">
-                        <Plus className="h-5 w-5 mr-2" /> Add Category
-                    </button>
                 </form>
 
                 <h3 className="asset-categories-list-title">Existing Categories</h3>
