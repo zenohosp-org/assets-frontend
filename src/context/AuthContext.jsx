@@ -16,6 +16,20 @@ export function AuthProvider({ children }) {
     // On mount: always verify session with backend via HttpOnly cookie.
     // If just logged out (flag set), skip and stay logged out.
     useEffect(() => {
+        if (import.meta.env.VITE_DEV_MOCK_AUTH === 'true') {
+            setUser({
+                userId: import.meta.env.VITE_MOCK_USER_ID || '1',
+                email: import.meta.env.VITE_MOCK_USER_EMAIL || 'dev@zenohosp.com',
+                firstName: import.meta.env.VITE_MOCK_USER_FIRST_NAME || 'Dev',
+                lastName: import.meta.env.VITE_MOCK_USER_LAST_NAME || 'Admin',
+                role: import.meta.env.VITE_MOCK_USER_ROLE || 'super_admin',
+                hospitalId: import.meta.env.VITE_MOCK_HOSPITAL_ID || '1',
+                modules: [],
+            });
+            setLoading(false);
+            return;
+        }
+
         const justLoggedOut = localStorage.getItem(LOGOUT_FLAG_KEY);
         if (justLoggedOut) {
             // Clear flag immediately — it should only block one mount cycle
@@ -46,6 +60,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const verifyOnFocus = async () => {
             if (!user) return;
+            if (import.meta.env.VITE_DEV_MOCK_AUTH === 'true') return;
             try {
                 await getMyProfile();
                 // still valid — nothing to do

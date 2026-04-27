@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getTransferLogs, createTransferLog, getAssets, getDirectoryUsers } from '../api/client';
-import { History, ArrowRight, Box, Calendar, Tag, Search, Plus, X, Loader2, User, Mail } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { History, ArrowRight, Box, Calendar, Search, Plus, X, Loader2, Mail, ChevronDown } from 'lucide-react';
 
 export default function TransferLogs() {
+    const { user } = useAuth();
     const [logs, setLogs] = useState([]);
     const [assets, setAssets] = useState([]);
     const [users, setUsers] = useState([]);
@@ -22,6 +24,11 @@ export default function TransferLogs() {
         remarks: ''
     });
 
+    // Searchable user dropdown state
+    const [userSearch, setUserSearch] = useState('');
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+    const userDropdownRef = useRef(null);
+
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -33,21 +40,12 @@ export default function TransferLogs() {
             setLogs(logsRes.data);
             setAssets(assetsRes.data);
 
-            // Try to extract hospital Id from token to fetch users
-            const token = localStorage.getItem('asset_jwt');
-            if (token) {
+            if (user?.hospitalId) {
                 try {
-                    // Extract payload without verifying signature (just for UI)
-                    const payloadB64 = token.split('.')[1];
-                    const payloadStr = atob(payloadB64);
-                    const payload = JSON.parse(payloadStr);
-
-                    if (payload.hospitalId) {
-                        const usersRes = await getDirectoryUsers(payload.hospitalId);
-                        setUsers(usersRes.data.data || []); // ApiResponse structure wraps data
-                    }
+                    const usersRes = await getDirectoryUsers(user.hospitalId);
+                    setUsers(usersRes.data.data || []);
                 } catch (e) {
-                    console.error("Failed to parse token or fetch users", e);
+                    console.error('Failed to fetch users', e);
                 }
             }
         } catch (err) {
@@ -58,7 +56,17 @@ export default function TransferLogs() {
     };
 
     useEffect(() => {
-        fetchData();
+        if (user) fetchData();
+    }, [user]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (userDropdownRef.current && !userDropdownRef.current.contains(e.target)) {
+                setUserDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const handleOpenModal = () => {
@@ -69,18 +77,28 @@ export default function TransferLogs() {
             toUserId: '',
             remarks: ''
         });
+        setUserSearch('');
+        setUserDropdownOpen(false);
         setIsModalOpen(true);
     };
 
-    const handleUserSelect = (e) => {
-        const userId = e.target.value;
-        const user = users.find(u => u.id === userId);
-        setFormData({
-            ...formData,
-            toUserId: userId,
-            toEntityName: user ? user.name : ''
-        });
+    const handleAssetSelect = (e) => {
+        const assetId = e.target.value;
+        const selected = assets.find(a => a.assetId === assetId);
+        const fromName = selected?.assignedTo || 'Inventory';
+        setFormData(prev => ({ ...prev, asset: { assetId }, fromEntityName: fromName }));
     };
+
+    const handleUserPick = (u) => {
+        setFormData(prev => ({ ...prev, toUserId: u.id, toEntityName: u.name }));
+        setUserSearch(u.name);
+        setUserDropdownOpen(false);
+    };
+
+    const filteredUsers = users.filter(u =>
+        u.name?.toLowerCase().includes(userSearch.toLowerCase()) ||
+        u.role?.toLowerCase().includes(userSearch.toLowerCase())
+    );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -88,6 +106,7 @@ export default function TransferLogs() {
         try {
             await createTransferLog(formData);
             await fetchData();
+            setUserSearch('');
             setIsModalOpen(false);
         } catch (error) {
             console.error('Failed to record transfer:', error);
@@ -257,19 +276,17 @@ export default function TransferLogs() {
                         <div className="p-6 overflow-y-auto">
                             <form id="transfer-form" onSubmit={handleSubmit} className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center gap-2">
-                                        <Box className="w-4 h-4 text-blue-500" /> Select Asset *
-                                    </label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Asset *</label>
                                     <select
                                         required
                                         value={formData.asset.assetId}
-                                        onChange={(e) => setFormData({ ...formData, asset: { assetId: e.target.value } })}
+                                        onChange={handleAssetSelect}
                                         className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white"
                                     >
                                         <option value="" disabled>-- Choose an asset --</option>
                                         {assets.map(asset => (
                                             <option key={asset.assetId} value={asset.assetId}>
-                                                {asset.assetName} - {asset.assetCode}
+                                                {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.assignedTo ? ` — ${asset.assignedTo}` : ' — Inventory'}
                                             </option>
                                         ))}
                                     </select>
@@ -277,42 +294,49 @@ export default function TransferLogs() {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">From Location/User *</label>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">From *</label>
                                         <input
                                             required
                                             type="text"
                                             value={formData.fromEntityName}
-                                            onChange={(e) => setFormData({ ...formData, fromEntityName: e.target.value })}
-                                            className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300 bg-slate-50"
-                                            placeholder="e.g. Inventory"
+                                            onChange={(e) => setFormData(prev => ({ ...prev, fromEntityName: e.target.value }))}
+                                            className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-slate-50"
+                                            placeholder="Inventory"
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1.5">To (Assignee) *</label>
-                                        {users.length > 0 ? (
-                                            <select
-                                                required
-                                                value={formData.toUserId}
-                                                onChange={handleUserSelect}
-                                                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white"
-                                            >
-                                                <option value="" disabled>Select User...</option>
-                                                {users.map(user => (
-                                                    <option key={user.id} value={user.id}>
-                                                        {user.name} ({user.role})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        ) : (
+                                        <div className="relative" ref={userDropdownRef}>
                                             <input
-                                                required
                                                 type="text"
-                                                value={formData.toEntityName}
-                                                onChange={(e) => setFormData({ ...formData, toEntityName: e.target.value })}
-                                                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
-                                                placeholder="Enter recipient name"
+                                                required={!formData.toUserId}
+                                                value={userSearch}
+                                                onChange={(e) => {
+                                                    setUserSearch(e.target.value);
+                                                    setFormData(prev => ({ ...prev, toUserId: '', toEntityName: e.target.value }));
+                                                    setUserDropdownOpen(true);
+                                                }}
+                                                onFocus={() => setUserDropdownOpen(true)}
+                                                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 pr-9 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                                placeholder={users.length > 0 ? 'Search staff...' : 'Recipient name'}
                                             />
-                                        )}
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                            {userDropdownOpen && filteredUsers.length > 0 && (
+                                                <div className="absolute z-20 top-full mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                                                    {filteredUsers.map(u => (
+                                                        <button
+                                                            key={u.id}
+                                                            type="button"
+                                                            onClick={() => handleUserPick(u)}
+                                                            className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors border-b border-slate-50 last:border-0"
+                                                        >
+                                                            <p className="text-sm font-medium text-slate-900">{u.name}</p>
+                                                            <p className="text-xs text-slate-400 capitalize">{u.role}</p>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
