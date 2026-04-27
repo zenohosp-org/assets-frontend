@@ -288,7 +288,6 @@ export default function TransferLogs() {
                                     </label>
                                     <select
                                         required
-                                        required
                                         value={formData.asset.assetId}
                                         onChange={handleAssetSelect}
                                     >

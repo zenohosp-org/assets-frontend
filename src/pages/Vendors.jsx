@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getVendors, createVendor } from '../api/client';
 import '../styles/common.css';
 import '../styles/buttons.css';
 import '../styles/cards.css';
