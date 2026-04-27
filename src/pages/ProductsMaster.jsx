@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus } from 'lucide-react';
+import '../styles/common.css';
+import '../styles/buttons.css';
+import '../styles/cards.css';
+import '../styles/forms.css';
+import '../styles/tables.css';
+import '../styles/pages/products-master.css';
 
 export default function ProductsMaster() {
     const [products, setProducts] = useState([]);
@@ -61,26 +67,26 @@ export default function ProductsMaster() {
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Products Master</h1>
+        <div className="app-page">
+            <h1 className="app-page-title">Products Master</h1>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
-                <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
-                <form onSubmit={handleCreateProduct} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="app-card" style={{ marginBottom: '32px' }}>
+                <h2 className="app-card-title">Add New Product</h2>
+                <form onSubmit={handleCreateProduct} className="app-form app-form-grid">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                        <label className="app-label">Product Name</label>
                         <input type="text" value={name} onChange={e => setName(e.target.value)} required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            className="app-input" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Product Details</label>
+                        <label className="app-label">Product Details</label>
                         <input type="text" value={details} onChange={e => setDetails(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            className="app-input" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                        <label className="app-label">Vendor</label>
                         <select value={vendorId} onChange={e => setVendorId(e.target.value)} required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            className="app-input">
                             <option value="">Select Vendor</option>
                             {vendors.map(v => (
                                 <option key={v.id} value={v.id}>{v.name}</option>
@@ -88,46 +94,46 @@ export default function ProductsMaster() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Product Group</label>
+                        <label className="app-label">Product Group</label>
                         <select value={groupId} onChange={e => setGroupId(e.target.value)} required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            className="app-input">
                             <option value="">Select Group</option>
                             {groups.map(g => (
                                 <option key={g.id} value={g.id}>{g.name}</option>
                             ))}
                         </select>
                     </div>
-                    <div className="md:col-span-2 pt-2">
-                        <button type="submit" disabled={!vendorId || !groupId} className="w-full md:w-auto bg-blue-600 text-white outline-none py-2 px-6 rounded-md hover:bg-blue-700 transition duration-150 ease-in-out flex items-center justify-center disabled:opacity-50">
+                    <div style={{ gridColumn: '1 / -1', paddingTop: '8px' }}>
+                        <button type="submit" disabled={!vendorId || !groupId} className="app-btn app-btn-primary">
                             <Plus className="h-5 w-5 mr-2" /> Add Product
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+            <div className="app-table-wrapper">
+                <table className="app-table">
+                    <thead>
+                        <tr className="app-table-thead-row">
+                            <th className="app-table-th">Product Name</th>
+                            <th className="app-table-th">Vendor</th>
+                            <th className="app-table-th">Group</th>
+                            <th className="app-table-th">Details</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="app-table-tbody">
                         {products.map((product) => (
-                            <tr key={product.id}>
-                                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{product.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{product.vendor?.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{product.productGroup?.name}</td>
-                                <td className="px-6 py-4 text-gray-500">{product.details}</td>
+                            <tr key={product.id} className="app-table-row">
+                                <td className="app-table-td products-master-td-bold">{product.name}</td>
+                                <td className="app-table-td">{product.vendor?.name}</td>
+                                <td className="app-table-td">{product.productGroup?.name}</td>
+                                <td className="app-table-td products-master-td-wrap">{product.details}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
                 {products.length === 0 && (
-                    <div className="p-6 text-center text-gray-500 italic">No products found.</div>
+                    <div className="products-master-empty text-center py-8">No products found.</div>
                 )}
             </div>
         </div>

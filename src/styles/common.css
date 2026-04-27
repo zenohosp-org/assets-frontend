@@ -1,0 +1,92 @@
+.app-page {
+    position: relative;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.app-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.app-page-title-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-page-title {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-page-title-icon {
+    color: #2563eb;
+}
+
+.app-page-subtitle {
+    margin-top: 2px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.app-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.app-badge-gray {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+.app-badge-green {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.app-badge-red {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.app-error {
+    padding: 12px;
+    color: #b91c1c;
+    background: #fee2e2;
+    border: 1px solid #f87171;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.app-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    color: #94a3b8;
+    gap: 12px;
+}

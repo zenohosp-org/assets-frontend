@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL;
-const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL;
-const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL;
+export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'https://api-asset.zenohosp.com';
+const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL || 'https://api-directory.zenohosp.com';
+const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL || 'https://api-inventory.zenohosp.com';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -31,15 +31,19 @@ const shouldTriggerAuthRedirect = () => {
 
 // ── Request interceptor: Cookie-based SSO ──
 // Browser automatically sends HttpOnly cookies when withCredentials: true
-// No need to manually inject Authorization header
 api.interceptors.request.use((config) => {
-    // withCredentials is already set on axios instance
-    // Cookies will be sent automatically by the browser
     return config;
 }, (err) => {
-    console.error('Request interceptor error', err);
     return Promise.reject(err);
 });
+
+// Inject real JWT on all requests when mock auth is enabled (local dev only)
+if (import.meta.env.VITE_DEV_MOCK_AUTH === 'true' && import.meta.env.VITE_MOCK_JWT) {
+    api.interceptors.request.use((config) => {
+        config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
+        return config;
+    });
+}
 
 // ── Response interceptor to handle 401/403 and logout across all apps ──
 api.interceptors.response.use(
