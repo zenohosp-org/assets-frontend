@@ -3,6 +3,7 @@ import axios from 'axios';
 export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'https://api-asset.zenohosp.com';
 const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL || 'https://api-directory.zenohosp.com';
 const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL || 'https://api-inventory.zenohosp.com';
+const FINANCE_API_URL = import.meta.env?.VITE_FINANCE_API_URL || 'https://api-finance.zenohosp.com';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -101,6 +102,11 @@ export const deleteAsset = (id) => api.delete(`/api/assets/${id}`);
 export const getMaintenanceRecords = () => api.get('/api/maintenance');
 export const getMaintenanceRecordsByAsset = (id) => api.get(`/api/maintenance/asset/${id}`);
 export const createMaintenanceRecord = (data) => api.post('/api/maintenance', data);
+export const completeMaintenanceRecord = (id, data) => api.patch(`/api/maintenance/${id}/complete`, data);
+
+// ── Finance APIs ──
+export const getFinanceBankAccounts = () => axios.get(`${FINANCE_API_URL}/api/finance/bank-accounts`, { withCredentials: true });
+export const createFinanceTransaction = (accountId, data) => axios.post(`${FINANCE_API_URL}/api/finance/bank-accounts/${accountId}/transactions`, data, { withCredentials: true });
 
 // ── Transfers ──
 export const getTransferLogs = () => api.get('/api/transfers');

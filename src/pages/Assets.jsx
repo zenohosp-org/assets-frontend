@@ -6,7 +6,7 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/assets.css';
-import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail } from 'lucide-react';
+import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail, Check, X as XIcon, Edit3 } from 'lucide-react';
 import { getAssets, createAsset, updateAsset, deleteAsset, getVendors, getAssetCategories } from '../api/client';
 
 export default function Assets() {
@@ -21,6 +21,11 @@ export default function Assets() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [vendors, setVendors] = useState([]);
     const [categories, setCategories] = useState([]);
+
+    // Serial number inline editing state
+    const [editingSerialId, setEditingSerialId] = useState(null);
+    const [editingSerialValue, setEditingSerialValue] = useState('');
+    const [isSerialSaving, setIsSerialSaving] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -82,6 +87,34 @@ export default function Assets() {
             assignedTo: ''
         });
         setEditingAsset(null);
+    };
+
+    const handleSerialEditStart = (asset) => {
+        setEditingSerialId(asset.assetId);
+        setEditingSerialValue(asset.serialNumber || '');
+    };
+
+    const handleSerialEditCancel = () => {
+        setEditingSerialId(null);
+        setEditingSerialValue('');
+    };
+
+    const handleSerialEditSave = async (asset) => {
+        setIsSerialSaving(true);
+        try {
+            const updated = { ...asset, serialNumber: editingSerialValue };
+            await updateAsset(asset.assetId, updated);
+            setAssets(prevAssets => 
+                prevAssets.map(a => a.assetId === asset.assetId ? updated : a)
+            );
+            setEditingSerialId(null);
+            setEditingSerialValue('');
+        } catch (err) {
+            console.error('Failed to update serial number:', err);
+            alert('Failed to update serial number');
+        } finally {
+            setIsSerialSaving(false);
+        }
     };
 
     const handleOpenModal = (asset = null) => {
@@ -289,7 +322,46 @@ export default function Assets() {
                                     </td>
                                     <td className="app-table-td">
                                         <div className="assets-code">{asset.assetCode || 'N/A'}</div>
-                                        <div className="assets-serial">{asset.serialNumber || 'No Serial'}</div>
+                                        {editingSerialId === asset.assetId ? (
+                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
+                                                <input
+                                                    type="text"
+                                                    value={editingSerialValue}
+                                                    onChange={(e) => setEditingSerialValue(e.target.value)}
+                                                    className="app-input"
+                                                    style={{ padding: '4px 8px', fontSize: '14px', flex: 1 }}
+                                                    placeholder="Enter serial number"
+                                                />
+                                                <button
+                                                    onClick={() => handleSerialEditSave(asset)}
+                                                    disabled={isSerialSaving}
+                                                    style={{ padding: '4px 8px', backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                                    title="Save"
+                                                >
+                                                    <Check size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={handleSerialEditCancel}
+                                                    disabled={isSerialSaving}
+                                                    style={{ padding: '4px 8px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                                    title="Cancel"
+                                                >
+                                                    <XIcon size={16} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+                                                <div className="assets-serial">{asset.serialNumber || 'No Serial'}</div>
+                                                <button
+                                                    onClick={() => handleSerialEditStart(asset)}
+                                                    className="app-btn-icon"
+                                                    style={{ padding: '4px' }}
+                                                    title="Edit serial number"
+                                                >
+                                                    <Edit3 size={14} />
+                                                </button>
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="app-table-td">
                                         <div className="assets-warranty-info">
