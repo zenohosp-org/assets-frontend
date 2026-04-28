@@ -3,7 +3,13 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 8px 16px;
+    border: none;
     border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease-in-out;
 }
 
 .app-btn:disabled {
@@ -12,17 +18,19 @@
 }
 
 .app-btn-primary {
-    background: #000000;
-    color: #fff;
-    padding: 8px 16px;
+    background-color: #000000;
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25), 0 1px 2px rgba(37, 99, 235, 0.15);
 }
 
 .app-btn-primary:hover:not(:disabled) {
-    background: #000000;
+    background-color: #000000;
+    transform: translateY(-1px);
 }
 
 .app-btn-primary:active:not(:disabled) {
-    transform: scale(0.98);
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
 }
 
 .app-btn-secondary {
