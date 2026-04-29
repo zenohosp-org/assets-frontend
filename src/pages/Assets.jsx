@@ -6,8 +6,8 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/assets.css';
-import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail, Check, X as XIcon, Edit3 } from 'lucide-react';
-import { getAssets, createAsset, updateAsset, deleteAsset, getVendors, getAssetCategories } from '../api/client';
+import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail, Check, X as XIcon, Edit3, MapPin } from 'lucide-react';
+import { getAssets, createAsset, updateAsset, deleteAsset, getVendors, getAssetCategories, getHmsRooms, assignAssetToRoom } from '../api/client';
 
 export default function Assets() {
     const [assets, setAssets] = useState([]);
@@ -21,6 +21,18 @@ export default function Assets() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [vendors, setVendors] = useState([]);
     const [categories, setCategories] = useState([]);
+
+    // Allocate Modal State
+    const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false);
+    const [allocatingAsset, setAllocatingAsset] = useState(null);
+    const [rooms, setRooms] = useState([]);
+    const [roomsLoading, setRoomsLoading] = useState(false);
+    const [allocateFormData, setAllocateFormData] = useState({
+        roomId: '',
+        floor: '',
+        notes: ''
+    });
+    const [isAllocateSubmitting, setIsAllocateSubmitting] = useState(false);
 
     // Serial number inline editing state
     const [editingSerialId, setEditingSerialId] = useState(null);
@@ -211,6 +223,66 @@ export default function Assets() {
         setActiveDropdown(null);
     };
 
+    const handleOpenAllocateModal = async (asset) => {
+        setAllocatingAsset(asset);
+        setAllocateFormData({
+            roomId: '',
+            floor: '',
+            notes: ''
+        });
+        setIsAllocateModalOpen(true);
+        setActiveDropdown(null);
+        
+        // Load rooms
+        setRoomsLoading(true);
+        try {
+            const roomsRes = await getHmsRooms();
+            setRooms(roomsRes.data || []);
+        } catch (err) {
+            console.error('Failed to load rooms:', err);
+            alert('Failed to load rooms. Please try again.');
+        } finally {
+            setRoomsLoading(false);
+        }
+    };
+
+    const handleCloseAllocateModal = () => {
+        setIsAllocateModalOpen(false);
+        setAllocatingAsset(null);
+        setAllocateFormData({ roomId: '', floor: '', notes: '' });
+    };
+
+    const handleAllocateSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!allocateFormData.roomId || !allocateFormData.floor) {
+            alert('Please select a room and floor');
+            return;
+        }
+        
+        setIsAllocateSubmitting(true);
+        try {
+            await assignAssetToRoom(allocatingAsset.assetId, {
+                roomId: parseInt(allocateFormData.roomId),
+                floor: parseInt(allocateFormData.floor),
+                notes: allocateFormData.notes
+            });
+            
+            // Refresh assets
+            const assetsRes = await getAssets();
+            setAssets(assetsRes.data);
+            
+            handleCloseAllocateModal();
+            alert('Asset allocated to room successfully!');
+        } catch (error) {
+            console.error('Failed to allocate asset:', error);
+            alert('Failed to allocate asset. Please try again.');
+        } finally {
+            setIsAllocateSubmitting(false);
+        }
+    };
+
+
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = () => setActiveDropdown(null);
@@ -394,6 +466,12 @@ export default function Assets() {
                                                 >
                                                     <Edit2 className="w-4 h-4 text-blue-500" /> Edit Details
                                                 </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleOpenAllocateModal(asset); }}
+                                                    className="assets-dropdown-item"
+                                                >
+                                                    <MapPin className="w-4 h-4 text-green-500" /> Allocate to Room
+                                                </button>
                                                 <div className="h-px my-1 bg-slate-100"></div>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleDelete(asset.assetId); }}
@@ -527,6 +605,110 @@ export default function Assets() {
                             <button type="submit" form="asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
                                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                                 {isSubmitting ? 'Saving...' : (editingAsset ? 'Update Asset' : 'Create Asset')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Allocate to Room Modal */}
+            {isAllocateModalOpen && (
+                <div className="app-modal-overlay">
+                    <div className="app-modal-backdrop" onClick={handleCloseAllocateModal}></div>
+
+                    <div className="app-modal-content">
+                        <div className="app-modal-header">
+                            <h2 className="app-modal-title">
+                                Allocate Asset to Room
+                            </h2>
+                            <button onClick={handleCloseAllocateModal} className="app-modal-close">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="app-modal-body">
+                            {allocatingAsset && (
+                                <form id="allocate-form" onSubmit={handleAllocateSubmit} className="app-form">
+                                    <div className="app-form-grid">
+                                        <div className="assets-form-section">
+                                            <h3 className="assets-form-section-title">Asset Details</h3>
+                                            <div className="app-form-row">
+                                                <div>
+                                                    <label className="app-label">Asset Name</label>
+                                                    <input type="text" value={allocatingAsset.assetName} disabled className="app-input" />
+                                                </div>
+                                                <div>
+                                                    <label className="app-label">Asset Code</label>
+                                                    <input type="text" value={allocatingAsset.assetCode || '-'} disabled className="app-input" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="assets-form-section">
+                                            <h3 className="assets-form-section-title">Allocation Details</h3>
+                                            <div className="app-form-row">
+                                                <div>
+                                                    <label className="app-label">Room *</label>
+                                                    {roomsLoading ? (
+                                                        <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            Loading rooms...
+                                                        </div>
+                                                    ) : (
+                                                        <select
+                                                            required
+                                                            value={allocateFormData.roomId}
+                                                            onChange={(e) => setAllocateFormData({ ...allocateFormData, roomId: e.target.value })}
+                                                            className="app-input"
+                                                        >
+                                                            <option value="">Select Room</option>
+                                                            {rooms.map(room => (
+                                                                <option key={room.id} value={room.id}>
+                                                                    {room.name} (Floor {room.floor})
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <label className="app-label">Floor *</label>
+                                                    <input
+                                                        required
+                                                        type="number"
+                                                        min="0"
+                                                        max="50"
+                                                        value={allocateFormData.floor}
+                                                        onChange={(e) => setAllocateFormData({ ...allocateFormData, floor: e.target.value })}
+                                                        className="app-input"
+                                                        placeholder="e.g., 3"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="app-form-row">
+                                                <div>
+                                                    <label className="app-label">Notes (Optional)</label>
+                                                    <textarea
+                                                        rows="3"
+                                                        value={allocateFormData.notes}
+                                                        onChange={(e) => setAllocateFormData({ ...allocateFormData, notes: e.target.value })}
+                                                        className="app-textarea"
+                                                        placeholder="Add any notes about this allocation..."
+                                                    ></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+
+                        <div className="app-modal-footer">
+                            <button type="button" onClick={handleCloseAllocateModal} className="app-btn app-btn-secondary">
+                                Cancel
+                            </button>
+                            <button type="submit" form="allocate-form" disabled={isAllocateSubmitting || roomsLoading} className="app-btn app-btn-primary">
+                                {isAllocateSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isAllocateSubmitting ? 'Allocating...' : 'Allocate Asset'}
                             </button>
                         </div>
                     </div>

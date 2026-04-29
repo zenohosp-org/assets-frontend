@@ -142,6 +142,13 @@ export const getFinanceBankAccounts = () => api.get('/api/proxy/finance/bank-acc
 export const createFinanceBankTransaction = (bankAccountId, data) =>
     api.post(`/api/proxy/finance/bank-accounts/${bankAccountId}/transactions`, data);
 
+// ── Room Allocation ──
+export const getHmsRooms = () => api.get('/api/proxy/hms/rooms');
+export const assignAssetToRoom = (assetId, data) => api.post(`/api/assets/${assetId}/assign-room`, data);
+export const unassignAssetFromRoom = (assetId, data) => api.post(`/api/assets/${assetId}/unassign-room`, data);
+export const transferAssetRoom = (assetId, data) => api.post(`/api/assets/${assetId}/transfer`, data);
+export const getAssetHistory = (assetId) => api.get(`/api/assets/${assetId}/history`);
+
 // ── Transfers ──
 export const getTransferLogs = () => api.get('/api/transfers');
 export const createTransferLog = (data) => api.post('/api/transfers', data);
