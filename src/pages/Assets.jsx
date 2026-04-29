@@ -227,6 +227,8 @@ export default function Assets() {
         setAllocatingAsset(asset);
         setAllocateFormData({
             roomId: '',
+            room_number: '',
+            room_type: '',
             floor: '',
             notes: ''
         });
@@ -664,7 +666,7 @@ export default function Assets() {
                                                             <option value="">Select Room</option>
                                                             {rooms.map(room => (
                                                                 <option key={room.id} value={room.id}>
-                                                                    {room.room_number} (TYPE {room.type})
+                                                                    {room.room_number} (TYPE {room.room_type}) - Floor {room.floor}
                                                                 </option>
                                                             ))}
                                                         </select>
