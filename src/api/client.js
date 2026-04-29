@@ -1,12 +1,17 @@
 import axios from 'axios';
 
 export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'https://api-asset.zenohosp.com';
+export const FINANCE_API_URL = import.meta.env?.VITE_FINANCE_API_URL || 'https://api-finance.zenohosp.com';
 const DIRECTORY_API_URL = import.meta.env?.VITE_DIRECTORY_API_URL || 'https://api-directory.zenohosp.com';
 const INVENTORY_API_URL = import.meta.env?.VITE_INVENTORY_API_URL || 'https://api-inventory.zenohosp.com';
-const FINANCE_API_URL = import.meta.env?.VITE_FINANCE_API_URL || 'https://api-finance.zenohosp.com';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
+    withCredentials: true,
+});
+
+const financeApi = axios.create({
+    baseURL: FINANCE_API_URL,
     withCredentials: true,
 });
 
@@ -44,6 +49,10 @@ if (import.meta.env.VITE_DEV_MOCK_AUTH === 'true' && import.meta.env.VITE_MOCK_J
         config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
         return config;
     });
+    financeApi.interceptors.request.use((config) => {
+        config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
+        return config;
+    });
 }
 
 // ── Response interceptor to handle 401/403 and logout across all apps ──
@@ -61,6 +70,30 @@ api.interceptors.response.use(
 
             // Only trigger global auth when session bootstrap/check fails.
             // For business endpoints, surface the error to page-level logic without forcing re-login loops.
+            if (isSessionCheckRequest && !isAuthFlowPath && shouldTriggerAuthRedirect()) {
+                window.location.href = getGlobalAuthRedirectUrl();
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+// ── Finance API interceptors (similar to main api) ──
+financeApi.interceptors.request.use((config) => {
+    return config;
+}, (err) => {
+    return Promise.reject(err);
+});
+
+financeApi.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const path = window.location.pathname;
+        const isAuthFlowPath = path === '/login' || path === '/sso/callback' || path === '/login/oauth2/code/directory';
+        const requestUrl = (error.config?.url || '').toString();
+        const isSessionCheckRequest = requestUrl.includes('/api/user/me');
+
+        if (error.response?.status === 401 || error.response?.status === 403) {
             if (isSessionCheckRequest && !isAuthFlowPath && shouldTriggerAuthRedirect()) {
                 window.location.href = getGlobalAuthRedirectUrl();
             }
@@ -105,8 +138,9 @@ export const createMaintenanceRecord = (data) => api.post('/api/maintenance', da
 export const completeMaintenanceRecord = (id, data) => api.patch(`/api/maintenance/${id}/complete`, data);
 
 // ── Finance APIs ──
-export const getFinanceBankAccounts = () => axios.get(`${FINANCE_API_URL}/api/finance/bank-accounts`, { withCredentials: true });
-export const createFinanceTransaction = (accountId, data) => axios.post(`${FINANCE_API_URL}/api/finance/bank-accounts/${accountId}/transactions`, data, { withCredentials: true });
+export const getFinanceBankAccounts = () => financeApi.get('/api/finance/bank-accounts');
+export const createFinanceBankTransaction = (bankAccountId, data) =>
+    financeApi.post(`/api/finance/bank-accounts/${bankAccountId}/transactions`, data);
 
 // ── Transfers ──
 export const getTransferLogs = () => api.get('/api/transfers');

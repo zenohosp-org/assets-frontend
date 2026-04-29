@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMaintenanceRecords, createMaintenanceRecord, completeMaintenanceRecord, getFinanceBankAccounts, createFinanceTransaction, getAssets, getVendors } from '../api/client';
+import { getMaintenanceRecords, createMaintenanceRecord, completeMaintenanceRecord, getFinanceBankAccounts, createFinanceBankTransaction, getAssets, getVendors } from '../api/client';
 import { Activity, AlertCircle, Wrench, Calendar, Tag, DollarSign, Search, Plus, X, Loader2, Check, XIcon } from 'lucide-react';
 import '../styles/common.css';
 import '../styles/buttons.css';
@@ -162,7 +162,7 @@ export default function Maintenance() {
             // 2. Create finance transaction (DEBIT)
             try {
                 const description = `Maintenance Bill ${completeFormData.billNumber} - ${completingRecord.asset?.assetName || 'N/A'}`;
-                await createFinanceTransaction(completeFormData.bankAccountId, {
+                await createFinanceBankTransaction(completeFormData.bankAccountId, {
                     type: 'DEBIT',
                     amount: completeFormData.cost ? parseFloat(completeFormData.cost) : 0,
                     description,
