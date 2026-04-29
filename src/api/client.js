@@ -138,9 +138,9 @@ export const createMaintenanceRecord = (data) => api.post('/api/maintenance', da
 export const completeMaintenanceRecord = (id, data) => api.patch(`/api/maintenance/${id}/complete`, data);
 
 // ── Finance APIs ──
-export const getFinanceBankAccounts = () => financeApi.get('/api/finance/bank-accounts');
+export const getFinanceBankAccounts = () => api.get('/api/proxy/finance/bank-accounts');
 export const createFinanceBankTransaction = (bankAccountId, data) =>
-    financeApi.post(`/api/finance/bank-accounts/${bankAccountId}/transactions`, data);
+    api.post(`/api/proxy/finance/bank-accounts/${bankAccountId}/transactions`, data);
 
 // ── Transfers ──
 export const getTransferLogs = () => api.get('/api/transfers');
