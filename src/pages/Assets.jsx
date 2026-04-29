@@ -664,7 +664,7 @@ export default function Assets() {
                                                             <option value="">Select Room</option>
                                                             {rooms.map(room => (
                                                                 <option key={room.id} value={room.id}>
-                                                                    {room.name} (Floor {room.floor})
+                                                                    {room.room_number} (TYPE {room.type})
                                                                 </option>
                                                             ))}
                                                         </select>
