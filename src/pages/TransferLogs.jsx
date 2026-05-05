@@ -1,8 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getTransferLogs, createTransferLog, getAssets, getDirectoryUsers } from '../api/client';
-import { History, ArrowRight, Box, Calendar, Tag, Search, Plus, X, Loader2, User, Mail } from 'lucide-react';
+import '../styles/common.css';
+import '../styles/buttons.css';
+import '../styles/cards.css';
+import '../styles/forms.css';
+import '../styles/tables.css';
+import '../styles/modals.css';
+import '../styles/pages/transfer-logs.css';
+import { useAuth } from '../context/AuthContext';
+import { History, ArrowRight, Box, Calendar, Search, Plus, X, Loader2, Mail, ChevronDown } from 'lucide-react';
 
 export default function TransferLogs() {
+    const { user } = useAuth();
     const [logs, setLogs] = useState([]);
     const [assets, setAssets] = useState([]);
     const [users, setUsers] = useState([]);
@@ -22,6 +31,11 @@ export default function TransferLogs() {
         remarks: ''
     });
 
+    // Searchable user dropdown state
+    const [userSearch, setUserSearch] = useState('');
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+    const userDropdownRef = useRef(null);
+
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -30,24 +44,15 @@ export default function TransferLogs() {
                 getTransferLogs(),
                 getAssets()
             ]);
-            setLogs(logsRes.data);
-            setAssets(assetsRes.data);
+            setLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
+            setAssets(Array.isArray(assetsRes.data) ? assetsRes.data : []);
 
-            // Try to extract hospital Id from token to fetch users
-            const token = localStorage.getItem('asset_jwt');
-            if (token) {
+            if (user?.hospitalId) {
                 try {
-                    // Extract payload without verifying signature (just for UI)
-                    const payloadB64 = token.split('.')[1];
-                    const payloadStr = atob(payloadB64);
-                    const payload = JSON.parse(payloadStr);
-
-                    if (payload.hospitalId) {
-                        const usersRes = await getDirectoryUsers(payload.hospitalId);
-                        setUsers(usersRes.data.data || []); // ApiResponse structure wraps data
-                    }
+                    const usersRes = await getDirectoryUsers(user.hospitalId);
+                    setUsers(usersRes.data.data || []);
                 } catch (e) {
-                    console.error("Failed to parse token or fetch users", e);
+                    console.error('Failed to fetch users', e);
                 }
             }
         } catch (err) {
@@ -58,7 +63,17 @@ export default function TransferLogs() {
     };
 
     useEffect(() => {
-        fetchData();
+        if (user) fetchData();
+    }, [user]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (userDropdownRef.current && !userDropdownRef.current.contains(e.target)) {
+                setUserDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const handleOpenModal = () => {
@@ -69,18 +84,33 @@ export default function TransferLogs() {
             toUserId: '',
             remarks: ''
         });
+        setUserSearch('');
+        setUserDropdownOpen(false);
         setIsModalOpen(true);
     };
 
-    const handleUserSelect = (e) => {
-        const userId = e.target.value;
-        const user = users.find(u => u.id === userId);
-        setFormData({
-            ...formData,
-            toUserId: userId,
-            toEntityName: user ? user.name : ''
-        });
+    const handleAssetSelect = (e) => {
+        const assetId = e.target.value;
+        const selected = assets.find(a => a.assetId === assetId);
+        const fromName = selected?.assignedTo || 'Inventory';
+        setFormData(prev => ({ ...prev, asset: { assetId }, fromEntityName: fromName }));
     };
+
+    const userName = (u) => [u.firstName, u.lastName].filter(Boolean).join(' ');
+    const userRole = (u) => u.role?.displayName || u.role?.name || '';
+
+    const handleUserPick = (u) => {
+        const name = userName(u);
+        setFormData(prev => ({ ...prev, toUserId: u.id, toEntityName: name }));
+        setUserSearch(name);
+        setUserDropdownOpen(false);
+    };
+
+    const filteredUsers = users.filter(u => {
+        const term = userSearch.toLowerCase();
+        return userName(u).toLowerCase().includes(term) ||
+            userRole(u).toLowerCase().includes(term);
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -88,6 +118,7 @@ export default function TransferLogs() {
         try {
             await createTransferLog(formData);
             await fetchData();
+            setUserSearch('');
             setIsModalOpen(false);
         } catch (error) {
             console.error('Failed to record transfer:', error);
@@ -104,121 +135,121 @@ export default function TransferLogs() {
     );
 
     return (
-        <div className="p-6 md:p-10 space-y-8 relative">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <History className="text-blue-600" /> Transfer History
+        <div className="app-page">
+            <header className="app-page-header">
+                <div className="app-page-title-wrapper">
+                    <h1 className="app-page-title">
+                        <History className="app-page-title-icon" /> Transfer History
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1">Audit trail of asset movement within the institution.</p>
+                    <p className="app-page-subtitle">Audit trail of asset movement within the institution.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button onClick={handleOpenModal} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]">
+                <div className="transfer-logs-actions">
+                    <button onClick={handleOpenModal} className="app-btn app-btn-primary">
                         <Plus className="w-5 h-5" /> Record Transfer
                     </button>
-                    <a href="mailto:support@zenohosp.com" className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-200 bg-white" title="Contact ZenoHosp Support">
-                        <Mail className="w-5 h-5" />
+                    <a href="mailto:support@zenohosp.com" className="transfer-logs-mail-btn" title="Contact ZenoHosp Support">
+                        <Mail className="transfer-logs-btn-icon" />
                     </a>
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Total Logs</div>
-                    <div className="text-3xl font-black text-slate-900">{logs.length}</div>
+            <div className="app-stats-grid">
+                <div className="app-stat-card">
+                    <div className="app-stat-label">Total Logs</div>
+                    <div className="app-stat-value">{logs.length}</div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Moved Today</div>
-                    <div className="text-3xl font-black text-blue-600">
+                <div className="app-stat-card">
+                    <div className="app-stat-label">Moved Today</div>
+                    <div className="app-stat-value transfer-logs-stat-value-blue">
                         {logs.filter(l => new Date(l.transferDate).toDateString() === new Date().toDateString()).length}
                     </div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Active Assets</div>
-                    <div className="text-3xl font-black text-emerald-600">{new Set(logs.map(l => l.asset?.assetId)).size}</div>
+                <div className="app-stat-card">
+                    <div className="app-stat-label">Active Assets</div>
+                    <div className="app-stat-value transfer-logs-stat-value-emerald">{new Set(logs.map(l => l.asset?.assetId)).size}</div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Audit Strength</div>
-                    <div className="text-3xl font-black text-purple-600">
+                <div className="app-stat-card">
+                    <div className="app-stat-label">Audit Strength</div>
+                    <div className="app-stat-value transfer-logs-stat-value-purple">
                         {logs.length > 0 ? '100%' : '0%'}
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-                <div className="pl-3">
+            <div className="app-search-wrapper">
+                <div className="app-search-icon-wrapper">
                     <Search className="w-5 h-5 text-slate-400" />
                 </div>
                 <input
                     type="text"
                     placeholder="Search by asset or person..."
-                    className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 placeholder:text-slate-400 py-2.5 outline-none"
+                    className="app-search-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto min-h-[400px]">
-                    <table className="w-full text-left">
+            <div className="app-table-wrapper">
+                <div className="app-table-container">
+                    <table className="app-table">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Asset</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Movement</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Remarks</th>
+                            <tr className="app-table-thead-row">
+                                <th className="app-table-th">Asset</th>
+                                <th className="app-table-th">Movement</th>
+                                <th className="app-table-th">Date</th>
+                                <th className="app-table-th">Remarks</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="app-table-tbody">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-20 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-3 text-slate-400">
-                                            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                                            <p className="font-medium text-sm animate-pulse">Fetching audit logs...</p>
+                                    <td colSpan="4" className="app-table-td text-center py-8">
+                                        <div className="transfer-logs-empty-wrapper">
+                                            <Loader2 className="transfer-logs-loader-icon" />
+                                            <p className="transfer-logs-loader-text">Fetching audit logs...</p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : filteredLogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-20 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-3 text-slate-400">
-                                            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100 mb-2">
-                                                <History className="w-8 h-8 text-slate-300" />
+                                    <td colSpan="4" className="app-table-td text-center py-8">
+                                        <div className="transfer-logs-empty-wrapper">
+                                            <div className="transfer-logs-empty-icon-bg">
+                                                <History className="transfer-logs-empty-icon" />
                                             </div>
-                                            <p className="font-medium text-slate-600">No transfer history found</p>
-                                            <p className="text-sm">There are no records of asset movement yet.</p>
+                                            <p className="transfer-logs-empty-title">No transfer history found</p>
+                                            <p className="transfer-logs-empty-text">There are no records of asset movement yet.</p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : filteredLogs.map((log) => (
-                                <tr key={log.transferId} className="hover:bg-slate-50/80 transition-colors">
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                <tr key={log.transferId} className="app-table-row">
+                                    <td className="app-table-td">
+                                        <div className="transfer-logs-asset-cell">
+                                            <div className="transfer-logs-asset-icon-bg">
                                                 <Box className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-900">{log.asset?.assetName || 'Unknown Asset'}</p>
-                                                <p className="text-[10px] text-slate-400 uppercase font-black tracking-tighter mt-0.5">{log.asset?.assetCode || 'NO CODE'}</p>
+                                                <p className="transfer-logs-asset-name">{log.asset?.assetName || 'Unknown Asset'}</p>
+                                                <p className="transfer-logs-asset-code">{log.asset?.assetCode || 'NO CODE'}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-center min-w-[100px]">
-                                                <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-0.5">From</p>
-                                                <p className="text-xs font-bold text-slate-700">{log.fromEntityName || 'Inventory'}</p>
+                                    <td className="app-table-td">
+                                        <div className="transfer-logs-movement-cell">
+                                            <div className="transfer-logs-movement-box">
+                                                <p className="transfer-logs-movement-label">From</p>
+                                                <p className="transfer-logs-movement-value">{log.fromEntityName || 'Inventory'}</p>
                                             </div>
-                                            <ArrowRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
-                                            <div className="px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-lg text-center min-w-[100px]">
-                                                <p className="text-[10px] text-blue-400 uppercase tracking-wider font-bold mb-0.5">To</p>
-                                                <p className="text-xs font-bold text-blue-700">{log.toEntityName}</p>
+                                            <ArrowRight className="transfer-logs-movement-arrow" />
+                                            <div className="transfer-logs-movement-box-blue">
+                                                <p className="transfer-logs-movement-label-blue">To</p>
+                                                <p className="transfer-logs-movement-value-blue">{log.toEntityName}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2 text-sm text-slate-600 font-medium whitespace-nowrap">
+                                    <td className="app-table-td">
+                                        <div className="transfer-logs-date-cell">
                                             <Calendar className="w-4 h-4 text-slate-400" />
                                             {new Date(log.transferDate).toLocaleDateString(undefined, {
                                                 year: 'numeric', month: 'short', day: 'numeric',
@@ -226,9 +257,9 @@ export default function TransferLogs() {
                                             })}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <p className="text-sm text-slate-500 max-w-xs truncate">
-                                            {log.remarks || <span className="italic text-slate-300">No remarks provided</span>}
+                                    <td className="app-table-td">
+                                        <p className="transfer-logs-remarks">
+                                            {log.remarks || <span className="transfer-logs-remarks-empty">No remarks provided</span>}
                                         </p>
                                     </td>
                                 </tr>
@@ -240,101 +271,109 @@ export default function TransferLogs() {
 
             {/* Transfer Record Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)}></div>
+                <div className="app-modal-overlay">
+                    <div className="app-modal-backdrop" onClick={() => setIsModalOpen(false)}></div>
 
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col relative z-10 animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div className="app-modal-content">
+                        <div className="app-modal-header">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">Record Asset Transfer</h2>
+                                <h2 className="app-modal-title">Record Asset Transfer</h2>
                                 <p className="text-xs text-slate-500 mt-1">Assign an asset to a user or location</p>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="app-modal-close">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <div className="p-6 overflow-y-auto">
-                            <form id="transfer-form" onSubmit={handleSubmit} className="space-y-5">
+                        <div className="app-modal-body">
+                            <form id="transfer-form" onSubmit={handleSubmit} className="app-form">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center gap-2">
+                                    <label className="app-label">
                                         <Box className="w-4 h-4 text-blue-500" /> Select Asset *
                                     </label>
                                     <select
                                         required
+                                        className="app-input"
                                         value={formData.asset.assetId}
-                                        onChange={(e) => setFormData({ ...formData, asset: { assetId: e.target.value } })}
-                                        className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white"
+                                        onChange={handleAssetSelect}
                                     >
                                         <option value="" disabled>-- Choose an asset --</option>
                                         {assets.map(asset => (
                                             <option key={asset.assetId} value={asset.assetId}>
-                                                {asset.assetName} - {asset.assetCode}
+                                                {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.assignedTo ? ` — ${asset.assignedTo}` : ' — Inventory'}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="app-form-grid">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">From Location/User *</label>
+                                        <label className="app-label">From *</label>
                                         <input
                                             required
                                             type="text"
                                             value={formData.fromEntityName}
-                                            onChange={(e) => setFormData({ ...formData, fromEntityName: e.target.value })}
-                                            className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300 bg-slate-50"
-                                            placeholder="e.g. Inventory"
+                                            onChange={(e) => setFormData(prev => ({ ...prev, fromEntityName: e.target.value }))}
+                                            className="app-input"
+                                            style={{ backgroundColor: '#f8fafc' }}
+                                            placeholder="Inventory"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">To (Assignee) *</label>
-                                        {users.length > 0 ? (
-                                            <select
-                                                required
-                                                value={formData.toUserId}
-                                                onChange={handleUserSelect}
-                                                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white"
-                                            >
-                                                <option value="" disabled>Select User...</option>
-                                                {users.map(user => (
-                                                    <option key={user.id} value={user.id}>
-                                                        {user.name} ({user.role})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        ) : (
+                                        <label className="app-label">To (Assignee) *</label>
+                                        <div className="relative" ref={userDropdownRef}>
                                             <input
-                                                required
                                                 type="text"
-                                                value={formData.toEntityName}
-                                                onChange={(e) => setFormData({ ...formData, toEntityName: e.target.value })}
-                                                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
-                                                placeholder="Enter recipient name"
+                                                required={!formData.toUserId}
+                                                value={userSearch}
+                                                onChange={(e) => {
+                                                    setUserSearch(e.target.value);
+                                                    setFormData(prev => ({ ...prev, toUserId: '', toEntityName: e.target.value }));
+                                                    setUserDropdownOpen(true);
+                                                }}
+                                                onFocus={() => setUserDropdownOpen(true)}
+                                                className="app-input"
+                                                placeholder={users.length > 0 ? 'Search staff...' : 'Recipient name'}
                                             />
-                                        )}
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                            {userDropdownOpen && filteredUsers.length > 0 && (
+                                                <div className="transfer-logs-dropdown-menu">
+                                                    {filteredUsers.map(u => (
+                                                        <button
+                                                            key={u.id}
+                                                            type="button"
+                                                            onClick={() => handleUserPick(u)}
+                                                            className="transfer-logs-dropdown-item"
+                                                        >
+                                                            <p className="transfer-logs-dropdown-name">{userName(u)}</p>
+                                                            <p className="transfer-logs-dropdown-role">{userRole(u)}</p>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5 text-slate-700">Remarks</label>
+                                    <label className="app-label">Remarks</label>
                                     <textarea
                                         rows="3"
                                         value={formData.remarks}
                                         onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-                                        className="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300 resize-none"
+                                        className="app-textarea"
                                         placeholder="Reason for transfer, conditions, etc..."
                                     ></textarea>
                                 </div>
                             </form>
                         </div>
 
-                        <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
-                            <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors">
+                        <div className="app-modal-footer">
+                            <button type="button" onClick={() => setIsModalOpen(false)} className="app-btn app-btn-secondary">
                                 Cancel
                             </button>
-                            <button type="submit" form="transfer-form" disabled={isSubmitting} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            <button type="submit" form="transfer-form" disabled={isSubmitting} className="app-btn app-btn-primary">
+                                {isSubmitting && <Loader2 className="w-5 h-5 animate-spin mr-2" />}
                                 {isSubmitting ? 'Recording...' : 'Record Transfer'}
                             </button>
                         </div>
