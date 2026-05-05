@@ -1,0 +1,45 @@
+/* Room Allocation Page Styles */
+
+.room-alloc-assets-container {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.room-alloc-assets-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.room-alloc-asset-row {
+    display: table-row;
+    border-bottom: 1px solid #e2e8f0;
+    transition: background-color 0.2s ease;
+}
+
+.room-alloc-asset-row:hover {
+    background-color: #f1f5f9;
+}
+
+.room-alloc-asset-row:last-child {
+    border-bottom: none;
+}
+
+.room-alloc-badge-type {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.room-alloc-badge-icu {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+.room-alloc-badge-standard {
+    background-color: #f0f9ff;
+    color: #0c4a6e;
+}

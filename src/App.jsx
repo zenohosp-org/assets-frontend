@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import OAuth2Callback from './pages/OAuth2Callback';
 import Dashboard from './pages/Dashboard';
 import Assets from './pages/Assets';
+import RoomAllocation from './pages/RoomAllocation';
 import Vendors from './pages/Vendors';
 import AssetCategories from './pages/AssetCategories';
 import Maintenance from './pages/Maintenance';
@@ -27,6 +28,7 @@ export default function App() {
                                     <Routes>
                                         <Route path="/dashboard" element={<Dashboard />} />
                                         <Route path="/assets" element={<Assets />} />
+                                        <Route path="/rooms" element={<RoomAllocation />} />
                                         <Route path="/asset-categories" element={<AssetCategories />} />
                                         <Route path="/maintenance" element={<Maintenance />} />
                                         <Route path="/transfers" element={<TransfersLogs />} />

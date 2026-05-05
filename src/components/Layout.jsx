@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, LogOut, ChevronDown, ChevronRight, Layers, Users } from 'lucide-react';
+import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, LogOut, ChevronDown, ChevronRight, Layers, Users, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/layout.css';
 
@@ -15,6 +15,7 @@ export default function Layout({ children }) {
     const navItems = [
         { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { label: 'Asset Inventory', path: '/assets', icon: Box },
+        { label: 'Room Allocation', path: '/rooms', icon: MapPin },
         { label: 'Transfer Logs', path: '/transfers', icon: History },
         { label: 'Maintenance', path: '/maintenance', icon: Activity },
     ];
