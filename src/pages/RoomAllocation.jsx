@@ -6,7 +6,7 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/room-allocation.css';
-import { Plus, Search, X, Loader2, Trash2, ArrowRight, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Search, X, Loader2, Trash2, ArrowRight, MapPin, Bed, Building2 } from 'lucide-react';
 import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom } from '../api/client';
 
 export default function RoomAllocation() {
@@ -14,9 +14,6 @@ export default function RoomAllocation() {
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-
-    // Expanded room state
-    const [expandedRoomId, setExpandedRoomId] = useState(null);
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -76,6 +73,19 @@ export default function RoomAllocation() {
             (room.roomNumber || '').toLowerCase().includes(search) ||
             (room.roomCode || '').toLowerCase().includes(search)
         );
+    });
+
+    // Create a flat list of room-asset combinations for table display
+    const tableData = [];
+    filteredRooms.forEach(room => {
+        const roomAssets = assetsByRoom[room.id] || [];
+        if (roomAssets.length === 0) {
+            tableData.push({ type: 'room', room, asset: null, isFirstAsset: true });
+        } else {
+            roomAssets.forEach((asset, idx) => {
+                tableData.push({ type: 'asset', room, asset, isFirstAsset: idx === 0 });
+            });
+        }
     });
 
     // Handlers for Add Asset modal
@@ -251,183 +261,174 @@ export default function RoomAllocation() {
             </div>
 
             {/* Search */}
-            <div className="app-card">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Search size={18} style={{ color: '#94a3b8' }} />
-                    <input
-                        type="text"
-                        placeholder="Search rooms by number or code..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="app-input"
-                        style={{ flex: 1, borderRadius: '8px', border: 'none', padding: '8px 12px' }}
-                    />
+            <div className="app-search-wrapper">
+                <div className="app-search-icon-wrapper">
+                    <Search className="w-5 h-5" />
                 </div>
+                <input
+                    type="text"
+                    placeholder="Search rooms by number or code..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="app-search-input"
+                />
             </div>
 
-            {/* Rooms List */}
+            {/* Rooms with Assets Table */}
             <div className="app-table-wrapper">
                 <div className="app-table-container">
                     <table className="app-table">
                         <thead>
                             <tr className="app-table-thead-row">
-                                <th className="app-table-th" style={{ width: '30px' }}></th>
                                 <th className="app-table-th">Room</th>
-                                <th className="app-table-th">Type</th>
-                                <th className="app-table-th">Floor</th>
-                                <th className="app-table-th">Status</th>
-                                <th className="app-table-th">Assets</th>
+                                <th className="app-table-th">Type & Status</th>
+                                <th className="app-table-th">Asset Info</th>
+                                <th className="app-table-th">Category</th>
+                                <th className="app-table-th room-alloc-table-th--right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="app-table-tbody">
-                            {filteredRooms.length === 0 ? (
+                            {loading ? (
                                 <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
-                                        No rooms found
+                                    <td colSpan="5" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
+                                        <div className="app-empty">
+                                            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                                            <p className="text-sm font-medium animate-pulse">Loading rooms...</p>
+                                        </div>
                                     </td>
                                 </tr>
-                            ) : (
-                                filteredRooms.map((room) => {
-                                    const roomAssets = assetsByRoom[room.id] || [];
-                                    const isExpanded = expandedRoomId === room.id;
-
+                            ) : tableData.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
+                                        <div className="app-empty">
+                                            <div className="flex items-center justify-center w-16 h-16 mb-2 border rounded-full bg-slate-50 border-slate-100">
+                                                <Building2 className="w-8 h-8 text-slate-300" />
+                                            </div>
+                                            <p className="font-medium text-slate-600" style={{ color: '#0f172a' }}>No rooms found</p>
+                                            <p className="text-sm">No rooms match your search criteria.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : tableData.map((row, idx) => {
+                                if (row.type === 'room' && row.asset === null) {
+                                    // Room with no assets
                                     return (
-                                        <tbody key={room.id}>
-                                            <tr className="app-table-row">
-                                                <td className="app-table-td" style={{ textAlign: 'center', padding: '8px 16px' }}>
-                                                    <button
-                                                        onClick={() => setExpandedRoomId(isExpanded ? null : room.id)}
-                                                        className="app-btn-icon"
-                                                        title={isExpanded ? 'Collapse' : 'Expand'}
-                                                    >
-                                                        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                                                    </button>
-                                                </td>
-                                                <td className="app-table-td">
-                                                    <div style={{ fontWeight: 600, color: '#1e293b' }}>
-                                                        {room.roomNumber}
+                                        <tr key={`${row.room.id}-empty`} className="app-table-row room-alloc-room-row">
+                                            <td className="app-table-td">
+                                                <div className="room-alloc-room-cell">
+                                                    <div className="room-alloc-room-icon">
+                                                        <Building2 className="w-5 h-5" />
                                                     </div>
-                                                    {room.roomCode && (
-                                                        <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'monospace', marginTop: '2px' }}>
-                                                            {room.roomCode}
-                                                        </div>
-                                                    )}
-                                                </td>
-                                                <td className="app-table-td">
-                                                    {room.roomType && (
-                                                        <span style={{
-                                                            display: 'inline-block',
-                                                            fontSize: '10px',
-                                                            fontWeight: 700,
-                                                            textTransform: 'uppercase',
-                                                            padding: '2px 8px',
-                                                            borderRadius: '12px',
-                                                            border: '1px solid #e2e8f0',
-                                                            backgroundColor: room.roomType === 'ICU' ? '#fef2f2' : '#f0f9ff',
-                                                            color: room.roomType === 'ICU' ? '#991b1b' : '#0c4a6e'
-                                                        }}>
-                                                            {room.roomType}
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="app-table-td">{room.bedCount ? `Bed ${room.bedCount}` : '-'}</td>
-                                                <td className="app-table-td">
-                                                    {room.status && (
-                                                        <span style={{
-                                                            display: 'inline-block',
-                                                            fontSize: '10px',
-                                                            fontWeight: 700,
-                                                            textTransform: 'uppercase',
-                                                            padding: '2px 8px',
-                                                            borderRadius: '12px',
-                                                            border: '1px solid #e2e8f0',
-                                                            backgroundColor: room.status === 'AVAILABLE' ? '#f0fdf4' : '#e0f2fe',
-                                                            color: room.status === 'AVAILABLE' ? '#15803d' : '#0369a1'
-                                                        }}>
-                                                            {room.status}
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="app-table-td">{roomAssets.length}</td>
-                                            </tr>
-
-                                            {/* Expanded Asset List */}
-                                            {isExpanded && (
-                                                <tr>
-                                                    <td colSpan="6" style={{ padding: 0 }}>
-                                                        <div className="room-alloc-assets-container">
-                                                            {roomAssets.length === 0 ? (
-                                                                <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', background: '#f8fafc' }}>
-                                                                    No assets allocated to this room
-                                                                </div>
-                                                            ) : (
-                                                                <div className="room-alloc-assets-wrapper">
-                                                                    {roomAssets.map((asset) => (
-                                                                        <div key={asset.assetId} className="room-alloc-asset-row-wrapper">
-                                                                            <div className="room-alloc-asset-spacer"></div>
-                                                                            <div className="room-alloc-asset-name">
-                                                                                <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>
-                                                                                    {asset.assetName}
-                                                                                </div>
-                                                                                {asset.assetCode && (
-                                                                                    <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
-                                                                                        {asset.assetCode}
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="room-alloc-asset-category">
-                                                                                {asset.category?.name || '-'}
-                                                                            </div>
-                                                                            <div className="room-alloc-asset-empty1"></div>
-                                                                            <div className="room-alloc-asset-empty2"></div>
-                                                                            <div className="room-alloc-asset-actions">
-                                                                                <button
-                                                                                    onClick={() => handleOpenTransferModal(room, asset)}
-                                                                                    className="app-btn-icon"
-                                                                                    title="Transfer to another room"
-                                                                                    style={{ color: '#3b82f6' }}
-                                                                                >
-                                                                                    <ArrowRight size={16} />
-                                                                                </button>
-                                                                                <button
-                                                                                    onClick={() => handleOpenRemoveModal(room, asset)}
-                                                                                    className="app-btn-icon"
-                                                                                    title="Remove from room"
-                                                                                    style={{ color: '#ef4444' }}
-                                                                                >
-                                                                                    <Trash2 size={16} />
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-
-                                                            {/* Add Asset Button */}
-                                                            <div className="room-alloc-asset-add-button">
-                                                                <button
-                                                                    onClick={() => handleOpenAddModal(room)}
-                                                                    className="app-btn app-btn-primary"
-                                                                    style={{ fontSize: '14px', padding: '6px 12px' }}
-                                                                    disabled={availableAssets.length === 0}
-                                                                >
-                                                                    <Plus size={16} />
-                                                                    Add Asset
-                                                                </button>
-                                                                {availableAssets.length === 0 && (
-                                                                    <span style={{ fontSize: '12px', color: '#94a3b8', padding: '6px 12px' }}>
-                                                                        No available assets
-                                                                    </span>
+                                                    <div>
+                                                        <p className="room-alloc-room-name">{row.room.roomNumber}</p>
+                                                        {row.room.roomCode && (
+                                                            <p className="room-alloc-room-code">{row.room.roomCode}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="app-table-td">
+                                                <div className="room-alloc-type-status">
+                                                    <span className={`room-alloc-type-badge ${row.room.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
+                                                        {row.room.roomType || 'Standard'}
+                                                    </span>
+                                                    <span className={`room-alloc-status-badge ${row.room.status === 'AVAILABLE' ? 'room-alloc-status-available' : 'room-alloc-status-occupied'}`}>
+                                                        {row.room.status}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="app-table-td">
+                                                <span style={{ color: '#94a3b8', fontSize: '14px' }}>No assets allocated</span>
+                                            </td>
+                                            <td className="app-table-td">
+                                                -
+                                            </td>
+                                            <td className="app-table-td room-alloc-table-td--right">
+                                                <button
+                                                    onClick={() => handleOpenAddModal(row.room)}
+                                                    className="app-btn app-btn-primary"
+                                                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                                                    disabled={availableAssets.length === 0}
+                                                    title="Add asset to this room"
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                } else if (row.type === 'asset' && row.asset) {
+                                    // Room with assets
+                                    const isFirstAsset = row.isFirstAsset;
+                                    return (
+                                        <tr key={`${row.room.id}-${row.asset.assetId}`} className="app-table-row">
+                                            {isFirstAsset ? (
+                                                <>
+                                                    <td className="app-table-td" rowSpan={assetsByRoom[row.room.id]?.length || 1}>
+                                                        <div className="room-alloc-room-cell">
+                                                            <div className="room-alloc-room-icon">
+                                                                <Building2 className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="room-alloc-room-name">{row.room.roomNumber}</p>
+                                                                {row.room.roomCode && (
+                                                                    <p className="room-alloc-room-code">{row.room.roomCode}</p>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
+                                                    <td className="app-table-td" rowSpan={assetsByRoom[row.room.id]?.length || 1}>
+                                                        <div className="room-alloc-type-status">
+                                                            <span className={`room-alloc-type-badge ${row.room.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
+                                                                {row.room.roomType || 'Standard'}
+                                                            </span>
+                                                            <span className={`room-alloc-status-badge ${row.room.status === 'AVAILABLE' ? 'room-alloc-status-available' : 'room-alloc-status-occupied'}`}>
+                                                                {row.room.status}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                </>
+                                            ) : null}
+                                            <td className="app-table-td">
+                                                <div className="room-alloc-asset-cell">
+                                                    <div className="room-alloc-asset-icon">
+                                                        <MapPin className="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="room-alloc-asset-name">{row.asset.assetName}</p>
+                                                        <p className="room-alloc-asset-code">{row.asset.assetCode || 'NO CODE'}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="app-table-td">
+                                                <span style={{ color: '#64748b', fontSize: '14px' }}>
+                                                    {row.asset.category?.name || 'Unknown'}
+                                                </span>
+                                            </td>
+                                            <td className="app-table-td room-alloc-table-td--right">
+                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        onClick={() => handleOpenTransferModal(row.room, row.asset)}
+                                                        className="app-btn-icon"
+                                                        title="Transfer to another room"
+                                                        style={{ color: '#3b82f6' }}
+                                                    >
+                                                        <ArrowRight size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleOpenRemoveModal(row.room, row.asset)}
+                                                        className="app-btn-icon"
+                                                        title="Remove from room"
+                                                        style={{ color: '#ef4444' }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     );
-                                })
-                            )}
+                                }
+                                return null;
+                            })}
                         </tbody>
                     </table>
                 </div>
