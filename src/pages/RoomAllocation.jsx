@@ -357,59 +357,54 @@ export default function RoomAllocation() {
                                                     <td colSpan="6" style={{ padding: 0 }}>
                                                         <div className="room-alloc-assets-container">
                                                             {roomAssets.length === 0 ? (
-                                                                <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8' }}>
+                                                                <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', background: '#f8fafc' }}>
                                                                     No assets allocated to this room
                                                                 </div>
                                                             ) : (
-                                                                <table className="room-alloc-assets-table">
-                                                                    <tbody>
-                                                                        {roomAssets.map((asset) => (
-                                                                            <tr key={asset.assetId} className="room-alloc-asset-row">
-                                                                                <td style={{ padding: '12px 20px', borderRight: '1px solid #e2e8f0' }}>
-                                                                                    <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>
-                                                                                        {asset.assetName}
+                                                                <div className="room-alloc-assets-wrapper">
+                                                                    {roomAssets.map((asset) => (
+                                                                        <div key={asset.assetId} className="room-alloc-asset-row-wrapper">
+                                                                            <div className="room-alloc-asset-spacer"></div>
+                                                                            <div className="room-alloc-asset-name">
+                                                                                <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>
+                                                                                    {asset.assetName}
+                                                                                </div>
+                                                                                {asset.assetCode && (
+                                                                                    <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                                                                                        {asset.assetCode}
                                                                                     </div>
-                                                                                    {asset.assetCode && (
-                                                                                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
-                                                                                            {asset.assetCode}
-                                                                                        </div>
-                                                                                    )}
-                                                                                </td>
-                                                                                <td style={{ padding: '12px 20px', borderRight: '1px solid #e2e8f0', minWidth: '120px' }}>
-                                                                                    {asset.category?.name && (
-                                                                                        <span style={{ fontSize: '12px', color: '#64748b' }}>
-                                                                                            {asset.category.name}
-                                                                                        </span>
-                                                                                    )}
-                                                                                </td>
-                                                                                <td style={{ padding: '12px 20px', textAlign: 'right' }}>
-                                                                                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                                                                        <button
-                                                                                            onClick={() => handleOpenTransferModal(room, asset)}
-                                                                                            className="app-btn-icon"
-                                                                                            title="Transfer to another room"
-                                                                                            style={{ color: '#3b82f6' }}
-                                                                                        >
-                                                                                            <ArrowRight size={16} />
-                                                                                        </button>
-                                                                                        <button
-                                                                                            onClick={() => handleOpenRemoveModal(room, asset)}
-                                                                                            className="app-btn-icon"
-                                                                                            title="Remove from room"
-                                                                                            style={{ color: '#ef4444' }}
-                                                                                        >
-                                                                                            <Trash2 size={16} />
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="room-alloc-asset-category">
+                                                                                {asset.category?.name || '-'}
+                                                                            </div>
+                                                                            <div className="room-alloc-asset-empty1"></div>
+                                                                            <div className="room-alloc-asset-empty2"></div>
+                                                                            <div className="room-alloc-asset-actions">
+                                                                                <button
+                                                                                    onClick={() => handleOpenTransferModal(room, asset)}
+                                                                                    className="app-btn-icon"
+                                                                                    title="Transfer to another room"
+                                                                                    style={{ color: '#3b82f6' }}
+                                                                                >
+                                                                                    <ArrowRight size={16} />
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => handleOpenRemoveModal(room, asset)}
+                                                                                    className="app-btn-icon"
+                                                                                    title="Remove from room"
+                                                                                    style={{ color: '#ef4444' }}
+                                                                                >
+                                                                                    <Trash2 size={16} />
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
                                                             )}
 
                                                             {/* Add Asset Button */}
-                                                            <div style={{ padding: '12px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '8px' }}>
+                                                            <div className="room-alloc-asset-add-button">
                                                                 <button
                                                                     onClick={() => handleOpenAddModal(room)}
                                                                     className="app-btn app-btn-primary"
