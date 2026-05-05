@@ -27,9 +27,9 @@ export default function RoomAllocation() {
     // Current operation state
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [selectedAsset, setSelectedAsset] = useState(null);
-    const [addFormData, setAddFormData] = useState({ assetId: '', notes: '' });
+    const [addFormData, setAddFormData] = useState({ assetId: '', floor: '', notes: '' });
     const [removeFormData, setRemoveFormData] = useState({ notes: '' });
-    const [transferFormData, setTransferFormData] = useState({ toRoomId: '', reason: '' });
+    const [transferFormData, setTransferFormData] = useState({ toRoomId: '', toFloor: '', reason: '' });
 
     // Load initial data
     useEffect(() => {
@@ -73,22 +73,22 @@ export default function RoomAllocation() {
     const filteredRooms = rooms.filter(room => {
         const search = searchTerm.toLowerCase();
         return (
-            (room.room_number || '').toLowerCase().includes(search) ||
-            (room.room_code || '').toLowerCase().includes(search)
+            (room.roomNumber || '').toLowerCase().includes(search) ||
+            (room.roomCode || '').toLowerCase().includes(search)
         );
     });
 
     // Handlers for Add Asset modal
     const handleOpenAddModal = (room) => {
         setSelectedRoom(room);
-        setAddFormData({ assetId: '', notes: '' });
+        setAddFormData({ assetId: '', floor: '', notes: '' });
         setIsAddModalOpen(true);
     };
 
     const handleCloseAddModal = () => {
         setIsAddModalOpen(false);
         setSelectedRoom(null);
-        setAddFormData({ assetId: '', notes: '' });
+        setAddFormData({ assetId: '', floor: '', notes: '' });
     };
 
     const handleAddAssetSubmit = async (e) => {
@@ -97,12 +97,16 @@ export default function RoomAllocation() {
             alert('Please select an asset');
             return;
         }
+        if (!addFormData.floor) {
+            alert('Please enter a floor number');
+            return;
+        }
 
         setIsSubmitting(true);
         try {
             await assignAssetToRoom(addFormData.assetId, {
                 roomId: parseInt(selectedRoom.id),
-                floor: parseInt(selectedRoom.floor),
+                floor: parseInt(addFormData.floor),
                 notes: addFormData.notes
             });
 
@@ -159,7 +163,7 @@ export default function RoomAllocation() {
     const handleOpenTransferModal = (room, asset) => {
         setSelectedRoom(room);
         setSelectedAsset(asset);
-        setTransferFormData({ toRoomId: '', reason: '' });
+        setTransferFormData({ toRoomId: '', toFloor: '', reason: '' });
         setIsTransferModalOpen(true);
     };
 
@@ -167,7 +171,7 @@ export default function RoomAllocation() {
         setIsTransferModalOpen(false);
         setSelectedRoom(null);
         setSelectedAsset(null);
-        setTransferFormData({ toRoomId: '', reason: '' });
+        setTransferFormData({ toRoomId: '', toFloor: '', reason: '' });
     };
 
     const handleTransferAssetSubmit = async (e) => {
@@ -176,10 +180,8 @@ export default function RoomAllocation() {
             alert('Please select a destination room');
             return;
         }
-
-        const toRoom = rooms.find(r => r.id === parseInt(transferFormData.toRoomId));
-        if (!toRoom) {
-            alert('Invalid room selected');
+        if (!transferFormData.toFloor) {
+            alert('Please enter a floor number');
             return;
         }
 
@@ -187,7 +189,7 @@ export default function RoomAllocation() {
         try {
             await transferAssetRoom(selectedAsset.assetId, {
                 toRoomId: parseInt(transferFormData.toRoomId),
-                toFloor: parseInt(toRoom.floor),
+                toFloor: parseInt(transferFormData.toFloor),
                 reason: transferFormData.reason
             });
 
@@ -303,16 +305,16 @@ export default function RoomAllocation() {
                                                 </td>
                                                 <td className="app-table-td">
                                                     <div style={{ fontWeight: 600, color: '#1e293b' }}>
-                                                        {room.room_number}
+                                                        {room.roomNumber}
                                                     </div>
-                                                    {room.room_code && (
+                                                    {room.roomCode && (
                                                         <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'monospace', marginTop: '2px' }}>
-                                                            {room.room_code}
+                                                            {room.roomCode}
                                                         </div>
                                                     )}
                                                 </td>
                                                 <td className="app-table-td">
-                                                    {room.room_type && (
+                                                    {room.roomType && (
                                                         <span style={{
                                                             display: 'inline-block',
                                                             fontSize: '10px',
@@ -321,14 +323,14 @@ export default function RoomAllocation() {
                                                             padding: '2px 8px',
                                                             borderRadius: '12px',
                                                             border: '1px solid #e2e8f0',
-                                                            backgroundColor: room.room_type === 'ICU' ? '#fef2f2' : '#f0f9ff',
-                                                            color: room.room_type === 'ICU' ? '#991b1b' : '#0c4a6e'
+                                                            backgroundColor: room.roomType === 'ICU' ? '#fef2f2' : '#f0f9ff',
+                                                            color: room.roomType === 'ICU' ? '#991b1b' : '#0c4a6e'
                                                         }}>
-                                                            {room.room_type}
+                                                            {room.roomType}
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="app-table-td">{room.floor}</td>
+                                                <td className="app-table-td">{room.bedCount ? `Bed ${room.bedCount}` : '-'}</td>
                                                 <td className="app-table-td">
                                                     {room.status && (
                                                         <span style={{
@@ -454,7 +456,7 @@ export default function RoomAllocation() {
                                         <label className="app-label">Room</label>
                                         <input
                                             type="text"
-                                            value={`${selectedRoom.room_number} (Floor ${selectedRoom.floor})`}
+                                            value={`${selectedRoom.roomNumber} (${selectedRoom.roomType || 'Standard'})`}
                                             disabled
                                             className="app-input"
                                         />
@@ -474,6 +476,19 @@ export default function RoomAllocation() {
                                                 </option>
                                             ))}
                                         </select>
+                                    </div>
+                                    <div>
+                                        <label className="app-label">Floor *</label>
+                                        <input
+                                            required
+                                            type="number"
+                                            min="0"
+                                            max="50"
+                                            value={addFormData.floor}
+                                            onChange={(e) => setAddFormData({ ...addFormData, floor: e.target.value })}
+                                            className="app-input"
+                                            placeholder="e.g., 3"
+                                        />
                                     </div>
                                     <div style={{ gridColumn: '1 / -1' }}>
                                         <label className="app-label">Notes</label>
@@ -588,10 +603,23 @@ export default function RoomAllocation() {
                                             <option value="">Select room</option>
                                             {rooms.map((room) => (
                                                 <option key={room.id} value={room.id}>
-                                                    {room.room_number} (Floor {room.floor}) - {room.room_type || 'Standard'}
+                                                    {room.roomNumber} - {room.roomType || 'Standard'}
                                                 </option>
                                             ))}
                                         </select>
+                                    </div>
+                                    <div>
+                                        <label className="app-label">Floor *</label>
+                                        <input
+                                            required
+                                            type="number"
+                                            min="0"
+                                            max="50"
+                                            value={transferFormData.toFloor}
+                                            onChange={(e) => setTransferFormData({ ...transferFormData, toFloor: e.target.value })}
+                                            className="app-input"
+                                            placeholder="e.g., 3"
+                                        />
                                     </div>
                                     <div style={{ gridColumn: '1 / -1' }}>
                                         <label className="app-label">Reason</label>
