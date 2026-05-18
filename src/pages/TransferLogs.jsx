@@ -300,7 +300,7 @@ export default function TransferLogs() {
                                         <option value="" disabled>-- Choose an asset --</option>
                                         {assets.map(asset => (
                                             <option key={asset.assetId} value={asset.assetId}>
-                                                {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.assignedTo ? ` — ${asset.assignedTo}` : ' — Inventory'}
+                                                {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.serialNumber ? ` | SN: ${asset.serialNumber}` : ''}{asset.assignedTo ? ` — ${asset.assignedTo}` : ' — Inventory'}
                                             </option>
                                         ))}
                                     </select>

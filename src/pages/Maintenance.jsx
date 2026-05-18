@@ -20,6 +20,7 @@ export default function Maintenance() {
     // Log Service Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedAssetHasAmc, setSelectedAssetHasAmc] = useState(false);
     const [formData, setFormData] = useState({
         assetId: '',
         maintenanceDate: '',
@@ -75,9 +76,22 @@ export default function Maintenance() {
         return `MB-${dateStr}-${random}`;
     };
 
+    const handleAssetChange = (assetId) => {
+        const asset = assets.find(a => a.assetId === assetId);
+        const today = new Date().toISOString().split('T')[0];
+        const hasAmc = !!(asset && asset.amcCost > 0 && asset.amcExpiry && asset.amcExpiry >= today);
+        setSelectedAssetHasAmc(hasAmc);
+        setFormData(prev => ({
+            ...prev,
+            assetId,
+            cost: hasAmc ? String(asset.amcCost) : prev.cost
+        }));
+    };
+
     const handleOpenModal = () => {
+        const firstAssetId = assets.length > 0 ? assets[0].assetId : '';
         setFormData({
-            assetId: assets.length > 0 ? assets[0].assetId : '',
+            assetId: firstAssetId,
             maintenanceDate: new Date().toISOString().split('T')[0],
             type: 'MAINTENANCE',
             performedByVendor: null,
@@ -86,10 +100,15 @@ export default function Maintenance() {
             description: '',
             notes: ''
         });
+        setSelectedAssetHasAmc(false);
+        if (firstAssetId) handleAssetChange(firstAssetId);
         setIsModalOpen(true);
     };
 
-    const handleCloseModal = () => setIsModalOpen(false);
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedAssetHasAmc(false);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -389,7 +408,7 @@ export default function Maintenance() {
                             <form id="maintenance-form" onSubmit={handleSubmit} className="app-form">
                                 <div>
                                     <label className="app-label">Asset *</label>
-                                    <select required value={formData.assetId} onChange={e => setFormData({ ...formData, assetId: e.target.value })} className="app-input">
+                                    <select required value={formData.assetId} onChange={e => handleAssetChange(e.target.value)} className="app-input">
                                         <option value="">-- Select Asset --</option>
                                         {assets.map(a => (
                                             <option key={a.assetId} value={a.assetId}>{a.assetName} {a.assetCode ? `(${a.assetCode})` : ''}</option>
@@ -422,6 +441,9 @@ export default function Maintenance() {
                                     <div>
                                         <label className="app-label">Cost (₹)</label>
                                         <input type="number" step="0.01" value={formData.cost} onChange={e => setFormData({ ...formData, cost: e.target.value })} className="app-input" placeholder="0.00" />
+                                        {selectedAssetHasAmc && (
+                                            <p className="maintenance-amc-notice">Under AMC — cost auto-filled from contract</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div>

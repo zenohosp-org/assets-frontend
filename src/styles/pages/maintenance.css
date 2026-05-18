@@ -158,3 +158,10 @@
     background-color: #fee2e2;
     color: #dc2626;
 }
+
+.maintenance-amc-notice {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #16a34a;
+    font-weight: 500;
+}
