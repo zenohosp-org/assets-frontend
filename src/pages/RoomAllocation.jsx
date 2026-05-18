@@ -98,7 +98,7 @@ export default function RoomAllocation() {
     // Handlers for Add Asset modal
     const handleOpenAddModal = (room) => {
         setSelectedRoom(room);
-        setAddRows([{ assetId: '', floor: '', notes: '' }]);
+        setAddRows([{ assetId: '', floor: room.floor ?? '', notes: '' }]);
         setIsAddModalOpen(true);
     };
 
@@ -108,7 +108,7 @@ export default function RoomAllocation() {
         setAddRows([{ assetId: '', floor: '', notes: '' }]);
     };
 
-    const addRow = () => setAddRows(prev => [...prev, { assetId: '', floor: '', notes: '' }]);
+    const addRow = () => setAddRows(prev => [...prev, { assetId: '', floor: selectedRoom?.floor ?? '', notes: '' }]);
     const removeRow = (i) => setAddRows(prev => prev.filter((_, idx) => idx !== i));
     const updateRow = (i, field, value) =>
         setAddRows(prev => prev.map((row, idx) => idx === i ? { ...row, [field]: value } : row));
