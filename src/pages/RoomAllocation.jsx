@@ -6,7 +6,7 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/room-allocation.css';
-import { Plus, Search, X, Loader2, Trash2, ArrowRight, MapPin, Bed, Building2, MoreVertical } from 'lucide-react';
+import { Plus, Search, X, Loader2, Trash2, ArrowRight, Building2, MoreVertical } from 'lucide-react';
 import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom } from '../api/client';
 
 export default function RoomAllocation() {
@@ -290,16 +290,15 @@ export default function RoomAllocation() {
                         <thead>
                             <tr className="app-table-thead-row">
                                 <th className="app-table-th">Room</th>
-                                <th className="app-table-th">Type & Status</th>
+                                <th className="app-table-th">Type</th>
                                 <th className="app-table-th">Asset Info</th>
-                                <th className="app-table-th">Category</th>
                                 <th className="app-table-th room-alloc-table-th--right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="app-table-tbody">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
+                                    <td colSpan="4" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
                                         <div className="app-empty">
                                             <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
                                             <p className="text-sm font-medium animate-pulse">Loading rooms...</p>
@@ -308,7 +307,7 @@ export default function RoomAllocation() {
                                 </tr>
                             ) : tableData.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
+                                    <td colSpan="4" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
                                         <div className="app-empty">
                                             <div className="flex items-center justify-center w-16 h-16 mb-2 border rounded-full bg-slate-50 border-slate-100">
                                                 <Building2 className="w-8 h-8 text-slate-300" />
@@ -337,20 +336,12 @@ export default function RoomAllocation() {
                                                 </div>
                                             </td>
                                             <td className="app-table-td">
-                                                <div className="room-alloc-type-status">
-                                                    <span className={`room-alloc-type-badge ${row.room.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
-                                                        {row.room.roomType || 'Standard'}
-                                                    </span>
-                                                    <span className={`room-alloc-status-badge ${row.room.status === 'AVAILABLE' ? 'room-alloc-status-available' : 'room-alloc-status-occupied'}`}>
-                                                        {row.room.status}
-                                                    </span>
-                                                </div>
+                                                <span className={`room-alloc-type-badge ${row.room.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
+                                                    {row.room.roomType || 'Standard'}
+                                                </span>
                                             </td>
                                             <td className="app-table-td">
                                                 <span style={{ color: '#94a3b8', fontSize: '14px' }}>No assets allocated</span>
-                                            </td>
-                                            <td className="app-table-td">
-                                                -
                                             </td>
                                             <td className="app-table-td room-alloc-table-td--right">
                                                 <button
@@ -386,32 +377,19 @@ export default function RoomAllocation() {
                                                         </div>
                                                     </td>
                                                     <td className="app-table-td" rowSpan={assetsByRoom[row.room.id]?.length || 1}>
-                                                        <div className="room-alloc-type-status">
-                                                            <span className={`room-alloc-type-badge ${row.room.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
-                                                                {row.room.roomType || 'Standard'}
-                                                            </span>
-                                                            <span className={`room-alloc-status-badge ${row.room.status === 'AVAILABLE' ? 'room-alloc-status-available' : 'room-alloc-status-occupied'}`}>
-                                                                {row.room.status}
-                                                            </span>
-                                                        </div>
+                                                        <span className={`room-alloc-type-badge ${row.room.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
+                                                            {row.room.roomType || 'Standard'}
+                                                        </span>
                                                     </td>
                                                 </>
                                             ) : null}
                                             <td className="app-table-td">
                                                 <div className="room-alloc-asset-cell">
-                                                    <div className="room-alloc-asset-icon">
-                                                        <MapPin className="w-4 h-4" />
-                                                    </div>
                                                     <div>
                                                         <p className="room-alloc-asset-name">{row.asset.assetName}</p>
                                                         <p className="room-alloc-asset-code">{row.asset.assetCode || 'NO CODE'}</p>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="app-table-td">
-                                                <span style={{ color: '#64748b', fontSize: '14px' }}>
-                                                    {row.asset.category?.name || 'Unknown'}
-                                                </span>
                                             </td>
                                             <td className="app-table-td room-alloc-table-td--right" style={{ position: 'relative' }}>
                                                 <button
