@@ -25,7 +25,7 @@ export default function RoomAllocation() {
     // Current operation state
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [selectedAsset, setSelectedAsset] = useState(null);
-    const [addFormData, setAddFormData] = useState({ assetId: '', floor: '', notes: '' });
+    const [addRows, setAddRows] = useState([{ assetId: '', floor: '', notes: '' }]);
     const [removeFormData, setRemoveFormData] = useState({ notes: '' });
     const [transferFormData, setTransferFormData] = useState({ toRoomId: '', toFloor: '', reason: '' });
 
@@ -98,43 +98,44 @@ export default function RoomAllocation() {
     // Handlers for Add Asset modal
     const handleOpenAddModal = (room) => {
         setSelectedRoom(room);
-        setAddFormData({ assetId: '', floor: '', notes: '' });
+        setAddRows([{ assetId: '', floor: '', notes: '' }]);
         setIsAddModalOpen(true);
     };
 
     const handleCloseAddModal = () => {
         setIsAddModalOpen(false);
         setSelectedRoom(null);
-        setAddFormData({ assetId: '', floor: '', notes: '' });
+        setAddRows([{ assetId: '', floor: '', notes: '' }]);
     };
+
+    const addRow = () => setAddRows(prev => [...prev, { assetId: '', floor: '', notes: '' }]);
+    const removeRow = (i) => setAddRows(prev => prev.filter((_, idx) => idx !== i));
+    const updateRow = (i, field, value) =>
+        setAddRows(prev => prev.map((row, idx) => idx === i ? { ...row, [field]: value } : row));
 
     const handleAddAssetSubmit = async (e) => {
         e.preventDefault();
-        if (!addFormData.assetId) {
-            alert('Please select an asset');
-            return;
-        }
-        if (!addFormData.floor) {
-            alert('Please enter a floor number');
-            return;
+        for (const row of addRows) {
+            if (!row.assetId) { alert('Please select an asset for all rows'); return; }
+            if (!row.floor) { alert('Please enter a floor for all rows'); return; }
         }
 
         setIsSubmitting(true);
         try {
-            await assignAssetToRoom(addFormData.assetId, {
-                roomId: parseInt(selectedRoom.id),
-                floor: parseInt(addFormData.floor),
-                notes: addFormData.notes
-            });
-
-            // Refresh assets
+            await Promise.all(addRows.map(row =>
+                assignAssetToRoom(row.assetId, {
+                    roomId: parseInt(selectedRoom.id),
+                    floor: parseInt(row.floor),
+                    notes: row.notes,
+                })
+            ));
             const assetsRes = await getAssets();
             setAssets(assetsRes.data || []);
             handleCloseAddModal();
-            alert('Asset assigned successfully!');
+            alert(addRows.length === 1 ? 'Asset assigned successfully!' : `${addRows.length} assets assigned successfully!`);
         } catch (error) {
-            console.error('Failed to assign asset:', error);
-            alert('Failed to assign asset. Please try again.');
+            console.error('Failed to assign assets:', error);
+            alert('Failed to assign one or more assets. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -438,56 +439,94 @@ export default function RoomAllocation() {
                         </div>
                         <div className="app-modal-body">
                             <form id="add-asset-form" onSubmit={handleAddAssetSubmit} className="app-form">
-                                <div className="app-form-grid">
-                                    <div>
-                                        <label className="app-label">Room</label>
-                                        <input
-                                            type="text"
-                                            value={`${selectedRoom.roomNumber} (${selectedRoom.roomType || 'Standard'})`}
-                                            disabled
-                                            className="app-input"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="app-label">Asset *</label>
-                                        <select
-                                            required
-                                            value={addFormData.assetId}
-                                            onChange={(e) => setAddFormData({ ...addFormData, assetId: e.target.value })}
-                                            className="app-input"
-                                        >
-                                            <option value="">Select an asset</option>
-                                            {availableAssets.map((asset) => (
-                                                <option key={asset.assetId} value={asset.assetId}>
-                                                    {asset.assetName} ({asset.assetCode || 'N/A'})
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="app-label">Floor *</label>
-                                        <input
-                                            required
-                                            type="number"
-                                            min="0"
-                                            max="50"
-                                            value={addFormData.floor}
-                                            onChange={(e) => setAddFormData({ ...addFormData, floor: e.target.value })}
-                                            className="app-input"
-                                            placeholder="e.g., 3"
-                                        />
-                                    </div>
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                        <label className="app-label">Notes</label>
-                                        <textarea
-                                            value={addFormData.notes}
-                                            onChange={(e) => setAddFormData({ ...addFormData, notes: e.target.value })}
-                                            className="app-textarea"
-                                            placeholder="Add any notes about this allocation..."
-                                            rows="3"
-                                        ></textarea>
+                                <div className="room-alloc-modal-room-label">
+                                    Room: <strong>{selectedRoom.roomNumber}</strong>
+                                    {selectedRoom.roomType && <span className={`room-alloc-type-badge ${selectedRoom.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`} style={{ marginLeft: '8px' }}>{selectedRoom.roomType}</span>}
+                                </div>
+                                <div className="app-table-wrapper" style={{ marginTop: '12px' }}>
+                                    <div className="app-table-container">
+                                        <table className="app-table">
+                                            <thead>
+                                                <tr className="app-table-thead-row">
+                                                    <th className="app-table-th">#</th>
+                                                    <th className="app-table-th">Asset *</th>
+                                                    <th className="app-table-th">Floor *</th>
+                                                    <th className="app-table-th">Notes</th>
+                                                    <th className="app-table-th"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="app-table-tbody">
+                                                {addRows.map((row, i) => {
+                                                    const rowAvailable = availableAssets.filter(
+                                                        a => !addRows.some((r, ri) => ri !== i && r.assetId === String(a.assetId))
+                                                    );
+                                                    return (
+                                                        <tr key={i} className="app-table-row">
+                                                            <td className="app-table-td" style={{ width: '32px', color: '#94a3b8', fontSize: '13px' }}>{i + 1}</td>
+                                                            <td className="app-table-td">
+                                                                <select
+                                                                    value={row.assetId}
+                                                                    onChange={(e) => updateRow(i, 'assetId', e.target.value)}
+                                                                    className="app-input"
+                                                                    style={{ minWidth: '180px' }}
+                                                                >
+                                                                    <option value="">Select asset</option>
+                                                                    {rowAvailable.map(a => (
+                                                                        <option key={a.assetId} value={a.assetId}>
+                                                                            {a.assetName} ({a.assetCode || 'N/A'})
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </td>
+                                                            <td className="app-table-td" style={{ width: '90px' }}>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    max="50"
+                                                                    value={row.floor}
+                                                                    onChange={(e) => updateRow(i, 'floor', e.target.value)}
+                                                                    className="app-input"
+                                                                    placeholder="0"
+                                                                />
+                                                            </td>
+                                                            <td className="app-table-td">
+                                                                <input
+                                                                    type="text"
+                                                                    value={row.notes}
+                                                                    onChange={(e) => updateRow(i, 'notes', e.target.value)}
+                                                                    className="app-input"
+                                                                    placeholder="Optional notes"
+                                                                />
+                                                            </td>
+                                                            <td className="app-table-td" style={{ width: '36px' }}>
+                                                                {addRows.length > 1 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeRow(i)}
+                                                                        className="app-btn-icon"
+                                                                        style={{ color: '#ef4444' }}
+                                                                        title="Remove row"
+                                                                    >
+                                                                        <X size={16} />
+                                                                    </button>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
+                                <button
+                                    type="button"
+                                    onClick={addRow}
+                                    disabled={addRows.length >= availableAssets.length}
+                                    className="app-btn app-btn-secondary"
+                                    style={{ marginTop: '10px', fontSize: '13px' }}
+                                >
+                                    <Plus size={14} /> Add Another Asset
+                                </button>
                             </form>
                         </div>
                         <div className="app-modal-footer">
@@ -496,7 +535,7 @@ export default function RoomAllocation() {
                             </button>
                             <button type="submit" form="add-asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
                                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                {isSubmitting ? 'Adding...' : 'Add Asset'}
+                                {isSubmitting ? 'Adding...' : addRows.length === 1 ? 'Add Asset' : `Add ${addRows.length} Assets`}
                             </button>
                         </div>
                     </div>

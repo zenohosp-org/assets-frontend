@@ -133,6 +133,15 @@
     background-color: #f1f5f9;
 }
 
+/* Modal room label */
+.room-alloc-modal-room-label {
+    font-size: 14px;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 /* Table Actions */
 .room-alloc-table-th--right {
     text-align: right;

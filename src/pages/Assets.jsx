@@ -632,77 +632,72 @@ export default function Assets() {
                         <div className="app-modal-body">
                             {allocatingAsset && (
                                 <form id="allocate-form" onSubmit={handleAllocateSubmit} className="app-form">
-                                    <div className="app-form-grid">
-                                        <div className="assets-form-section">
-                                            <h3 className="assets-form-section-title">Asset Details</h3>
-                                            <div className="app-form-row">
-                                                <div>
-                                                    <label className="app-label">Asset Name</label>
-                                                    <input type="text" value={allocatingAsset.assetName} disabled className="app-input" />
-                                                </div>
-                                                <div>
-                                                    <label className="app-label">Asset Code</label>
-                                                    <input type="text" value={allocatingAsset.assetCode || '-'} disabled className="app-input" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="assets-form-section">
-                                            <h3 className="assets-form-section-title">Allocation Details</h3>
-                                            <div className="app-form-row">
-                                                <div>
-                                                    <label className="app-label">Room *</label>
-                                                    {roomsLoading ? (
-                                                        <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                            Loading rooms...
-                                                        </div>
-                                                    ) : (
-                                                        <select
-                                                            required
-                                                            value={allocateFormData.roomId}
-                                                            onChange={(e) => {
-                                                                const selected = rooms.find(r => String(r.id) === e.target.value);
-                                                                setAllocateFormData({
-                                                                    ...allocateFormData,
-                                                                    roomId: e.target.value,
-                                                                    floor: selected?.floor ?? ''
-                                                                });
-                                                            }}
-                                                            className="app-input"
-                                                        >
-                                                            <option value="">Select Room</option>
-                                                            {rooms.map(room => (
-                                                                <option key={room.id} value={room.id}>
-                                                                    {room.roomNumber} ({room.roomType || 'Standard'}) - Floor {room.floor}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <label className="app-label">Floor</label>
-                                                    <input
-                                                        type="number"
-                                                        value={allocateFormData.floor}
-                                                        disabled
-                                                        className="app-input"
-                                                        placeholder="Auto-filled from room"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="app-form-row">
-                                                <div>
-                                                    <label className="app-label">Notes (Optional)</label>
-                                                    <textarea
-                                                        rows="3"
-                                                        value={allocateFormData.notes}
-                                                        onChange={(e) => setAllocateFormData({ ...allocateFormData, notes: e.target.value })}
-                                                        className="app-textarea"
-                                                        placeholder="Add any notes about this allocation..."
-                                                    ></textarea>
-                                                </div>
-                                            </div>
+                                    <div className="assets-allocate-asset-label">
+                                        Asset: <strong>{allocatingAsset.assetName}</strong>
+                                        {allocatingAsset.assetCode && <span className="assets-allocate-asset-code">{allocatingAsset.assetCode}</span>}
+                                    </div>
+                                    <div className="app-table-wrapper" style={{ marginTop: '12px' }}>
+                                        <div className="app-table-container">
+                                            <table className="app-table">
+                                                <thead>
+                                                    <tr className="app-table-thead-row">
+                                                        <th className="app-table-th">Room *</th>
+                                                        <th className="app-table-th">Floor</th>
+                                                        <th className="app-table-th">Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="app-table-tbody">
+                                                    <tr className="app-table-row">
+                                                        <td className="app-table-td">
+                                                            {roomsLoading ? (
+                                                                <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
+                                                                    <Loader2 className="w-4 h-4 animate-spin" /> Loading rooms...
+                                                                </div>
+                                                            ) : (
+                                                                <select
+                                                                    required
+                                                                    value={allocateFormData.roomId}
+                                                                    onChange={(e) => {
+                                                                        const selected = rooms.find(r => String(r.id) === e.target.value);
+                                                                        setAllocateFormData({
+                                                                            ...allocateFormData,
+                                                                            roomId: e.target.value,
+                                                                            floor: selected?.floor ?? ''
+                                                                        });
+                                                                    }}
+                                                                    className="app-input"
+                                                                    style={{ minWidth: '200px' }}
+                                                                >
+                                                                    <option value="">Select Room</option>
+                                                                    {rooms.map(room => (
+                                                                        <option key={room.id} value={room.id}>
+                                                                            {room.roomNumber} ({room.roomType || 'Standard'})
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            )}
+                                                        </td>
+                                                        <td className="app-table-td" style={{ width: '90px' }}>
+                                                            <input
+                                                                type="number"
+                                                                value={allocateFormData.floor}
+                                                                disabled
+                                                                className="app-input"
+                                                                placeholder="—"
+                                                            />
+                                                        </td>
+                                                        <td className="app-table-td">
+                                                            <input
+                                                                type="text"
+                                                                value={allocateFormData.notes}
+                                                                onChange={(e) => setAllocateFormData({ ...allocateFormData, notes: e.target.value })}
+                                                                className="app-input"
+                                                                placeholder="Optional notes"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </form>
