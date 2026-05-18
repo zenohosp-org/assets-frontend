@@ -6,7 +6,7 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/room-allocation.css';
-import { Plus, Search, X, Loader2, Trash2, ArrowRight, MapPin, Bed, Building2 } from 'lucide-react';
+import { Plus, Search, X, Loader2, Trash2, ArrowRight, MapPin, Bed, Building2, MoreVertical } from 'lucide-react';
 import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom } from '../api/client';
 
 export default function RoomAllocation() {
@@ -14,6 +14,7 @@ export default function RoomAllocation() {
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeDropdown, setActiveDropdown] = useState(null);
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -27,6 +28,12 @@ export default function RoomAllocation() {
     const [addFormData, setAddFormData] = useState({ assetId: '', floor: '', notes: '' });
     const [removeFormData, setRemoveFormData] = useState({ notes: '' });
     const [transferFormData, setTransferFormData] = useState({ toRoomId: '', toFloor: '', reason: '' });
+
+    useEffect(() => {
+        const handleClickOutside = () => setActiveDropdown(null);
+        window.addEventListener('click', handleClickOutside);
+        return () => window.removeEventListener('click', handleClickOutside);
+    }, []);
 
     // Load initial data
     useEffect(() => {
@@ -135,6 +142,7 @@ export default function RoomAllocation() {
 
     // Handlers for Remove Asset modal
     const handleOpenRemoveModal = (room, asset) => {
+        setActiveDropdown(null);
         setSelectedRoom(room);
         setSelectedAsset(asset);
         setRemoveFormData({ notes: '' });
@@ -171,6 +179,7 @@ export default function RoomAllocation() {
 
     // Handlers for Transfer Asset modal
     const handleOpenTransferModal = (room, asset) => {
+        setActiveDropdown(null);
         setSelectedRoom(room);
         setSelectedAsset(asset);
         setTransferFormData({ toRoomId: '', toFloor: '', reason: '' });
@@ -404,25 +413,30 @@ export default function RoomAllocation() {
                                                     {row.asset.category?.name || 'Unknown'}
                                                 </span>
                                             </td>
-                                            <td className="app-table-td room-alloc-table-td--right">
-                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                                    <button
-                                                        onClick={() => handleOpenTransferModal(row.room, row.asset)}
-                                                        className="app-btn-icon"
-                                                        title="Transfer to another room"
-                                                        style={{ color: '#3b82f6' }}
-                                                    >
-                                                        <ArrowRight size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleOpenRemoveModal(row.room, row.asset)}
-                                                        className="app-btn-icon"
-                                                        title="Remove from room"
-                                                        style={{ color: '#ef4444' }}
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
+                                            <td className="app-table-td room-alloc-table-td--right" style={{ position: 'relative' }}>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === row.asset.assetId ? null : row.asset.assetId); }}
+                                                    className="app-btn-icon"
+                                                >
+                                                    <MoreVertical size={18} />
+                                                </button>
+                                                {activeDropdown === row.asset.assetId && (
+                                                    <div className="assets-dropdown">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleOpenTransferModal(row.room, row.asset); }}
+                                                            className="assets-dropdown-item"
+                                                        >
+                                                            <ArrowRight className="w-4 h-4 text-blue-500" /> Transfer Room
+                                                        </button>
+                                                        <div className="h-px my-1 bg-slate-100"></div>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleOpenRemoveModal(row.room, row.asset); }}
+                                                            className="assets-dropdown-item--danger"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" /> Remove from Room
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </td>
                                         </tr>
                                     );

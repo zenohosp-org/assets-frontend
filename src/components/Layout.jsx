@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, ChevronDown, ChevronRight, Layers, Users, MapPin, BarChart2, Package, ArrowUpRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 import Header from './Header';
 import '../styles/layout.css';
 
