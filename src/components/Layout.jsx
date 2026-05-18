@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, LogOut, ChevronDown, ChevronRight, Layers, Users, MapPin, BarChart2, Package, ArrowUpRight } from 'lucide-react';
+import { Box, History, Activity, Settings, LayoutDashboard, Tag, Globe, ChevronDown, ChevronRight, Layers, Users, MapPin, BarChart2, Package, ArrowUpRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Header from './Header';
 import '../styles/layout.css';
 
 export default function Layout({ children }) {
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
-    // Check if user has an admin role
-    const [isAdmin, setIsAdmin] = useState(user?.role === 'hospital_admin' || user?.role === 'super_admin' || user?.role?.toLowerCase() === 'admin');
+    const isAdmin = user?.role === 'hospital_admin' || user?.role === 'super_admin' || user?.role?.toLowerCase() === 'admin';
     const [isMastersOpen, setIsMastersOpen] = useState(location.pathname.startsWith('/vendors') || location.pathname.startsWith('/asset-categories'));
 
     const navItems = [
@@ -102,18 +102,11 @@ export default function Layout({ children }) {
 
                 <div className="app-sidebar-footer">
                     {isAdmin && (
-                        <a href="https://directory.zenohosp.com/dashboard" className="app-sidebar-btn admin">
+                        <a href="https://directory.zenohosp.com/dashboard" className="app-sidebar-btn admin" target="_blank" rel="noopener noreferrer">
                             <Globe />
                             Directory Admin
                         </a>
                     )}
-                    <button
-                        onClick={logout}
-                        className="app-sidebar-btn logout"
-                    >
-                        <LogOut />
-                        Sign Out
-                    </button>
                 </div>
 
                 <div className="app-sidebar-copyright">
@@ -121,9 +114,12 @@ export default function Layout({ children }) {
                 </div>
             </aside>
 
-            {/* Main Content */}
+            {/* Header + Main Content */}
             <main className="app-main">
-                {children}
+                <Header onMenuClick={() => {}} />
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                    {children}
+                </div>
             </main>
         </div>
     );
