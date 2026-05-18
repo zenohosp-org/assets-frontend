@@ -247,3 +247,8 @@
     font-size: 12px;
     color: #94a3b8;
 }
+.transfer-logs-input-readonly {
+    background-color: #f8fafc;
+    color: #64748b;
+    cursor: default;
+}

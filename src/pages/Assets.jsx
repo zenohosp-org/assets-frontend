@@ -519,8 +519,8 @@ export default function Assets() {
                                                 <input required type="text" value={formData.assetName} onChange={(e) => setFormData({ ...formData, assetName: e.target.value })} className="app-input" placeholder="e.g. MRI Scanner Model X" />
                                             </div>
                                             <div>
-                                                <label className="app-label">Asset Category *</label>
-                                                <select required
+                                                <label className="app-label">Asset Category</label>
+                                                <select
                                                     value={formData.category?.id || ''}
                                                     onChange={(e) => setFormData({ ...formData, category: e.target.value ? { id: e.target.value } : null })}
                                                     className="app-input">

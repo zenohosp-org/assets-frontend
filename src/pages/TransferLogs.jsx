@@ -92,7 +92,11 @@ export default function TransferLogs() {
     const handleAssetSelect = (e) => {
         const assetId = e.target.value;
         const selected = assets.find(a => a.assetId === assetId);
-        const fromName = selected?.assignedTo || 'Inventory';
+        let fromName = 'Inventory';
+        if (selected?.assignedTo) {
+            const assignedUser = users.find(u => String(u.id) === String(selected.assignedTo));
+            if (assignedUser) fromName = userName(assignedUser);
+        }
         setFormData(prev => ({ ...prev, asset: { assetId }, fromEntityName: fromName }));
     };
 
@@ -308,15 +312,12 @@ export default function TransferLogs() {
 
                                 <div className="app-form-grid">
                                     <div>
-                                        <label className="app-label">From *</label>
+                                        <label className="app-label">From</label>
                                         <input
-                                            required
                                             type="text"
                                             value={formData.fromEntityName}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, fromEntityName: e.target.value }))}
-                                            className="app-input"
-                                            style={{ backgroundColor: '#f8fafc' }}
-                                            placeholder="Inventory"
+                                            readOnly
+                                            className="app-input transfer-logs-input-readonly"
                                         />
                                     </div>
                                     <div>

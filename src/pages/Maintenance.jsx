@@ -21,6 +21,7 @@ export default function Maintenance() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedAssetHasAmc, setSelectedAssetHasAmc] = useState(false);
+    const [selectedAssetHasWarranty, setSelectedAssetHasWarranty] = useState(false);
     const [formData, setFormData] = useState({
         assetId: '',
         maintenanceDate: '',
@@ -80,7 +81,9 @@ export default function Maintenance() {
         const asset = assets.find(a => a.assetId === assetId);
         const today = new Date().toISOString().split('T')[0];
         const hasAmc = !!(asset && asset.amcCost > 0 && asset.amcExpiry && asset.amcExpiry >= today);
+        const hasWarranty = !!(asset && asset.warrantyExpiry && asset.warrantyExpiry >= today);
         setSelectedAssetHasAmc(hasAmc);
+        setSelectedAssetHasWarranty(hasWarranty);
         setFormData(prev => ({
             ...prev,
             assetId,
@@ -108,6 +111,7 @@ export default function Maintenance() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedAssetHasAmc(false);
+        setSelectedAssetHasWarranty(false);
     };
 
     const handleSubmit = async (e) => {
@@ -443,6 +447,9 @@ export default function Maintenance() {
                                         <input type="number" step="0.01" value={formData.cost} onChange={e => setFormData({ ...formData, cost: e.target.value })} className="app-input" placeholder="0.00" />
                                         {selectedAssetHasAmc && (
                                             <p className="maintenance-amc-notice">Under AMC — cost auto-filled from contract</p>
+                                        )}
+                                        {formData.type === 'REPAIR' && selectedAssetHasWarranty && (
+                                            <p className="maintenance-warranty-notice">Asset is still under warranty — repair may be covered by the vendor</p>
                                         )}
                                     </div>
                                 </div>
