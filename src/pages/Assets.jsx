@@ -33,6 +33,7 @@ export default function Assets() {
         notes: ''
     });
     const [isAllocateSubmitting, setIsAllocateSubmitting] = useState(false);
+    const [roomsError, setRoomsError] = useState(false);
 
     // Serial number inline editing state
     const [editingSerialId, setEditingSerialId] = useState(null);
@@ -257,8 +258,8 @@ export default function Assets() {
     const handleAllocateSubmit = async (e) => {
         e.preventDefault();
         
-        if (!allocateFormData.roomId || !allocateFormData.floor) {
-            alert('Please select a room and floor');
+        if (!allocateFormData.roomId) {
+            alert('Please select a room');
             return;
         }
         
@@ -660,29 +661,33 @@ export default function Assets() {
                                                         <select
                                                             required
                                                             value={allocateFormData.roomId}
-                                                            onChange={(e) => setAllocateFormData({ ...allocateFormData, roomId: e.target.value })}
+                                                            onChange={(e) => {
+                                                                const selected = rooms.find(r => String(r.id) === e.target.value);
+                                                                setAllocateFormData({
+                                                                    ...allocateFormData,
+                                                                    roomId: e.target.value,
+                                                                    floor: selected?.floor ?? ''
+                                                                });
+                                                            }}
                                                             className="app-input"
                                                         >
                                                             <option value="">Select Room</option>
                                                             {rooms.map(room => (
                                                                 <option key={room.id} value={room.id}>
-                                                                    {room.room_number} (TYPE {room.room_type}) - Floor {room.floor}
+                                                                    {room.roomNumber} ({room.roomType || 'Standard'}) - Floor {room.floor}
                                                                 </option>
                                                             ))}
                                                         </select>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <label className="app-label">Floor *</label>
+                                                    <label className="app-label">Floor</label>
                                                     <input
-                                                        required
                                                         type="number"
-                                                        min="0"
-                                                        max="50"
                                                         value={allocateFormData.floor}
-                                                        onChange={(e) => setAllocateFormData({ ...allocateFormData, floor: e.target.value })}
+                                                        disabled
                                                         className="app-input"
-                                                        placeholder="e.g., 3"
+                                                        placeholder="Auto-filled from room"
                                                     />
                                                 </div>
                                             </div>

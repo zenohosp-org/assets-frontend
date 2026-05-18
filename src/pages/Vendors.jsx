@@ -6,7 +6,7 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/vendors.css';
-import { Users, Plus, Edit2, Trash2, X, Search } from 'lucide-react';
+import { Users, Plus, Edit2, Trash2, X, Search, MoreVertical } from 'lucide-react';
 import { getVendors, createVendor, updateVendor, deleteVendor } from '../api/client';
 
 const GST_TYPES = ['REGULAR', 'COMPOSITION', 'UNREGISTERED', 'CONSUMER', 'OVERSEAS'];
@@ -38,8 +38,15 @@ export default function Vendors() {
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState(EMPTY_FORM);
     const [stateAutoFilled, setStateAutoFilled] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState(null);
 
     useEffect(() => { fetchVendors(); }, []);
+
+    useEffect(() => {
+        const handleClickOutside = () => setActiveDropdown(null);
+        window.addEventListener('click', handleClickOutside);
+        return () => window.removeEventListener('click', handleClickOutside);
+    }, []);
 
     const fetchVendors = async () => {
         setLoading(true);
@@ -203,15 +210,24 @@ export default function Vendors() {
                                             {v.isActive !== false ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td className="app-table-td">
-                                        <div className="vendors-table-actions">
-                                            <button onClick={() => handleOpenModal(v)} className="app-btn-icon" title="Edit">
-                                                <Edit2 size={16} />
-                                            </button>
-                                            <button onClick={() => handleDelete(v.id)} className="app-btn-icon" title="Delete" style={{ color: '#ef4444' }}>
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
+                                    <td className="app-table-td" style={{ position: 'relative' }}>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === v.id ? null : v.id); }}
+                                            className="app-btn-icon"
+                                        >
+                                            <MoreVertical size={18} />
+                                        </button>
+                                        {activeDropdown === v.id && (
+                                            <div className="assets-dropdown">
+                                                <button onClick={(e) => { e.stopPropagation(); handleOpenModal(v); }} className="assets-dropdown-item">
+                                                    <Edit2 className="w-4 h-4 text-blue-500" /> Edit Details
+                                                </button>
+                                                <div className="h-px my-1 bg-slate-100"></div>
+                                                <button onClick={(e) => { e.stopPropagation(); handleDelete(v.id); }} className="assets-dropdown-item--danger">
+                                                    <Trash2 className="w-4 h-4" /> Delete Vendor
+                                                </button>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
