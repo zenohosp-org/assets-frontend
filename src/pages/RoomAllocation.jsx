@@ -6,7 +6,7 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/room-allocation.css';
-import { Plus, Search, X, Loader2, Trash2, ArrowRight, Building2, MoreVertical } from 'lucide-react';
+import { Plus, Search, X, Loader2, Trash2,MapPin,ArrowRight, Building2, MoreVertical } from 'lucide-react';
 import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom } from '../api/client';
 
 export default function RoomAllocation() {
