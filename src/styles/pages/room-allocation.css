@@ -142,6 +142,16 @@
     gap: 4px;
 }
 
+/* Modal inner table overrides */
+.room-alloc-modal-table .app-table-container {
+    min-height: unset;
+}
+
+.room-alloc-modal-table .app-table-th,
+.room-alloc-modal-table .app-table-td {
+    padding: 10px 12px;
+}
+
 /* Table Actions */
 .room-alloc-table-th--right {
     text-align: right;

@@ -636,7 +636,7 @@ export default function Assets() {
                                         Asset: <strong>{allocatingAsset.assetName}</strong>
                                         {allocatingAsset.assetCode && <span className="assets-allocate-asset-code">{allocatingAsset.assetCode}</span>}
                                     </div>
-                                    <div className="app-table-wrapper" style={{ marginTop: '12px' }}>
+                                    <div className="app-table-wrapper assets-allocate-modal-table" style={{ marginTop: '12px' }}>
                                         <div className="app-table-container">
                                             <table className="app-table">
                                                 <thead>

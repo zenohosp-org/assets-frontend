@@ -392,6 +392,18 @@ export default function RoomAllocation() {
                                                 </div>
                                             </td>
                                             <td className="app-table-td room-alloc-table-td--right" style={{ position: 'relative' }}>
+                                                <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                {isFirstAsset && (
+                                                    <button
+                                                        onClick={() => handleOpenAddModal(row.room)}
+                                                        className="app-btn app-btn-primary"
+                                                        style={{ fontSize: '12px', padding: '6px 12px' }}
+                                                        disabled={availableAssets.length === 0}
+                                                        title="Add asset to this room"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === row.asset.assetId ? null : row.asset.assetId); }}
                                                     className="app-btn-icon"
@@ -415,6 +427,7 @@ export default function RoomAllocation() {
                                                         </button>
                                                     </div>
                                                 )}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -443,7 +456,7 @@ export default function RoomAllocation() {
                                     Room: <strong>{selectedRoom.roomNumber}</strong>
                                     {selectedRoom.roomType && <span className={`room-alloc-type-badge ${selectedRoom.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`} style={{ marginLeft: '8px' }}>{selectedRoom.roomType}</span>}
                                 </div>
-                                <div className="app-table-wrapper" style={{ marginTop: '12px' }}>
+                                <div className="app-table-wrapper room-alloc-modal-table" style={{ marginTop: '12px' }}>
                                     <div className="app-table-container">
                                         <table className="app-table">
                                             <thead>

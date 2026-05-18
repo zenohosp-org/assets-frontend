@@ -1,3 +1,12 @@
+.assets-allocate-modal-table .app-table-container {
+    min-height: unset;
+}
+
+.assets-allocate-modal-table .app-table-th,
+.assets-allocate-modal-table .app-table-td {
+    padding: 10px 12px;
+}
+
 .assets-allocate-asset-label {
     font-size: 14px;
     color: #475569;
