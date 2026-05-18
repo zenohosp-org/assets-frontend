@@ -7,9 +7,7 @@ import '../styles/layout.css';
 
 export default function Layout({ children }) {
     const location = useLocation();
-    const { user } = useAuth();
 
-    const isAdmin = user?.role === 'hospital_admin' || user?.role === 'super_admin' || user?.role?.toLowerCase() === 'admin';
     const [isMastersOpen, setIsMastersOpen] = useState(location.pathname.startsWith('/vendors') || location.pathname.startsWith('/asset-categories'));
 
     const navItems = [
@@ -99,15 +97,6 @@ export default function Layout({ children }) {
                         </a>
                     ))}
                 </nav>
-
-                <div className="app-sidebar-footer">
-                    {isAdmin && (
-                        <a href="https://directory.zenohosp.com/dashboard" className="app-sidebar-btn admin" target="_blank" rel="noopener noreferrer">
-                            <Globe />
-                            Directory Admin
-                        </a>
-                    )}
-                </div>
 
                 <div className="app-sidebar-copyright">
                     &copy; 2026 Institutional Asset Manager
