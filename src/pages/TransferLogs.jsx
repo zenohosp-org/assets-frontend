@@ -140,11 +140,13 @@ export default function TransferLogs() {
         }
     };
 
-    const filteredLogs = logs.filter(log =>
-        log.asset?.assetName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.fromEntityName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.toEntityName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredLogs = logs
+        .filter(log =>
+            log.asset?.assetName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            log.fromEntityName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            log.toEntityName?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => new Date(b.transferDate ?? 0) - new Date(a.transferDate ?? 0));
 
     return (
         <div className="app-page">
