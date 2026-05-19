@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext';
 export default function Header() {
     const { user, logout } = useAuth();
 
+    const displayName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User';
     const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}` || 'U';
-    const displayName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || 'User';
 
     return (
         <header className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 shrink-0">

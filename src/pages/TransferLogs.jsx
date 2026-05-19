@@ -165,7 +165,7 @@ export default function TransferLogs() {
                 <div className="app-stat-card">
                     <div className="app-stat-label">Moved Today</div>
                     <div className="app-stat-value transfer-logs-stat-value-blue">
-                        {logs.filter(l => new Date(l.transferDate).toDateString() === new Date().toDateString()).length}
+                        {logs.filter(l => l.transferDate && new Date(l.transferDate).toDateString() === new Date().toDateString()).length}
                     </div>
                 </div>
                 <div className="app-stat-card">
@@ -255,10 +255,12 @@ export default function TransferLogs() {
                                     <td className="app-table-td">
                                         <div className="transfer-logs-date-cell">
                                             <Calendar className="w-4 h-4 text-slate-400" />
-                                            {new Date(log.transferDate).toLocaleDateString(undefined, {
-                                                year: 'numeric', month: 'short', day: 'numeric',
-                                                hour: '2-digit', minute: '2-digit'
-                                            })}
+                                            {log.transferDate
+                                                ? new Date(log.transferDate).toLocaleDateString(undefined, {
+                                                    year: 'numeric', month: 'short', day: 'numeric',
+                                                    hour: '2-digit', minute: '2-digit'
+                                                })
+                                                : '—'}
                                         </div>
                                     </td>
                                     <td className="app-table-td">
