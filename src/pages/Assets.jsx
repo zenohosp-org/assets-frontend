@@ -8,6 +8,7 @@ import '../styles/modals.css';
 import '../styles/pages/assets.css';
 import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail, Check, X as XIcon, Edit3, MapPin } from 'lucide-react';
 import { getAssets, createAsset, updateAsset, deleteAsset, getVendors, getAssetCategories, getHmsRooms, assignAssetToRoom } from '../api/client';
+import SearchableSelect from '../components/SearchableSelect';
 
 export default function Assets() {
     const [assets, setAssets] = useState([]);
@@ -520,27 +521,26 @@ export default function Assets() {
                                             </div>
                                             <div>
                                                 <label className="app-label">Asset Category</label>
-                                                <select
+                                                <SearchableSelect
                                                     value={formData.category?.id || ''}
-                                                    onChange={(e) => setFormData({ ...formData, category: e.target.value ? { id: e.target.value } : null })}
-                                                    className="app-input">
-                                                    <option value="">Select Category</option>
-                                                    {categories.map(c => (
-                                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                                    ))}
-                                                </select>
+                                                    onChange={(id) => setFormData({ ...formData, category: id ? { id } : null })}
+                                                    options={categories}
+                                                    getId={c => c.id}
+                                                    getLabel={c => c.name}
+                                                    placeholder="Select Category"
+                                                />
                                             </div>
                                             <div>
                                                 <label className="app-label">Vendor *</label>
-                                                <select required
+                                                <SearchableSelect
                                                     value={formData.vendor?.id || ''}
-                                                    onChange={(e) => setFormData({ ...formData, vendor: e.target.value ? { id: e.target.value } : null })}
-                                                    className="app-input">
-                                                    <option value="">Select Vendor</option>
-                                                    {vendors.map(v => (
-                                                        <option key={v.id} value={v.id}>{v.name}</option>
-                                                    ))}
-                                                </select>
+                                                    onChange={(id) => setFormData({ ...formData, vendor: id ? { id } : null })}
+                                                    options={vendors}
+                                                    getId={v => v.id}
+                                                    getLabel={v => v.name}
+                                                    placeholder="Select Vendor"
+                                                    required
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -654,27 +654,18 @@ export default function Assets() {
                                                                     <Loader2 className="w-4 h-4 animate-spin" /> Loading rooms...
                                                                 </div>
                                                             ) : (
-                                                                <select
-                                                                    required
+                                                                <SearchableSelect
                                                                     value={allocateFormData.roomId}
-                                                                    onChange={(e) => {
-                                                                        const selected = rooms.find(r => String(r.id) === e.target.value);
-                                                                        setAllocateFormData({
-                                                                            ...allocateFormData,
-                                                                            roomId: e.target.value,
-                                                                            floor: selected?.floor ?? ''
-                                                                        });
+                                                                    onChange={(id) => {
+                                                                        const room = rooms.find(r => String(r.id) === id);
+                                                                        setAllocateFormData({ ...allocateFormData, roomId: id, floor: room?.floor ?? '' });
                                                                     }}
-                                                                    className="app-input"
-                                                                    style={{ minWidth: '200px' }}
-                                                                >
-                                                                    <option value="">Select Room</option>
-                                                                    {rooms.map(room => (
-                                                                        <option key={room.id} value={room.id}>
-                                                                            {room.roomNumber} ({room.roomType || 'Standard'})
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
+                                                                    options={rooms}
+                                                                    getId={r => String(r.id)}
+                                                                    getLabel={r => `${r.roomNumber} (${r.roomType || 'Standard'})`}
+                                                                    placeholder="Select Room"
+                                                                    required
+                                                                />
                                                             )}
                                                         </td>
                                                         <td className="app-table-td" style={{ width: '90px' }}>

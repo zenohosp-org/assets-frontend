@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getMaintenanceRecords, createMaintenanceRecord, completeMaintenanceRecord, getFinanceBankAccounts, createFinanceBankTransaction, getAssets, getVendors } from '../api/client';
 import { Activity, AlertCircle, Wrench, Calendar, Tag, DollarSign, Search, Plus, X, Loader2, Check, XIcon } from 'lucide-react';
+import SearchableSelect from '../components/SearchableSelect';
 import '../styles/common.css';
 import '../styles/buttons.css';
 import '../styles/cards.css';
@@ -412,12 +413,15 @@ export default function Maintenance() {
                             <form id="maintenance-form" onSubmit={handleSubmit} className="app-form">
                                 <div>
                                     <label className="app-label">Asset *</label>
-                                    <select required value={formData.assetId} onChange={e => handleAssetChange(e.target.value)} className="app-input">
-                                        <option value="">-- Select Asset --</option>
-                                        {assets.map(a => (
-                                            <option key={a.assetId} value={a.assetId}>{a.assetName} {a.assetCode ? `(${a.assetCode})` : ''}</option>
-                                        ))}
-                                    </select>
+                                    <SearchableSelect
+                                        value={formData.assetId}
+                                        onChange={handleAssetChange}
+                                        options={assets}
+                                        getId={a => a.assetId}
+                                        getLabel={a => `${a.assetName}${a.assetCode ? ` (${a.assetCode})` : ''}`}
+                                        placeholder="Search asset..."
+                                        required
+                                    />
                                 </div>
                                 <div className="app-form-grid">
                                     <div>
@@ -433,14 +437,14 @@ export default function Maintenance() {
                                     </div>
                                     <div>
                                         <label className="app-label">Service Vendor</label>
-                                        <select value={formData.performedByVendor?.id || ''}
-                                            onChange={e => setFormData({ ...formData, performedByVendor: e.target.value ? { id: e.target.value } : null })}
-                                            className="app-input">
-                                            <option value="">-- In-house / Other --</option>
-                                            {vendors.map(v => (
-                                                <option key={v.id} value={v.id}>{v.name}</option>
-                                            ))}
-                                        </select>
+                                        <SearchableSelect
+                                            value={formData.performedByVendor?.id || ''}
+                                            onChange={(id) => setFormData({ ...formData, performedByVendor: id ? { id } : null })}
+                                            options={vendors}
+                                            getId={v => v.id}
+                                            getLabel={v => v.name}
+                                            placeholder="In-house / Other"
+                                        />
                                     </div>
                                     <div>
                                         <label className="app-label">Cost (₹)</label>
@@ -523,24 +527,18 @@ export default function Maintenance() {
                                         {isBankAccountsLoading ? (
                                             <div style={{ padding: '8px', color: '#6b7280' }}>Loading accounts...</div>
                                         ) : (
-                                            <select
-                                                required
+                                            <SearchableSelect
                                                 value={completeFormData.bankAccountId}
-                                                onChange={e => {
-                                                    const account = bankAccounts.find(a => a.id === e.target.value);
-                                                    setCompleteFormData({
-                                                        ...completeFormData,
-                                                        bankAccountId: e.target.value,
-                                                        bankAccountName: account?.accountName || account?.bankName || ''
-                                                    });
+                                                onChange={(id) => {
+                                                    const account = bankAccounts.find(a => a.id === id);
+                                                    setCompleteFormData({ ...completeFormData, bankAccountId: id, bankAccountName: account?.accountName || account?.bankName || '' });
                                                 }}
-                                                className="app-input"
-                                            >
-                                                <option value="">-- Select Bank Account --</option>
-                                                {bankAccounts.map(account => (
-                                                    <option key={account.id} value={account.id}>{account.accountName || account.bankName}</option>
-                                                ))}
-                                            </select>
+                                                options={bankAccounts}
+                                                getId={a => a.id}
+                                                getLabel={a => a.accountName || a.bankName}
+                                                placeholder="Select Bank Account"
+                                                required
+                                            />
                                         )}
                                     </div>
                                 </div>

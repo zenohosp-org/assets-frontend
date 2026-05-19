@@ -1,0 +1,62 @@
+.ss-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.ss-input-wrap {
+    position: relative;
+}
+
+.ss-input-wrap .app-input {
+    padding-right: 36px;
+}
+
+.ss-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.ss-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 50;
+}
+
+.ss-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #1e293b;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.ss-item:hover {
+    background: #f1f5f9;
+}
+
+.ss-item:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+.ss-item:last-child {
+    border-radius: 0 0 12px 12px;
+}

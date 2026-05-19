@@ -9,6 +9,7 @@ import '../styles/modals.css';
 import '../styles/pages/transfer-logs.css';
 import { useAuth } from '../context/AuthContext';
 import { History, ArrowRight, Box, Calendar, Search, Plus, X, Loader2, Mail, ChevronDown } from 'lucide-react';
+import SearchableSelect from '../components/SearchableSelect';
 
 export default function TransferLogs() {
     const { user } = useAuth();
@@ -100,8 +101,7 @@ export default function TransferLogs() {
         ])
     );
 
-    const handleAssetSelect = (e) => {
-        const assetId = e.target.value;
+    const handleAssetSelect = (assetId) => {
         const selected = assets.find(a => a.assetId === assetId);
         let fromName = 'Inventory';
         if (selected?.assignedTo) {
@@ -307,26 +307,20 @@ export default function TransferLogs() {
                                     <label className="app-label">
                                         <Box className="w-4 h-4 text-blue-500" /> Select Asset *
                                     </label>
-                                    <select
-                                        required
-                                        className="app-input"
+                                    <SearchableSelect
                                         value={formData.asset.assetId}
                                         onChange={handleAssetSelect}
-                                    >
-                                        <option value="" disabled>-- Choose an asset --</option>
-                                        {assets.map(asset => {
-                                            const holder = asset.assignedTo
-                                                ? (userById[String(asset.assignedTo)]
-                                                    ? userName(userById[String(asset.assignedTo)])
-                                                    : 'Unknown User')
+                                        options={assets}
+                                        getId={a => a.assetId}
+                                        getLabel={a => {
+                                            const holder = a.assignedTo
+                                                ? (userById[String(a.assignedTo)] ? userName(userById[String(a.assignedTo)]) : 'Unknown User')
                                                 : 'Inventory';
-                                            return (
-                                                <option key={asset.assetId} value={asset.assetId}>
-                                                    {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.serialNumber ? ` | SN: ${asset.serialNumber}` : ''} — {holder}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
+                                            return `${a.assetName}${a.assetCode ? ` (${a.assetCode})` : ''}${a.serialNumber ? ` | SN: ${a.serialNumber}` : ''} — ${holder}`;
+                                        }}
+                                        placeholder="Search asset..."
+                                        required
+                                    />
                                 </div>
 
                                 <div className="app-form-grid">
