@@ -1,5 +1,57 @@
 /* Room Allocation Page Styles */
 
+/* Loading full-page */
+.room-alloc-loading-page {
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+/* Stat cards */
+.room-alloc-stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.room-alloc-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Empty state */
+.room-alloc-empty-cell {
+    text-align: center;
+    padding: 80px 24px;
+}
+
+.room-alloc-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
+    border: 1px solid #f1f5f9;
+    border-radius: 50%;
+    background: #f8fafc;
+    color: #cbd5e1;
+}
+
+.room-alloc-empty-title {
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.room-alloc-empty-sub {
+    font-size: 14px;
+    color: #64748b;
+}
+
 /* Room Cell */
 .room-alloc-room-cell {
     display: flex;
@@ -35,23 +87,80 @@
     margin-top: 2px;
 }
 
-/* Asset Cell */
-.room-alloc-asset-cell {
+/* Chevron expand indicator */
+.room-alloc-chevron {
+    color: #94a3b8;
+    flex-shrink: 0;
+    transition: transform 200ms ease;
+}
+
+.room-alloc-chevron--open {
+    transform: rotate(180deg);
+}
+
+/* Asset count / no assets text */
+.room-alloc-asset-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 3px 10px;
+    display: inline-block;
+}
+
+.room-alloc-no-assets {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* Add button */
+.room-alloc-add-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+/* Room Row Styling */
+.room-alloc-room-row {
+    background-color: #f8fafc;
+}
+
+.room-alloc-room-row:hover {
+    background-color: #f1f5f9;
+}
+
+.room-alloc-room-row--clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Asset sub-rows (accordion items) */
+.room-alloc-asset-row {
+    background-color: #ffffff;
+    border-left: 3px solid #bfdbfe;
+    transition: background-color 150ms ease;
+}
+
+.room-alloc-asset-row:hover {
+    background-color: #eff6ff;
+}
+
+.room-alloc-asset-td {
+    padding-left: 72px;
+}
+
+.room-alloc-asset-item {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.room-alloc-asset-icon {
-    width: 32px;
-    height: 32px;
-    background-color: #fef3c7;
-    border: 1px solid #fde68a;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d97706;
+.room-alloc-asset-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #93c5fd;
     flex-shrink: 0;
 }
 
@@ -70,14 +179,19 @@
     margin-top: 2px;
 }
 
-/* Type & Status */
-.room-alloc-type-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+/* Asset actions cell */
+.room-alloc-asset-actions {
+    position: relative;
 }
 
+/* Dropdown divider */
+.room-alloc-dropdown-divider {
+    height: 1px;
+    margin: 4px 0;
+    background: #f1f5f9;
+}
+
+/* Type & Status Badges */
 .room-alloc-type-badge {
     display: inline-block;
     font-size: 10px;
@@ -101,36 +215,38 @@
     border-color: #bfdbfe;
 }
 
-.room-alloc-status-badge {
-    display: inline-block;
-    font-size: 10px;
+/* Table Actions alignment */
+.room-alloc-table-th--right {
+    text-align: right;
+}
+
+.room-alloc-table-td--right {
+    text-align: right;
+}
+
+/* Danger button */
+.app-btn-danger {
+    background-color: #ef4444;
+    color: #fff;
     font-weight: 700;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-    letter-spacing: 0.05em;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 150ms ease;
 }
 
-.room-alloc-status-available {
-    background-color: #dcfce7;
-    color: #166534;
-    border-color: #bbf7d0;
+.app-btn-danger:hover {
+    background-color: #dc2626;
 }
 
-.room-alloc-status-occupied {
-    background-color: #cffafe;
-    color: #164e63;
-    border-color: #a5f3fc;
-}
-
-/* Room Row Styling */
-.room-alloc-room-row {
-    background-color: #f8fafc;
-}
-
-.room-alloc-room-row:hover {
-    background-color: #f1f5f9;
+.app-btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Modal room label */
@@ -142,7 +258,15 @@
     gap: 4px;
 }
 
+.room-alloc-modal-badge {
+    margin-left: 8px;
+}
+
 /* Modal inner table overrides */
+.room-alloc-modal-table {
+    margin-top: 12px;
+}
+
 .room-alloc-modal-table .app-table-container {
     min-height: unset;
 }
@@ -152,11 +276,61 @@
     padding: 10px 12px;
 }
 
-/* Table Actions */
-.room-alloc-table-th--right {
-    text-align: right;
+.room-alloc-modal-row-num {
+    width: 32px;
+    color: #94a3b8;
+    font-size: 13px;
 }
 
-.room-alloc-table-td--right {
-    text-align: right;
+.room-alloc-modal-asset-select {
+    min-width: 180px;
+}
+
+.room-alloc-modal-floor-col {
+    width: 90px;
+}
+
+.room-alloc-modal-remove-col {
+    width: 36px;
+}
+
+.room-alloc-modal-remove-btn {
+    color: #ef4444;
+}
+
+.room-alloc-add-another-btn {
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+/* Modal asset info box */
+.room-alloc-modal-asset-info {
+    margin-bottom: 20px;
+    padding: 16px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.room-alloc-modal-asset-info-label {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.room-alloc-modal-asset-info-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.room-alloc-modal-asset-info-code {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* Full-column grid span */
+.room-alloc-modal-full-col {
+    grid-column: 1 / -1;
 }
