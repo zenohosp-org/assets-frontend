@@ -41,7 +41,7 @@
     width: 100%;
     text-align: left;
     padding: 10px 16px;
-    font-size: 14px;
+    font-size: var(--fs-sm);
     color: #1e293b;
     background: transparent;
     border: none;

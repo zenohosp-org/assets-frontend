@@ -8,13 +8,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: var(--fs-sm);
 }
 
 .vendors-checkbox-input {
     border: 1px solid #d1d5db;
     border-radius: 4px;
-    accent-color: #000000;
+    accent-color: var(--color-black);
 }
 
 .vendors-checkbox-input:focus {
@@ -29,8 +29,8 @@
     margin-bottom: 8px;
     padding-bottom: 8px;
     border-bottom: 1px solid #e5e7eb;
-    font-size: 18px;
-    font-weight: 500;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-medium);
 }
 
 .vendors-list {
@@ -46,46 +46,48 @@
 }
 
 .vendors-list-item-name {
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-sm);
 }
 
 .vendors-list-item-gst {
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: #6b7280;
 }
 
 .vendors-list-item-details {
     margin-top: 4px;
-    font-size: 14px;
+    font-size: var(--fs-sm);
     color: #4b5563;
 }
 
 .vendors-empty {
-    font-size: 14px;
+    font-size: var(--fs-sm);
     color: #6b7280;
     font-style: italic;
 }
 
 .vendors-table-name {
-    font-weight: 700;
-    color: #0f172a;
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-900);
+    font-size: var(--fs-sm);
 }
 
 .vendors-table-subtext {
-    font-size: 12px;
-    color: #94a3b8;
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
     margin-top: 2px;
 }
 
 .vendors-table-text {
-    font-size: 14px;
-    color: #475569;
+    font-size: var(--fs-sm);
+    color: var(--color-gray-600);
 }
 
 .vendors-table-mono {
-    font-size: 14px;
-    font-family: monospace;
-    color: #475569;
+    font-size: var(--fs-sm);
+    font-family: var(--font-mono);
+    color: var(--color-gray-600);
 }
 
 .vendors-table-actions {

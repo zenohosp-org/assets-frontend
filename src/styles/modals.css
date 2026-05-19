@@ -1,11 +1,11 @@
 .app-modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: 50;
+    z-index: var(--z-modal-backdrop);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: var(--spacing-4);
 }
 
 .app-modal-backdrop {
@@ -17,34 +17,28 @@
 }
 
 .app-modal-content {
-    background: #fff;
+    background: var(--color-white);
     border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-xl);
     width: 100%;
     max-width: 600px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
     position: relative;
-    z-index: 10;
+    z-index: var(--z-modal);
     animation: appZoomIn 200ms ease-out;
     overflow: hidden;
 }
 
 @keyframes appZoomIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
 .app-modal-header {
-    padding: 24px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: var(--spacing-6);
+    border-bottom: 1px solid var(--color-gray-100);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -52,14 +46,14 @@
 }
 
 .app-modal-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #0f172a;
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-900);
 }
 
 .app-modal-close {
     padding: 8px;
-    color: #94a3b8;
+    color: var(--color-gray-400);
     border-radius: 12px;
     transition: background-color 150ms ease, color 150ms ease;
     border: none;
@@ -71,20 +65,21 @@
 }
 
 .app-modal-close:hover {
-    color: #334155;
-    background: #f1f5f9;
+    color: var(--color-gray-700);
+    background: var(--color-gray-100);
 }
 
 .app-modal-body {
-    padding: 24px;
+    padding: var(--spacing-6);
     overflow-y: auto;
+    font-size: var(--fs-sm);
 }
 
 .app-modal-footer {
-    padding: 20px;
-    border-top: 1px solid #f1f5f9;
+    padding: var(--spacing-5);
+    border-top: 1px solid var(--color-gray-100);
     background: rgba(248, 250, 252, 0.5);
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
+    gap: var(--spacing-3);
 }

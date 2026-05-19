@@ -27,7 +27,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 12px;
-  font-size: 1.5rem;
+  font-size: var(--fs-2xl);
   font-weight: 900;
   border-bottom: 1px solid #f1f5f9;
   color: #0f172a;
@@ -173,8 +173,7 @@
   /* rounded-lg */
   transition-property: all;
   transition-duration: 150ms;
-  font-size: 0.875rem;
-  /* text-sm */
+  font-size: var(--fs-sm);
   font-weight: 500;
   /* font-medium */
   text-decoration: none;
@@ -260,7 +259,7 @@
   padding: 1rem;
   border-top: 1px solid #f1f5f9;
   color: #94a3b8;
-  font-size: 0.625rem;
+  font-size: var(--fs-xs);
   font-weight: 400;
   text-align: center;
 }

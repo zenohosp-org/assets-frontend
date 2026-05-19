@@ -1,9 +1,9 @@
 .app-page {
     position: relative;
-    padding: 24px;
+    padding: var(--spacing-6);
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: var(--spacing-8);
     flex: 1;
 }
 
@@ -11,7 +11,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: var(--spacing-4);
 }
 
 .app-page-title-wrapper {
@@ -20,66 +20,67 @@
 }
 
 .app-page-title {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: var(--fs-xl);
+    line-height: 1.35;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--color-gray-900);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .app-page-title-icon {
-    color: #000000;
+    color: var(--color-black);
 }
 
 .app-page-subtitle {
     margin-top: 2px;
-    font-size: 14px;
-    color: #64748b;
+    font-size: var(--fs-xs);
+    color: var(--color-gray-500);
 }
 
 .app-page-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-3);
 }
 
 .app-badge {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 8px;
-    font-size: 10px;
+    font-size: var(--fs-xs);
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
 .app-badge-gray {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
     border: 1px solid rgba(226, 232, 240, 0.6);
 }
 
 .app-badge-green {
-    background: #ecfdf5;
-    color: #059669;
+    background: var(--color-success-subtle);
+    color: var(--color-success-dark);
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .app-badge-red {
-    background: #fef2f2;
-    color: #dc2626;
+    background: var(--color-error-subtle);
+    color: var(--color-error-dark);
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .app-error {
-    padding: 12px;
+    padding: var(--spacing-3);
     color: #b91c1c;
     background: #fee2e2;
     border: 1px solid #f87171;
     border-radius: 4px;
-    margin-bottom: 16px;
+    margin-bottom: var(--spacing-4);
+    font-size: var(--fs-sm);
 }
 
 .app-empty {
@@ -87,7 +88,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 80px 24px;
-    color: #94a3b8;
-    gap: 12px;
+    padding: 80px var(--spacing-6);
+    color: var(--color-gray-400);
+    gap: var(--spacing-3);
+    font-size: var(--fs-sm);
 }
