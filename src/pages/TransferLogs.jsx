@@ -27,7 +27,7 @@ export default function TransferLogs() {
         asset: { assetId: '' },
         fromEntityName: 'Inventory',
         toEntityName: '',
-        toUserId: '',
+        toEntityId: '',
         remarks: ''
     });
 
@@ -81,7 +81,7 @@ export default function TransferLogs() {
             asset: { assetId: '' },
             fromEntityName: 'Inventory',
             toEntityName: '',
-            toUserId: '',
+            toEntityId: '',
             remarks: ''
         });
         setUserSearch('');
@@ -89,23 +89,31 @@ export default function TransferLogs() {
         setIsModalOpen(true);
     };
 
+    const userName = (u) => [u.firstName, u.lastName].filter(Boolean).join(' ');
+    const userRole = (u) => u.role?.displayName || u.role?.name || '';
+
+    // keyed by both u.id and u.userId to handle either field from Directory
+    const userById = Object.fromEntries(
+        users.flatMap(u => [
+            u.id ? [String(u.id), u] : [],
+            u.userId ? [String(u.userId), u] : [],
+        ])
+    );
+
     const handleAssetSelect = (e) => {
         const assetId = e.target.value;
         const selected = assets.find(a => a.assetId === assetId);
         let fromName = 'Inventory';
         if (selected?.assignedTo) {
-            const assignedUser = users.find(u => String(u.id) === String(selected.assignedTo));
-            if (assignedUser) fromName = userName(assignedUser);
+            const assignedUser = userById[String(selected.assignedTo)];
+            fromName = assignedUser ? userName(assignedUser) : 'Unknown User';
         }
         setFormData(prev => ({ ...prev, asset: { assetId }, fromEntityName: fromName }));
     };
 
-    const userName = (u) => [u.firstName, u.lastName].filter(Boolean).join(' ');
-    const userRole = (u) => u.role?.displayName || u.role?.name || '';
-
     const handleUserPick = (u) => {
         const name = userName(u);
-        setFormData(prev => ({ ...prev, toUserId: u.id, toEntityName: name }));
+        setFormData(prev => ({ ...prev, toEntityId: u.id ?? u.userId, toEntityName: name }));
         setUserSearch(name);
         setUserDropdownOpen(false);
     };
@@ -304,11 +312,18 @@ export default function TransferLogs() {
                                         onChange={handleAssetSelect}
                                     >
                                         <option value="" disabled>-- Choose an asset --</option>
-                                        {assets.map(asset => (
-                                            <option key={asset.assetId} value={asset.assetId}>
-                                                {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.serialNumber ? ` | SN: ${asset.serialNumber}` : ''}{asset.assignedTo ? ` — ${asset.assignedTo}` : ' — Inventory'}
-                                            </option>
-                                        ))}
+                                        {assets.map(asset => {
+                                            const holder = asset.assignedTo
+                                                ? (userById[String(asset.assignedTo)]
+                                                    ? userName(userById[String(asset.assignedTo)])
+                                                    : 'Unknown User')
+                                                : 'Inventory';
+                                            return (
+                                                <option key={asset.assetId} value={asset.assetId}>
+                                                    {asset.assetName}{asset.assetCode ? ` (${asset.assetCode})` : ''}{asset.serialNumber ? ` | SN: ${asset.serialNumber}` : ''} — {holder}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
 
@@ -327,11 +342,11 @@ export default function TransferLogs() {
                                         <div className="relative" ref={userDropdownRef}>
                                             <input
                                                 type="text"
-                                                required={!formData.toUserId}
+                                                required={!formData.toEntityId}
                                                 value={userSearch}
                                                 onChange={(e) => {
                                                     setUserSearch(e.target.value);
-                                                    setFormData(prev => ({ ...prev, toUserId: '', toEntityName: e.target.value }));
+                                                    setFormData(prev => ({ ...prev, toEntityId: '', toEntityName: e.target.value }));
                                                     setUserDropdownOpen(true);
                                                 }}
                                                 onFocus={() => setUserDropdownOpen(true)}
