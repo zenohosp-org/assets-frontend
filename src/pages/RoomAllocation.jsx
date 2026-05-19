@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/common.css';
 import '../styles/buttons.css';
 import '../styles/cards.css';
@@ -323,7 +323,6 @@ export default function RoomAllocation() {
                                     <React.Fragment key={room.id}>
                                         {/* Room header row */}
                                         <tr
-                                            key={`room-${room.id}`}
                                             className={`app-table-row room-alloc-room-row${hasAssets ? ' room-alloc-room-row--clickable' : ''}`}
                                             onClick={() => hasAssets && toggleRoom(room.id)}
                                         >
