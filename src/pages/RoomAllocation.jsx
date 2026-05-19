@@ -323,17 +323,15 @@ export default function RoomAllocation() {
                                     <React.Fragment key={room.id}>
                                         {/* Room header row */}
                                         <tr
-                                            className={`app-table-row room-alloc-room-row${hasAssets ? ' room-alloc-room-row--clickable' : ''}`}
-                                            onClick={() => hasAssets && toggleRoom(room.id)}
+                                            className="app-table-row room-alloc-room-row room-alloc-room-row--clickable"
+                                            onClick={() => toggleRoom(room.id)}
                                         >
                                             <td className="app-table-td">
                                                 <div className="room-alloc-room-cell">
-                                                    {hasAssets && (
-                                                        <ChevronDown
-                                                            size={16}
-                                                            className={`room-alloc-chevron${isExpanded ? ' room-alloc-chevron--open' : ''}`}
-                                                        />
-                                                    )}
+                                                    <ChevronDown
+                                                        size={16}
+                                                        className={`room-alloc-chevron${isExpanded ? ' room-alloc-chevron--open' : ''}`}
+                                                    />
                                                     <div className="room-alloc-room-icon">
                                                         <Building2 className="w-5 h-5" />
                                                     </div>
@@ -370,6 +368,13 @@ export default function RoomAllocation() {
                                         </tr>
 
                                         {/* Expanded asset sub-rows */}
+                                        {isExpanded && !hasAssets && (
+                                            <tr className="room-alloc-asset-row">
+                                                <td className="app-table-td room-alloc-asset-td" colSpan="4">
+                                                    <span className="room-alloc-no-assets">No assets allocated</span>
+                                                </td>
+                                            </tr>
+                                        )}
                                         {isExpanded && roomAssets.map((asset) => (
                                             <tr key={`asset-${asset.assetId}`} className="room-alloc-asset-row">
                                                 <td className="app-table-td room-alloc-asset-td" colSpan="2">
