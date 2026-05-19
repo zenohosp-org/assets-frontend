@@ -1,0 +1,249 @@
+.transfer-logs-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.transfer-logs-mail-btn {
+    padding: 10px;
+    color: var(--color-gray-400);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 12px;
+    transition: all 150ms ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transfer-logs-mail-btn:hover {
+    color: var(--color-black);
+    background-color: #eff6ff;
+}
+
+.transfer-logs-stat-value-blue   { color: var(--color-black); }
+.transfer-logs-stat-value-emerald { color: #059669; }
+.transfer-logs-stat-value-purple  { color: #9333ea; }
+
+.transfer-logs-empty-cell {
+    padding: 80px var(--spacing-6);
+    text-align: center;
+}
+
+.transfer-logs-empty-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--color-gray-400);
+}
+
+.transfer-logs-loader-text {
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-sm);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.transfer-logs-empty-icon-bg {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-gray-50);
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-gray-100);
+    margin-bottom: 8px;
+}
+
+.transfer-logs-empty-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-gray-300);
+}
+
+.transfer-logs-empty-title {
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-600);
+    font-size: var(--fs-sm);
+}
+
+.transfer-logs-empty-text {
+    font-size: var(--fs-xs);
+}
+
+.transfer-logs-asset-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.transfer-logs-asset-icon-bg {
+    width: 40px;
+    height: 40px;
+    background-color: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-black);
+}
+
+.transfer-logs-asset-name {
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-900);
+    font-size: var(--fs-sm);
+}
+
+.transfer-logs-asset-code {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    margin-top: 2px;
+}
+
+.transfer-logs-movement-cell {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.transfer-logs-movement-box {
+    padding: 6px 12px;
+    background-color: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.transfer-logs-movement-box-blue {
+    padding: 6px 12px;
+    background-color: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.transfer-logs-movement-label {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.transfer-logs-movement-label-blue {
+    font-size: var(--fs-xs);
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.transfer-logs-movement-value {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-700);
+}
+
+.transfer-logs-movement-value-blue {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--color-black);
+}
+
+.transfer-logs-movement-arrow {
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-300);
+    flex-shrink: 0;
+}
+
+.transfer-logs-date-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-sm);
+    color: var(--color-gray-600);
+    font-weight: var(--fw-medium);
+    white-space: nowrap;
+}
+
+.transfer-logs-remarks {
+    font-size: var(--fs-sm);
+    color: var(--color-gray-500);
+    max-width: 20rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transfer-logs-remarks-empty {
+    font-style: italic;
+    color: var(--color-gray-300);
+}
+
+.transfer-logs-form-input-bg {
+    background-color: var(--color-gray-50);
+}
+
+.transfer-logs-dropdown-menu {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    margin-top: 4px;
+    width: 100%;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    max-height: 208px;
+    overflow-y: auto;
+}
+
+.transfer-logs-dropdown-item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    transition: background-color 150ms ease;
+    border-bottom: 1px solid var(--color-gray-50);
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+}
+
+.transfer-logs-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.transfer-logs-dropdown-item:hover {
+    background-color: #eff6ff;
+}
+
+.transfer-logs-dropdown-name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-900);
+}
+
+.transfer-logs-dropdown-role {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
+}
+
+.transfer-logs-input-readonly {
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-500);
+    cursor: default;
+}

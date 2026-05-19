@@ -1,111 +1,163 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, History, Activity, Settings, LayoutDashboard, Tag, FileText, Globe, LogOut, ChevronDown, ChevronRight, Layers, Package, Users } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import {
+    LayoutDashboard, Box, MapPin, History, Activity,
+    Settings, Layers, Users, ChevronDown, ChevronRight,
+    Globe, BarChart2, Package, ArrowUpRight, Tag
+} from 'lucide-react';
+import Header from './Header';
+import '../styles/layout.css';
 
 export default function Layout({ children }) {
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // Check if user has an admin role
-    const [isAdmin, setIsAdmin] = useState(user?.role === 'hospital_admin' || user?.role === 'super_admin' || user?.role?.toLowerCase() === 'admin');
-    const [isMastersOpen, setIsMastersOpen] = useState(location.pathname.startsWith('/vendors') || location.pathname.startsWith('/products') || location.pathname.startsWith('/product-groups') || location.pathname.startsWith('/asset-categories'));
+    const [mastersOpen, setMastersOpen] = useState(
+        location.pathname.startsWith('/vendors') || location.pathname.startsWith('/asset-categories')
+    );
 
-    const navItems = [
-        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { label: 'Asset Inventory', path: '/assets', icon: Box },
-        { label: 'Transfer Logs', path: '/transfers', icon: History },
-        { label: 'Maintenance', path: '/maintenance', icon: Activity },
-    ];
+    const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
-    const masterItems = [
-        { label: 'Vendors', path: '/vendors', icon: Users },
-        { label: 'Product Groups', path: '/product-groups', icon: Package },
-        { label: 'Asset Categories', path: '/asset-categories', icon: Layers },
-        { label: 'Products Master', path: '/products', icon: Settings },
-    ];
+    const NavLink = ({ to, icon: Icon, label }) => (
+        <Link
+            to={to}
+            className={`sidebar-link sidebar-submenu-link ${isActive(to) ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+        >
+            <Icon className="sidebar-icon" size={15} />
+            {label}
+        </Link>
+    );
+
+    const CollapseToggle = ({ open, onToggle, icon: Icon, label }) => (
+        <button onClick={onToggle} className="sidebar-link sidebar-submenu-toggle">
+            <div className="sidebar-submenu-inner">
+                <Icon className="sidebar-icon" size={18} />
+                {label}
+            </div>
+            {open ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+        </button>
+    );
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="app-layout">
+
             {/* Sidebar */}
-            <aside className="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen">
-                <div className="p-8 border-b border-slate-100 italic font-black text-2xl text-primary flex items-center gap-2">
-                    <Tag className="w-8 h-8" />
-                    <span>ZenoAssets</span>
+            <aside className={`sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+                <div className="sidebar-brand">
+                    <Tag size={20} className="sidebar-brand-icon" />
+                    <span className="sidebar-brand-text">ZenoAssets</span>
                 </div>
 
-                <nav className="flex-1 p-6 space-y-2">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${location.pathname === item.path
-                                ? 'bg-primary/10 text-primary shadow-sm'
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                                }`}
-                        >
-                            <item.icon className="w-5 h-5" />
-                            {item.label}
-                        </Link>
-                    ))}
+                <nav className="sidebar-nav">
+                    <ul className="sidebar-menu">
+                        {/* Dashboard */}
+                        <li>
+                            <Link
+                                to="/dashboard"
+                                className={`sidebar-link ${isActive('/dashboard') ? 'active' : ''}`}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <LayoutDashboard className="sidebar-icon" size={18} />
+                                Dashboard
+                            </Link>
+                        </li>
 
-                    <div className="pt-2">
-                        <button
-                            onClick={() => setIsMastersOpen(!isMastersOpen)}
-                            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isMastersOpen ? 'text-slate-900 bg-slate-50/50' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
-                        >
-                            <div className="flex items-center gap-3">
-                                <Settings className="w-5 h-5 text-slate-400" />
-                                <span>Masters</span>
-                            </div>
-                            {isMastersOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                        </button>
+                        {/* Assets Section */}
+                        <li className="sidebar-section">
+                            <div className="sidebar-section-title">Assets</div>
 
-                        {isMastersOpen && (
-                            <div className="mt-1 ml-4 pl-4 border-l-2 border-slate-100 space-y-1 animate-in slide-in-from-top-2 duration-200">
-                                {masterItems.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${location.pathname === item.path
-                                            ? 'text-primary bg-primary/5'
-                                            : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
-                                            }`}
-                                    >
-                                        <item.icon className="w-4 h-4" />
-                                        {item.label}
-                                    </Link>
-                                ))}
+                            <Link
+                                to="/assets"
+                                className={`sidebar-link ${isActive('/assets') ? 'active' : ''}`}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <Box className="sidebar-icon" size={18} />
+                                Asset Inventory
+                            </Link>
+
+                            <Link
+                                to="/rooms"
+                                className={`sidebar-link ${isActive('/rooms') ? 'active' : ''}`}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <MapPin className="sidebar-icon" size={18} />
+                                Room Allocation
+                            </Link>
+
+                            <Link
+                                to="/transfers"
+                                className={`sidebar-link ${isActive('/transfers') ? 'active' : ''}`}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <History className="sidebar-icon" size={18} />
+                                Transfer Logs
+                            </Link>
+
+                            <Link
+                                to="/maintenance"
+                                className={`sidebar-link ${isActive('/maintenance') ? 'active' : ''}`}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <Activity className="sidebar-icon" size={18} />
+                                Maintenance
+                            </Link>
+
+                            {/* Masters collapsible */}
+                            <div className="sidebar-subsection">
+                                <CollapseToggle
+                                    open={mastersOpen}
+                                    onToggle={() => setMastersOpen(o => !o)}
+                                    icon={Settings}
+                                    label="Masters"
+                                />
+                                {mastersOpen && (
+                                    <div className="sidebar-submenu">
+                                        <NavLink to="/vendors" icon={Users} label="Vendors" />
+                                        <NavLink to="/asset-categories" icon={Layers} label="Asset Categories" />
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </li>
+
+                        {/* Other Apps */}
+                        <li className="sidebar-section">
+                            <div className="sidebar-section-title">Other Apps</div>
+                            {[
+                                { label: 'HMS', href: 'https://hms.zenohosp.com', icon: Activity },
+                                { label: 'Finance', href: 'https://finance.zenohosp.com', icon: BarChart2 },
+                                { label: 'Inventory', href: 'https://inventory.zenohosp.com', icon: Package },
+                                { label: 'Directory', href: 'https://directory.zenohosp.com', icon: Globe },
+                            ].map(({ label, href, icon: Icon }) => (
+                                <a
+                                    key={href}
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="sidebar-link"
+                                    onClick={() => setSidebarOpen(false)}
+                                >
+                                    <Icon className="sidebar-icon" size={18} />
+                                    {label}
+                                    <ArrowUpRight size={12} className="sidebar-external-icon" />
+                                </a>
+                            ))}
+                        </li>
+                    </ul>
                 </nav>
 
-                <div className="p-4 border-t border-slate-100 mt-auto">
-                    {isAdmin && (
-                        <a href="http://localhost:5173/dashboard" className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-100 font-bold transition-all shadow-sm">
-                            <Globe className="w-5 h-5" />
-                            Directory Admin
-                        </a>
-                    )}
-                    <button
-                        onClick={logout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 font-bold transition-all shadow-sm"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        Sign Out
-                    </button>
-                </div>
-
-                <div className="p-4 border-t border-slate-100 italic text-slate-400 text-[10px] font-black uppercase tracking-widest text-center">
-                    &copy; 2026 Institutional Asset Manager
+                <div className="sidebar-footer">
+                    <div className="sidebar-copyright">© 2026 Institutional Asset Manager</div>
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 min-w-0 flex flex-col">
-                {children}
-            </main>
+            {/* Header + Main */}
+            <div className="app-main-wrapper">
+                <Header onMenuClick={() => setSidebarOpen(o => !o)} />
+                <main className="main-content">
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }

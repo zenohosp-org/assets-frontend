@@ -1,0 +1,147 @@
+.maintenance-stat-card-orange,
+.maintenance-stat-card-blue {
+    padding: var(--spacing-6);
+    background: var(--color-white);
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow 150ms ease;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.maintenance-stat-card-orange:hover,
+.maintenance-stat-card-blue:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.maintenance-stat-icon-wrapper-orange,
+.maintenance-stat-icon-wrapper-blue {
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: transparent;
+    border-radius: 0;
+}
+
+.maintenance-stat-icon-wrapper-orange { color: #f97316; }
+.maintenance-stat-icon-wrapper-blue   { color: #2563eb; }
+
+.maintenance-stat-label-orange,
+.maintenance-stat-label-blue {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: var(--color-black);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.maintenance-stat-value-orange,
+.maintenance-stat-value-blue {
+    margin-top: 18px;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: var(--color-black);
+}
+
+.maintenance-asset-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.maintenance-asset-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+}
+
+.maintenance-asset-name {
+    font-weight: var(--fw-semibold);
+    color: var(--color-gray-900);
+    font-size: var(--fs-sm);
+}
+
+.maintenance-asset-code {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-500);
+}
+
+.maintenance-date-cell {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--color-gray-600);
+}
+
+.maintenance-type-badge-repair,
+.maintenance-type-badge-maintenance {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.maintenance-type-badge-repair {
+    background: var(--color-error-subtle);
+    color: var(--color-error-dark);
+}
+
+.maintenance-type-badge-maintenance {
+    background: var(--color-success-subtle);
+    color: var(--color-success-dark);
+}
+
+.maintenance-vendor-name {
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-700);
+    font-size: var(--fs-sm);
+}
+
+.maintenance-vendor-cost {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-900);
+}
+
+.maintenance-details-cell {
+    max-width: 300px;
+    font-size: var(--fs-sm);
+    color: var(--color-gray-600);
+}
+
+.status-badge {
+    display: inline-block;
+    font-weight: var(--fw-medium);
+    text-transform: uppercase;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.5px;
+}
+
+.status-badge-scheduled  { background-color: #f3f4f6; color: #6b7280; }
+.status-badge-in-progress { background-color: #fef3c7; color: #d97706; }
+.status-badge-completed  { background-color: #dcfce7; color: #16a34a; }
+.status-badge-cancelled  { background-color: #fee2e2; color: #dc2626; }
+
+.maintenance-amc-notice {
+    margin-top: 4px;
+    font-size: var(--fs-xs);
+    color: #16a34a;
+    font-weight: var(--fw-medium);
+}
+
+.maintenance-warranty-notice {
+    margin-top: 4px;
+    font-size: var(--fs-xs);
+    color: #d97706;
+    font-weight: var(--fw-medium);
+}
