@@ -209,3 +209,35 @@
     color: var(--color-gray-400);
     font-size: var(--fs-sm);
 }
+
+.assets-assign-toggle {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.assets-assign-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 10px;
+    background: var(--color-white);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-500);
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.assets-assign-toggle-btn:hover {
+    background: var(--color-gray-50);
+    color: var(--color-gray-700);
+}
+
+.assets-assign-toggle-btn--active {
+    background: var(--color-black);
+    border-color: var(--color-black);
+    color: var(--color-white);
+}

@@ -83,7 +83,8 @@
 }
 
 .maintenance-type-badge-repair,
-.maintenance-type-badge-maintenance {
+.maintenance-type-badge-maintenance,
+.maintenance-type-badge-breakdown {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 9999px;
@@ -99,6 +100,11 @@
 .maintenance-type-badge-maintenance {
     background: var(--color-success-subtle);
     color: var(--color-success-dark);
+}
+
+.maintenance-type-badge-breakdown {
+    background: #fff7ed;
+    color: #c2410c;
 }
 
 .maintenance-vendor-name {

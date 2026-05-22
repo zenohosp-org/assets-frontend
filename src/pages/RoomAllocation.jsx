@@ -6,16 +6,20 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/room-allocation.css';
-import { Plus, Search, X, Loader2, Trash2, ArrowRight, Building2, MoreVertical, ChevronDown } from 'lucide-react';
-import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom } from '../api/client';
+import { Plus, Search, X, Loader2, Trash2, ArrowRight, Building2, MoreVertical, Calendar, Package } from 'lucide-react';
+import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom, getTransferLogs } from '../api/client';
 
 export default function RoomAllocation() {
     const [rooms, setRooms] = useState([]);
     const [assets, setAssets] = useState([]);
+    const [allLogs, setAllLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeDropdown, setActiveDropdown] = useState(null);
-    const [expandedRooms, setExpandedRooms] = useState(new Set());
+
+    // Side panel state
+    const [panelRoom, setPanelRoom] = useState(null);
+    const [panelLogsLoading, setPanelLogsLoading] = useState(false);
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -23,12 +27,11 @@ export default function RoomAllocation() {
     const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Current operation state
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [selectedAsset, setSelectedAsset] = useState(null);
-    const [addRows, setAddRows] = useState([{ assetId: '', floor: '', notes: '' }]);
+    const [addRows, setAddRows] = useState([{ assetId: '', notes: '' }]);
     const [removeFormData, setRemoveFormData] = useState({ notes: '' });
-    const [transferFormData, setTransferFormData] = useState({ toRoomId: '', toFloor: '', reason: '' });
+    const [transferFormData, setTransferFormData] = useState({ toRoomId: '', reason: '' });
 
     useEffect(() => {
         const handleClickOutside = () => setActiveDropdown(null);
@@ -36,45 +39,40 @@ export default function RoomAllocation() {
         return () => window.removeEventListener('click', handleClickOutside);
     }, []);
 
-    // Load initial data
-    useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            try {
-                const [roomsRes, assetsRes] = await Promise.all([
-                    getHmsRooms(),
-                    getAssets()
-                ]);
-                setRooms(roomsRes.data || []);
-                setAssets(assetsRes.data || []);
-            } catch (err) {
-                console.error('Failed to load data:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadData();
-    }, []);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const [roomsRes, assetsRes, logsRes] = await Promise.all([
+                getHmsRooms(),
+                getAssets(),
+                getTransferLogs()
+            ]);
+            setRooms(roomsRes.data || []);
+            setAssets(assetsRes.data || []);
+            setAllLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
+        } catch (err) {
+            console.error('Failed to load data:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { loadData(); }, []);
 
     // Build a map of assets by room
     const assetsByRoom = {};
     assets.forEach(asset => {
-        const roomId = asset.roomId;
-        if (roomId) {
-            if (!assetsByRoom[roomId]) {
-                assetsByRoom[roomId] = [];
-            }
-            assetsByRoom[roomId].push(asset);
+        if (asset.roomId) {
+            if (!assetsByRoom[asset.roomId]) assetsByRoom[asset.roomId] = [];
+            assetsByRoom[asset.roomId].push(asset);
         }
     });
 
-    // Derived stats
     const totalRooms = rooms.length;
     const roomsWithAssets = Object.keys(assetsByRoom).length;
     const allocatedAssets = assets.filter(a => a.roomId).length;
     const unallocatedAssets = assets.filter(a => !a.roomId).length;
 
-    // Filter rooms based on search
     const filteredRooms = rooms.filter(room => {
         const search = searchTerm.toLowerCase();
         return (
@@ -83,29 +81,32 @@ export default function RoomAllocation() {
         );
     });
 
-    const toggleRoom = (roomId) => {
-        setExpandedRooms(prev => {
-            const next = new Set(prev);
-            if (next.has(roomId)) next.delete(roomId);
-            else next.add(roomId);
-            return next;
-        });
+    // Side panel helpers
+    const openPanel = (room) => {
+        setPanelRoom(room);
     };
 
-    // Handlers for Add Asset modal
-    const handleOpenAddModal = (room) => {
+    const closePanel = () => setPanelRoom(null);
+
+    const panelAssets = panelRoom ? (assetsByRoom[panelRoom.id] || []) : [];
+    const panelAssetIds = new Set(panelAssets.map(a => a.assetId));
+    const panelLogs = allLogs.filter(log => panelAssetIds.has(log.asset?.assetId));
+
+    // Add Asset Modal
+    const handleOpenAddModal = (room, e) => {
+        e?.stopPropagation();
         setSelectedRoom(room);
-        setAddRows([{ assetId: '', floor: room.floor ?? '', notes: '' }]);
+        setAddRows([{ assetId: '', notes: '' }]);
         setIsAddModalOpen(true);
     };
 
     const handleCloseAddModal = () => {
         setIsAddModalOpen(false);
         setSelectedRoom(null);
-        setAddRows([{ assetId: '', floor: '', notes: '' }]);
+        setAddRows([{ assetId: '', notes: '' }]);
     };
 
-    const addRow = () => setAddRows(prev => [...prev, { assetId: '', floor: selectedRoom?.floor ?? '', notes: '' }]);
+    const addRow = () => setAddRows(prev => [...prev, { assetId: '', notes: '' }]);
     const removeRow = (i) => setAddRows(prev => prev.filter((_, idx) => idx !== i));
     const updateRow = (i, field, value) =>
         setAddRows(prev => prev.map((row, idx) => idx === i ? { ...row, [field]: value } : row));
@@ -114,22 +115,19 @@ export default function RoomAllocation() {
         e.preventDefault();
         for (const row of addRows) {
             if (!row.assetId) { alert('Please select an asset for all rows'); return; }
-            if (!row.floor) { alert('Please enter a floor for all rows'); return; }
         }
-
         setIsSubmitting(true);
         try {
             await Promise.all(addRows.map(row =>
                 assignAssetToRoom(row.assetId, {
                     roomId: parseInt(selectedRoom.id),
-                    floor: parseInt(row.floor),
                     notes: row.notes,
                 })
             ));
-            const assetsRes = await getAssets();
+            const [assetsRes, logsRes] = await Promise.all([getAssets(), getTransferLogs()]);
             setAssets(assetsRes.data || []);
+            setAllLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
             handleCloseAddModal();
-            alert(addRows.length === 1 ? 'Asset assigned successfully!' : `${addRows.length} assets assigned successfully!`);
         } catch (error) {
             console.error('Failed to assign assets:', error);
             alert('Failed to assign one or more assets. Please try again.');
@@ -138,7 +136,7 @@ export default function RoomAllocation() {
         }
     };
 
-    // Handlers for Remove Asset modal
+    // Remove Asset Modal
     const handleOpenRemoveModal = (room, asset) => {
         setActiveDropdown(null);
         setSelectedRoom(room);
@@ -158,15 +156,11 @@ export default function RoomAllocation() {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await unassignAssetFromRoom(selectedAsset.assetId, {
-                notes: removeFormData.notes
-            });
-
-            // Refresh assets
-            const assetsRes = await getAssets();
+            await unassignAssetFromRoom(selectedAsset.assetId, { notes: removeFormData.notes });
+            const [assetsRes, logsRes] = await Promise.all([getAssets(), getTransferLogs()]);
             setAssets(assetsRes.data || []);
+            setAllLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
             handleCloseRemoveModal();
-            alert('Asset removed successfully!');
         } catch (error) {
             console.error('Failed to remove asset:', error);
             alert('Failed to remove asset. Please try again.');
@@ -175,12 +169,12 @@ export default function RoomAllocation() {
         }
     };
 
-    // Handlers for Transfer Asset modal
+    // Transfer Asset Modal
     const handleOpenTransferModal = (room, asset) => {
         setActiveDropdown(null);
         setSelectedRoom(room);
         setSelectedAsset(asset);
-        setTransferFormData({ toRoomId: '', toFloor: '', reason: '' });
+        setTransferFormData({ toRoomId: '', reason: '' });
         setIsTransferModalOpen(true);
     };
 
@@ -188,33 +182,22 @@ export default function RoomAllocation() {
         setIsTransferModalOpen(false);
         setSelectedRoom(null);
         setSelectedAsset(null);
-        setTransferFormData({ toRoomId: '', toFloor: '', reason: '' });
+        setTransferFormData({ toRoomId: '', reason: '' });
     };
 
     const handleTransferAssetSubmit = async (e) => {
         e.preventDefault();
-        if (!transferFormData.toRoomId) {
-            alert('Please select a destination room');
-            return;
-        }
-        if (!transferFormData.toFloor) {
-            alert('Please enter a floor number');
-            return;
-        }
-
+        if (!transferFormData.toRoomId) { alert('Please select a destination room'); return; }
         setIsSubmitting(true);
         try {
             await transferAssetRoom(selectedAsset.assetId, {
                 toRoomId: parseInt(transferFormData.toRoomId),
-                toFloor: parseInt(transferFormData.toFloor),
                 reason: transferFormData.reason
             });
-
-            // Refresh assets
-            const assetsRes = await getAssets();
+            const [assetsRes, logsRes] = await Promise.all([getAssets(), getTransferLogs()]);
             setAssets(assetsRes.data || []);
+            setAllLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
             handleCloseTransferModal();
-            alert('Asset transferred successfully!');
         } catch (error) {
             console.error('Failed to transfer asset:', error);
             alert('Failed to transfer asset. Please try again.');
@@ -223,7 +206,6 @@ export default function RoomAllocation() {
         }
     };
 
-    // Get available assets for adding (not allocated to any room)
     const availableAssets = assets.filter(a => !a.roomId);
 
     if (loading) {
@@ -236,17 +218,13 @@ export default function RoomAllocation() {
 
     return (
         <div className="app-page">
-            {/* Header */}
             <div className="app-page-header">
                 <div>
-                    <h1 className="app-page-title">
-                        Room Allocation
-                    </h1>
+                    <h1 className="app-page-title">Room Allocation</h1>
                     <p className="app-page-subtitle">View and manage asset allocation across rooms</p>
                 </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="app-stats-grid">
                 <div className="app-card">
                     <p className="room-alloc-stat-label">Total Rooms</p>
@@ -266,7 +244,6 @@ export default function RoomAllocation() {
                 </div>
             </div>
 
-            {/* Search */}
             <div className="app-search-wrapper">
                 <div className="app-search-icon-wrapper">
                     <Search className="w-5 h-5" />
@@ -280,58 +257,44 @@ export default function RoomAllocation() {
                 />
             </div>
 
-            {/* Rooms with Assets Table */}
-            <div className="app-table-wrapper">
-                <div className="app-table-container">
-                    <table className="app-table">
-                        <thead>
-                            <tr className="app-table-thead-row">
-                                <th className="app-table-th">Room</th>
-                                <th className="app-table-th">Type</th>
-                                <th className="app-table-th">Assets</th>
-                                <th className="app-table-th room-alloc-table-th--right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="app-table-tbody">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan="4" className="app-table-td room-alloc-empty-cell">
-                                        <div className="app-empty">
-                                            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                                            <p className="text-sm font-medium animate-pulse">Loading rooms...</p>
-                                        </div>
-                                    </td>
+            {/* Main layout: table + side panel */}
+            <div className={`room-alloc-layout${panelRoom ? ' room-alloc-layout--panel-open' : ''}`}>
+                <div className="app-table-wrapper room-alloc-table-area">
+                    <div className="app-table-container">
+                        <table className="app-table">
+                            <thead>
+                                <tr className="app-table-thead-row">
+                                    <th className="app-table-th">Room</th>
+                                    <th className="app-table-th">Type</th>
+                                    <th className="app-table-th">Assets</th>
+                                    <th className="app-table-th room-alloc-table-th--right">Actions</th>
                                 </tr>
-                            ) : filteredRooms.length === 0 ? (
-                                <tr>
-                                    <td colSpan="4" className="app-table-td room-alloc-empty-cell">
-                                        <div className="app-empty">
-                                            <div className="room-alloc-empty-icon">
-                                                <Building2 className="w-8 h-8" />
+                            </thead>
+                            <tbody className="app-table-tbody">
+                                {filteredRooms.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="4" className="app-table-td room-alloc-empty-cell">
+                                            <div className="app-empty">
+                                                <div className="room-alloc-empty-icon">
+                                                    <Building2 className="w-8 h-8" />
+                                                </div>
+                                                <p className="room-alloc-empty-title">No rooms found</p>
+                                                <p className="room-alloc-empty-sub">No rooms match your search criteria.</p>
                                             </div>
-                                            <p className="room-alloc-empty-title">No rooms found</p>
-                                            <p className="room-alloc-empty-sub">No rooms match your search criteria.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : filteredRooms.map((room) => {
-                                const roomAssets = assetsByRoom[room.id] || [];
-                                const isExpanded = expandedRooms.has(room.id);
-                                const hasAssets = roomAssets.length > 0;
+                                        </td>
+                                    </tr>
+                                ) : filteredRooms.map((room) => {
+                                    const roomAssets = assetsByRoom[room.id] || [];
+                                    const isSelected = panelRoom?.id === room.id;
 
-                                return (
-                                    <React.Fragment key={room.id}>
-                                        {/* Room header row */}
+                                    return (
                                         <tr
-                                            className="app-table-row room-alloc-room-row room-alloc-room-row--clickable"
-                                            onClick={() => toggleRoom(room.id)}
+                                            key={room.id}
+                                            className={`app-table-row room-alloc-room-row room-alloc-room-row--clickable${isSelected ? ' room-alloc-room-row--selected' : ''}`}
+                                            onClick={() => openPanel(room)}
                                         >
                                             <td className="app-table-td">
                                                 <div className="room-alloc-room-cell">
-                                                    <ChevronDown
-                                                        size={16}
-                                                        className={`room-alloc-chevron${isExpanded ? ' room-alloc-chevron--open' : ''}`}
-                                                    />
                                                     <div className="room-alloc-room-icon">
                                                         <Building2 className="w-5 h-5" />
                                                     </div>
@@ -349,7 +312,7 @@ export default function RoomAllocation() {
                                                 </span>
                                             </td>
                                             <td className="app-table-td">
-                                                {hasAssets ? (
+                                                {roomAssets.length > 0 ? (
                                                     <span className="room-alloc-asset-count">{roomAssets.length} asset{roomAssets.length !== 1 ? 's' : ''}</span>
                                                 ) : (
                                                     <span className="room-alloc-no-assets">No assets allocated</span>
@@ -357,7 +320,7 @@ export default function RoomAllocation() {
                                             </td>
                                             <td className="app-table-td room-alloc-table-td--right">
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); handleOpenAddModal(room); }}
+                                                    onClick={(e) => handleOpenAddModal(room, e)}
                                                     className="app-btn app-btn-primary room-alloc-add-btn"
                                                     disabled={availableAssets.length === 0}
                                                     title="Add asset to this room"
@@ -366,60 +329,121 @@ export default function RoomAllocation() {
                                                 </button>
                                             </td>
                                         </tr>
-
-                                        {/* Expanded asset sub-rows */}
-                                        {isExpanded && !hasAssets && (
-                                            <tr className="room-alloc-asset-row">
-                                                <td className="app-table-td room-alloc-asset-td" colSpan="4">
-                                                    <span className="room-alloc-no-assets">No assets allocated</span>
-                                                </td>
-                                            </tr>
-                                        )}
-                                        {isExpanded && roomAssets.map((asset) => (
-                                            <tr key={`asset-${asset.assetId}`} className="room-alloc-asset-row">
-                                                <td className="app-table-td room-alloc-asset-td" colSpan="2">
-                                                    <div className="room-alloc-asset-item">
-                                                        <div className="room-alloc-asset-dot" />
-                                                        <div>
-                                                            <p className="room-alloc-asset-name">{asset.assetName}</p>
-                                                            <p className="room-alloc-asset-code">{asset.assetCode || 'NO CODE'}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="app-table-td" />
-                                                <td className="app-table-td room-alloc-table-td--right room-alloc-asset-actions">
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === asset.assetId ? null : asset.assetId); }}
-                                                        className="app-btn-icon"
-                                                    >
-                                                        <MoreVertical size={18} />
-                                                    </button>
-                                                    {activeDropdown === asset.assetId && (
-                                                        <div className="assets-dropdown">
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleOpenTransferModal(room, asset); }}
-                                                                className="assets-dropdown-item"
-                                                            >
-                                                                <ArrowRight className="w-4 h-4 text-blue-500" /> Transfer Room
-                                                            </button>
-                                                            <div className="room-alloc-dropdown-divider" />
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleOpenRemoveModal(room, asset); }}
-                                                                className="assets-dropdown-item--danger"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" /> Remove from Room
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </React.Fragment>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                {/* Side Panel */}
+                {panelRoom && (
+                    <div className="room-alloc-panel">
+                        <div className="room-alloc-panel-header">
+                            <div className="room-alloc-panel-title-row">
+                                <div className="room-alloc-room-icon">
+                                    <Building2 className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="room-alloc-room-name">{panelRoom.roomNumber}</p>
+                                    {panelRoom.roomCode && <p className="room-alloc-room-code">{panelRoom.roomCode}</p>}
+                                </div>
+                                <span className={`room-alloc-type-badge ${panelRoom.roomType === 'ICU' ? 'room-alloc-badge-icu' : 'room-alloc-badge-standard'}`}>
+                                    {panelRoom.roomType || 'Standard'}
+                                </span>
+                            </div>
+                            <button onClick={closePanel} className="app-btn-icon">
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Assets Section */}
+                        <div className="room-alloc-panel-section">
+                            <div className="room-alloc-panel-section-header">
+                                <Package size={14} />
+                                <span>Assigned Assets</span>
+                                <span className="room-alloc-panel-count">{panelAssets.length}</span>
+                                <button
+                                    onClick={(e) => handleOpenAddModal(panelRoom, e)}
+                                    className="app-btn app-btn-primary room-alloc-add-btn"
+                                    disabled={availableAssets.length === 0}
+                                    style={{ marginLeft: 'auto' }}
+                                >
+                                    <Plus size={12} /> Add
+                                </button>
+                            </div>
+                            {panelAssets.length === 0 ? (
+                                <p className="room-alloc-panel-empty">No assets in this room.</p>
+                            ) : (
+                                <div className="room-alloc-panel-assets">
+                                    {panelAssets.map(asset => (
+                                        <div key={asset.assetId} className="room-alloc-panel-asset-row">
+                                            <div className="room-alloc-asset-dot" />
+                                            <div className="room-alloc-panel-asset-info">
+                                                <p className="room-alloc-asset-name">{asset.assetName}</p>
+                                                <p className="room-alloc-asset-code">{asset.assetCode || 'NO CODE'}</p>
+                                            </div>
+                                            <div className="room-alloc-panel-asset-actions">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === asset.assetId ? null : asset.assetId); }}
+                                                    className="app-btn-icon"
+                                                >
+                                                    <MoreVertical size={16} />
+                                                </button>
+                                                {activeDropdown === asset.assetId && (
+                                                    <div className="assets-dropdown" style={{ right: '0', top: '28px' }}>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleOpenTransferModal(panelRoom, asset); }}
+                                                            className="assets-dropdown-item"
+                                                        >
+                                                            <ArrowRight className="w-4 h-4 text-blue-500" /> Transfer Room
+                                                        </button>
+                                                        <div className="room-alloc-dropdown-divider" />
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleOpenRemoveModal(panelRoom, asset); }}
+                                                            className="assets-dropdown-item--danger"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" /> Remove from Room
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Transfer Logs Section */}
+                        <div className="room-alloc-panel-section">
+                            <div className="room-alloc-panel-section-header">
+                                <Calendar size={14} />
+                                <span>Transfer Logs</span>
+                                <span className="room-alloc-panel-count">{panelLogs.length}</span>
+                            </div>
+                            {panelLogs.length === 0 ? (
+                                <p className="room-alloc-panel-empty">No transfer logs for this room.</p>
+                            ) : (
+                                <div className="room-alloc-panel-logs">
+                                    {panelLogs.map((log, i) => (
+                                        <div key={log.transferId || i} className="room-alloc-panel-log-row">
+                                            <p className="room-alloc-panel-log-asset">{log.asset?.assetName || '—'}</p>
+                                            <div className="room-alloc-panel-log-movement">
+                                                <span className="room-alloc-panel-log-from">{log.fromEntityName || 'Inventory'}</span>
+                                                <ArrowRight size={12} className="room-alloc-panel-log-arrow" />
+                                                <span className="room-alloc-panel-log-to">{log.toEntityName || '—'}</span>
+                                            </div>
+                                            <p className="room-alloc-panel-log-date">
+                                                {log.transferDate ? new Date(log.transferDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                                            </p>
+                                            {log.remarks && <p className="room-alloc-panel-log-remarks">{log.remarks}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Add Asset Modal */}
@@ -446,7 +470,6 @@ export default function RoomAllocation() {
                                                 <tr className="app-table-thead-row">
                                                     <th className="app-table-th">#</th>
                                                     <th className="app-table-th">Asset *</th>
-                                                    <th className="app-table-th">Floor *</th>
                                                     <th className="app-table-th">Notes</th>
                                                     <th className="app-table-th"></th>
                                                 </tr>
@@ -473,17 +496,6 @@ export default function RoomAllocation() {
                                                                     ))}
                                                                 </select>
                                                             </td>
-                                                            <td className="app-table-td room-alloc-modal-floor-col">
-                                                                <input
-                                                                    type="number"
-                                                                    min="0"
-                                                                    max="50"
-                                                                    value={row.floor}
-                                                                    onChange={(e) => updateRow(i, 'floor', e.target.value)}
-                                                                    className="app-input"
-                                                                    placeholder="0"
-                                                                />
-                                                            </td>
                                                             <td className="app-table-td">
                                                                 <input
                                                                     type="text"
@@ -499,7 +511,6 @@ export default function RoomAllocation() {
                                                                         type="button"
                                                                         onClick={() => removeRow(i)}
                                                                         className="app-btn-icon room-alloc-modal-remove-btn"
-                                                                        title="Remove row"
                                                                     >
                                                                         <X size={16} />
                                                                     </button>
@@ -523,9 +534,7 @@ export default function RoomAllocation() {
                             </form>
                         </div>
                         <div className="app-modal-footer">
-                            <button type="button" onClick={handleCloseAddModal} className="app-btn app-btn-secondary">
-                                Cancel
-                            </button>
+                            <button type="button" onClick={handleCloseAddModal} className="app-btn app-btn-secondary">Cancel</button>
                             <button type="submit" form="add-asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
                                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                                 {isSubmitting ? 'Adding...' : addRows.length === 1 ? 'Add Asset' : `Add ${addRows.length} Assets`}
@@ -551,9 +560,7 @@ export default function RoomAllocation() {
                                 <div className="room-alloc-modal-asset-info">
                                     <p className="room-alloc-modal-asset-info-label">Asset:</p>
                                     <p className="room-alloc-modal-asset-info-name">{selectedAsset.assetName}</p>
-                                    {selectedAsset.assetCode && (
-                                        <p className="room-alloc-modal-asset-info-code">{selectedAsset.assetCode}</p>
-                                    )}
+                                    {selectedAsset.assetCode && <p className="room-alloc-modal-asset-info-code">{selectedAsset.assetCode}</p>}
                                 </div>
                                 <div className="app-form-grid">
                                     <div className="room-alloc-modal-full-col">
@@ -570,9 +577,7 @@ export default function RoomAllocation() {
                             </form>
                         </div>
                         <div className="app-modal-footer">
-                            <button type="button" onClick={handleCloseRemoveModal} className="app-btn app-btn-secondary">
-                                Cancel
-                            </button>
+                            <button type="button" onClick={handleCloseRemoveModal} className="app-btn app-btn-secondary">Cancel</button>
                             <button type="submit" form="remove-asset-form" disabled={isSubmitting} className="app-btn app-btn-danger">
                                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                                 {isSubmitting ? 'Removing...' : 'Remove Asset'}
@@ -598,9 +603,7 @@ export default function RoomAllocation() {
                                 <div className="room-alloc-modal-asset-info">
                                     <p className="room-alloc-modal-asset-info-label">Asset:</p>
                                     <p className="room-alloc-modal-asset-info-name">{selectedAsset.assetName}</p>
-                                    {selectedAsset.assetCode && (
-                                        <p className="room-alloc-modal-asset-info-code">{selectedAsset.assetCode}</p>
-                                    )}
+                                    {selectedAsset.assetCode && <p className="room-alloc-modal-asset-info-code">{selectedAsset.assetCode}</p>}
                                 </div>
                                 <div className="app-form-grid">
                                     <div>
@@ -612,25 +615,14 @@ export default function RoomAllocation() {
                                             className="app-input"
                                         >
                                             <option value="">Select room</option>
-                                            {rooms.map((room) => (
-                                                <option key={room.id} value={room.id}>
-                                                    {room.roomNumber} - {room.roomType || 'Standard'}
-                                                </option>
-                                            ))}
+                                            {rooms
+                                                .filter(r => r.id !== selectedRoom?.id)
+                                                .map((room) => (
+                                                    <option key={room.id} value={room.id}>
+                                                        {room.roomNumber} ({room.roomType || 'Standard'})
+                                                    </option>
+                                                ))}
                                         </select>
-                                    </div>
-                                    <div>
-                                        <label className="app-label">Floor *</label>
-                                        <input
-                                            required
-                                            type="number"
-                                            min="0"
-                                            max="50"
-                                            value={transferFormData.toFloor}
-                                            onChange={(e) => setTransferFormData({ ...transferFormData, toFloor: e.target.value })}
-                                            className="app-input"
-                                            placeholder="e.g., 3"
-                                        />
                                     </div>
                                     <div className="room-alloc-modal-full-col">
                                         <label className="app-label">Reason</label>
@@ -646,9 +638,7 @@ export default function RoomAllocation() {
                             </form>
                         </div>
                         <div className="app-modal-footer">
-                            <button type="button" onClick={handleCloseTransferModal} className="app-btn app-btn-secondary">
-                                Cancel
-                            </button>
+                            <button type="button" onClick={handleCloseTransferModal} className="app-btn app-btn-secondary">Cancel</button>
                             <button type="submit" form="transfer-asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
                                 {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                                 {isSubmitting ? 'Transferring...' : 'Transfer Asset'}

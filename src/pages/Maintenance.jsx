@@ -352,8 +352,8 @@ export default function Maintenance() {
                                         {record.maintenanceDate}
                                     </td>
                                     <td className="app-table-td">
-                                        <span className={record.type === 'REPAIR' ? 'maintenance-type-badge-repair' : 'maintenance-type-badge-maintenance'}>
-                                            {record.type}
+                                        <span className={record.type === 'REPAIR' ? 'maintenance-type-badge-repair' : record.type === 'BREAKDOWN' ? 'maintenance-type-badge-breakdown' : 'maintenance-type-badge-maintenance'}>
+                                            {record.type === 'MAINTENANCE' ? 'Scheduled' : record.type === 'REPAIR' ? 'Emergency Repair' : record.type}
                                         </span>
                                     </td>
                                     {activeTab === 'bills' && (
@@ -429,6 +429,7 @@ export default function Maintenance() {
                                         <select required value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })} className="app-input">
                                             <option value="MAINTENANCE">Scheduled Maintenance</option>
                                             <option value="REPAIR">Emergency Repair</option>
+                                            <option value="BREAKDOWN">Breakdown</option>
                                         </select>
                                     </div>
                                     <div>

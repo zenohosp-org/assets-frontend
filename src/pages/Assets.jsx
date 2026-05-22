@@ -6,11 +6,13 @@ import '../styles/forms.css';
 import '../styles/tables.css';
 import '../styles/modals.css';
 import '../styles/pages/assets.css';
-import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, Tag, HardDrive, Mail, Check, X as XIcon, Edit3, MapPin } from 'lucide-react';
-import { getAssets, createAsset, updateAsset, deleteAsset, getVendors, getAssetCategories, getHmsRooms, assignAssetToRoom } from '../api/client';
+import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, HardDrive, Mail, MapPin, Users } from 'lucide-react';
+import { getAssets, createAsset, updateAsset, deleteAsset, getAssetCategories, getHmsRooms, assignAssetToRoom, createTransferLog, getDirectoryUsers } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import SearchableSelect from '../components/SearchableSelect';
 
 export default function Assets() {
+    const { user } = useAuth();
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -20,32 +22,23 @@ export default function Assets() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingAsset, setEditingAsset] = useState(null);
     const [activeDropdown, setActiveDropdown] = useState(null);
-    const [vendors, setVendors] = useState([]);
     const [categories, setCategories] = useState([]);
 
-    // Allocate Modal State
-    const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false);
-    const [allocatingAsset, setAllocatingAsset] = useState(null);
+    // Assign/Transfer Modal State
+    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+    const [assigningAsset, setAssigningAsset] = useState(null);
+    const [assignMode, setAssignMode] = useState('ROOM'); // 'ROOM' | 'STAFF'
     const [rooms, setRooms] = useState([]);
     const [roomsLoading, setRoomsLoading] = useState(false);
-    const [allocateFormData, setAllocateFormData] = useState({
-        roomId: '',
-        floor: '',
-        notes: ''
-    });
-    const [isAllocateSubmitting, setIsAllocateSubmitting] = useState(false);
-    const [roomsError, setRoomsError] = useState(false);
-
-    // Serial number inline editing state
-    const [editingSerialId, setEditingSerialId] = useState(null);
-    const [editingSerialValue, setEditingSerialValue] = useState('');
-    const [isSerialSaving, setIsSerialSaving] = useState(false);
+    const [staffList, setStaffList] = useState([]);
+    const [staffLoading, setStaffLoading] = useState(false);
+    const [assignFormData, setAssignFormData] = useState({ roomId: '', notes: '', staffId: '', staffName: '', remarks: '' });
+    const [isAssignSubmitting, setIsAssignSubmitting] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
         assetName: '',
         category: null,
-        vendor: null,
         assetCode: '',
         serialNumber: '',
         make: '',
@@ -56,22 +49,17 @@ export default function Assets() {
         amcExpiry: '',
         amcCost: '',
         notes: '',
-        assignedToType: 'LOCATION',
-        assignedTo: ''
     });
-
 
     useEffect(() => {
         const loadAllData = async () => {
             setLoading(true);
             try {
-                const [assetsRes, vendorsRes, categoriesRes] = await Promise.all([
+                const [assetsRes, categoriesRes] = await Promise.all([
                     getAssets(),
-                    getVendors(),
                     getAssetCategories()
                 ]);
                 setAssets(assetsRes.data);
-                setVendors(vendorsRes.data);
                 setCategories(categoriesRes.data);
             } catch (err) {
                 console.error('Failed to load data:', err);
@@ -86,7 +74,6 @@ export default function Assets() {
         setFormData({
             assetName: '',
             category: null,
-            vendor: null,
             assetCode: '',
             serialNumber: '',
             make: '',
@@ -97,38 +84,8 @@ export default function Assets() {
             amcExpiry: '',
             amcCost: '',
             notes: '',
-            assignedToType: 'LOCATION',
-            assignedTo: ''
         });
         setEditingAsset(null);
-    };
-
-    const handleSerialEditStart = (asset) => {
-        setEditingSerialId(asset.assetId);
-        setEditingSerialValue(asset.serialNumber || '');
-    };
-
-    const handleSerialEditCancel = () => {
-        setEditingSerialId(null);
-        setEditingSerialValue('');
-    };
-
-    const handleSerialEditSave = async (asset) => {
-        setIsSerialSaving(true);
-        try {
-            const updated = { ...asset, serialNumber: editingSerialValue };
-            await updateAsset(asset.assetId, updated);
-            setAssets(prevAssets => 
-                prevAssets.map(a => a.assetId === asset.assetId ? updated : a)
-            );
-            setEditingSerialId(null);
-            setEditingSerialValue('');
-        } catch (err) {
-            console.error('Failed to update serial number:', err);
-            alert('Failed to update serial number');
-        } finally {
-            setIsSerialSaving(false);
-        }
     };
 
     const handleOpenModal = (asset = null) => {
@@ -137,7 +94,6 @@ export default function Assets() {
             setFormData({
                 assetName: asset.assetName || '',
                 category: asset.category ? { id: asset.category.id } : null,
-                vendor: asset.vendor ? { id: asset.vendor.id } : null,
                 assetCode: asset.assetCode || '',
                 serialNumber: asset.serialNumber || '',
                 make: asset.make || '',
@@ -148,8 +104,6 @@ export default function Assets() {
                 amcExpiry: asset.amcExpiry || '',
                 amcCost: asset.amcCost || '',
                 notes: asset.notes || '',
-                assignedToType: asset.assignedToType || 'LOCATION',
-                assignedTo: asset.assignedTo || ''
             });
         } else {
             resetForm();
@@ -167,8 +121,6 @@ export default function Assets() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Data cleaning: Convert empty strings to null for UUID, Date, and Number fields
-        // Backend (Spring) will throw 400 if it gets "" for these types
         const payload = {
             ...formData,
             assetCode: formData.assetCode === '' ? null : formData.assetCode,
@@ -178,7 +130,6 @@ export default function Assets() {
             warrantyExpiry: formData.warrantyExpiry === '' ? null : formData.warrantyExpiry,
             amcExpiry: formData.amcExpiry === '' ? null : formData.amcExpiry,
             purchaseDate: formData.purchaseDate === '' ? null : formData.purchaseDate,
-            assignedTo: formData.assignedTo === '' ? null : formData.assignedTo
         };
 
         try {
@@ -187,13 +138,11 @@ export default function Assets() {
             } else {
                 await createAsset(payload);
             }
-            const [assetsRes, vendorsRes, categoriesRes] = await Promise.all([
+            const [assetsRes, categoriesRes] = await Promise.all([
                 getAssets(),
-                getVendors(),
                 getAssetCategories()
             ]);
             setAssets(assetsRes.data);
-            setVendors(vendorsRes.data);
             setCategories(categoriesRes.data);
             handleCloseModal();
         } catch (error) {
@@ -209,13 +158,11 @@ export default function Assets() {
         if (window.confirm('Are you sure you want to delete this asset?')) {
             try {
                 await deleteAsset(id);
-                const [assetsRes, vendorsRes, categoriesRes] = await Promise.all([
+                const [assetsRes, categoriesRes] = await Promise.all([
                     getAssets(),
-                    getVendors(),
                     getAssetCategories()
                 ]);
                 setAssets(assetsRes.data);
-                setVendors(vendorsRes.data);
                 setCategories(categoriesRes.data);
             } catch (error) {
                 console.error('Failed to delete asset:', error);
@@ -225,67 +172,70 @@ export default function Assets() {
         setActiveDropdown(null);
     };
 
-    const handleOpenAllocateModal = async (asset) => {
-        setAllocatingAsset(asset);
-        setAllocateFormData({
-            roomId: '',
-            room_number: '',
-            room_type: '',
-            floor: '',
-            notes: ''
-        });
-        setIsAllocateModalOpen(true);
+    const handleOpenAssignModal = async (asset) => {
+        setAssigningAsset(asset);
+        setAssignMode('ROOM');
+        setAssignFormData({ roomId: '', notes: '', staffId: '', staffName: '', remarks: '' });
+        setIsAssignModalOpen(true);
         setActiveDropdown(null);
-        
-        // Load rooms
+
         setRoomsLoading(true);
+        setStaffLoading(true);
         try {
             const roomsRes = await getHmsRooms();
             setRooms(roomsRes.data || []);
         } catch (err) {
             console.error('Failed to load rooms:', err);
-            alert('Failed to load rooms. Please try again.');
         } finally {
             setRoomsLoading(false);
         }
-    };
-
-    const handleCloseAllocateModal = () => {
-        setIsAllocateModalOpen(false);
-        setAllocatingAsset(null);
-        setAllocateFormData({ roomId: '', floor: '', notes: '' });
-    };
-
-    const handleAllocateSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (!allocateFormData.roomId) {
-            alert('Please select a room');
-            return;
-        }
-        
-        setIsAllocateSubmitting(true);
         try {
-            await assignAssetToRoom(allocatingAsset.assetId, {
-                roomId: parseInt(allocateFormData.roomId),
-                floor: parseInt(allocateFormData.floor),
-                notes: allocateFormData.notes
-            });
-            
-            // Refresh assets
+            if (user?.hospitalId) {
+                const staffRes = await getDirectoryUsers(user.hospitalId);
+                setStaffList(staffRes.data.data || []);
+            }
+        } catch (err) {
+            console.error('Failed to load staff:', err);
+        } finally {
+            setStaffLoading(false);
+        }
+    };
+
+    const handleCloseAssignModal = () => {
+        setIsAssignModalOpen(false);
+        setAssigningAsset(null);
+        setAssignFormData({ roomId: '', notes: '', staffId: '', staffName: '', remarks: '' });
+    };
+
+    const handleAssignSubmit = async (e) => {
+        e.preventDefault();
+        setIsAssignSubmitting(true);
+        try {
+            if (assignMode === 'ROOM') {
+                if (!assignFormData.roomId) { alert('Please select a room'); setIsAssignSubmitting(false); return; }
+                await assignAssetToRoom(assigningAsset.assetId, {
+                    roomId: parseInt(assignFormData.roomId),
+                    notes: assignFormData.notes
+                });
+            } else {
+                if (!assignFormData.staffId) { alert('Please select a staff member'); setIsAssignSubmitting(false); return; }
+                await createTransferLog({
+                    asset: { assetId: assigningAsset.assetId },
+                    toEntityId: assignFormData.staffId,
+                    toEntityName: assignFormData.staffName,
+                    remarks: assignFormData.remarks
+                });
+            }
             const assetsRes = await getAssets();
             setAssets(assetsRes.data);
-            
-            handleCloseAllocateModal();
-            alert('Asset allocated to room successfully!');
+            handleCloseAssignModal();
         } catch (error) {
-            console.error('Failed to allocate asset:', error);
-            alert('Failed to allocate asset. Please try again.');
+            console.error('Failed to assign asset:', error);
+            alert('Failed to assign asset. Please try again.');
         } finally {
-            setIsAllocateSubmitting(false);
+            setIsAssignSubmitting(false);
         }
     };
-
 
     // Close dropdowns when clicking outside
     useEffect(() => {
@@ -387,9 +337,6 @@ export default function Assets() {
                                 <tr key={asset.assetId} className="app-table-row group">
                                     <td className="app-table-td">
                                         <div className="assets-item-title">{asset.assetName}</div>
-                                        <div className="assets-item-vendor">
-                                            <Tag className="w-3 h-3" /> {asset.vendor?.name || 'Unknown Vendor'}
-                                        </div>
                                     </td>
                                     <td className="app-table-td">
                                         <span className="assets-type-badge">
@@ -398,46 +345,7 @@ export default function Assets() {
                                     </td>
                                     <td className="app-table-td">
                                         <div className="assets-code">{asset.assetCode || 'N/A'}</div>
-                                        {editingSerialId === asset.assetId ? (
-                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
-                                                <input
-                                                    type="text"
-                                                    value={editingSerialValue}
-                                                    onChange={(e) => setEditingSerialValue(e.target.value)}
-                                                    className="app-input"
-                                                    style={{ padding: '4px 8px', fontSize: '14px', flex: 1 }}
-                                                    placeholder="Enter serial number"
-                                                />
-                                                <button
-                                                    onClick={() => handleSerialEditSave(asset)}
-                                                    disabled={isSerialSaving}
-                                                    style={{ padding: '4px 8px', backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                                                    title="Save"
-                                                >
-                                                    <Check size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={handleSerialEditCancel}
-                                                    disabled={isSerialSaving}
-                                                    style={{ padding: '4px 8px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                                                    title="Cancel"
-                                                >
-                                                    <XIcon size={16} />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
-                                                <div className="assets-serial">{asset.serialNumber || 'No Serial'}</div>
-                                                <button
-                                                    onClick={() => handleSerialEditStart(asset)}
-                                                    className="app-btn-icon"
-                                                    style={{ padding: '4px' }}
-                                                    title="Edit serial number"
-                                                >
-                                                    <Edit3 size={14} />
-                                                </button>
-                                            </div>
-                                        )}
+                                        <div className="assets-serial">{asset.serialNumber || 'No Serial'}</div>
                                     </td>
                                     <td className="app-table-td">
                                         <div className="assets-warranty-info">
@@ -471,10 +379,10 @@ export default function Assets() {
                                                     <Edit2 className="w-4 h-4 text-blue-500" /> Edit Details
                                                 </button>
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); handleOpenAllocateModal(asset); }}
+                                                    onClick={(e) => { e.stopPropagation(); handleOpenAssignModal(asset); }}
                                                     className="assets-dropdown-item"
                                                 >
-                                                    <MapPin className="w-4 h-4 text-green-500" /> Allocate to Room
+                                                    <MapPin className="w-4 h-4 text-green-500" /> Assign / Transfer
                                                 </button>
                                                 <div className="h-px my-1 bg-slate-100"></div>
                                                 <button
@@ -493,7 +401,7 @@ export default function Assets() {
                 </div>
             </div>
 
-            {/* Asset Detail Drawer */}
+            {/* Add / Edit Asset Modal */}
             {isModalOpen && (
                 <div className="app-modal-overlay">
                     <div className="app-modal-backdrop" onClick={handleCloseModal}></div>
@@ -530,18 +438,6 @@ export default function Assets() {
                                                     placeholder="Select Category"
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="app-label">Vendor *</label>
-                                                <SearchableSelect
-                                                    value={formData.vendor?.id || ''}
-                                                    onChange={(id) => setFormData({ ...formData, vendor: id ? { id } : null })}
-                                                    options={vendors}
-                                                    getId={v => v.id}
-                                                    getLabel={v => v.name}
-                                                    placeholder="Select Vendor"
-                                                    required
-                                                />
-                                            </div>
                                         </div>
                                     </div>
 
@@ -549,6 +445,14 @@ export default function Assets() {
                                     <div className="assets-form-section">
                                         <h3 className="assets-form-section-title">Identification</h3>
                                         <div className="assets-form-row-3">
+                                            <div>
+                                                <label className="app-label">Asset Code</label>
+                                                <input type="text" value={formData.assetCode} onChange={(e) => setFormData({ ...formData, assetCode: e.target.value })} className="app-input" placeholder="e.g. AST-001" />
+                                            </div>
+                                            <div>
+                                                <label className="app-label">Serial Number</label>
+                                                <input type="text" value={formData.serialNumber} onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })} className="app-input" placeholder="e.g. SN123456" />
+                                            </div>
                                             <div>
                                                 <label className="app-label">Make / Brand</label>
                                                 <input type="text" value={formData.make} onChange={(e) => setFormData({ ...formData, make: e.target.value })} className="app-input" placeholder="e.g. GE Healthcare" />
@@ -590,7 +494,7 @@ export default function Assets() {
                                         </div>
                                     </div>
 
-                                    {/* Other */}
+                                    {/* Notes */}
                                     <div className="assets-form-section">
                                         <h3 className="assets-form-section-title">Additional Notes</h3>
                                         <div>
@@ -614,94 +518,128 @@ export default function Assets() {
                 </div>
             )}
 
-            {/* Allocate to Room Modal */}
-            {isAllocateModalOpen && (
+            {/* Assign / Transfer Modal */}
+            {isAssignModalOpen && (
                 <div className="app-modal-overlay">
-                    <div className="app-modal-backdrop" onClick={handleCloseAllocateModal}></div>
+                    <div className="app-modal-backdrop" onClick={handleCloseAssignModal}></div>
 
                     <div className="app-modal-content">
                         <div className="app-modal-header">
-                            <h2 className="app-modal-title">
-                                Allocate Asset to Room
-                            </h2>
-                            <button onClick={handleCloseAllocateModal} className="app-modal-close">
+                            <h2 className="app-modal-title">Assign / Transfer Asset</h2>
+                            <button onClick={handleCloseAssignModal} className="app-modal-close">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         <div className="app-modal-body">
-                            {allocatingAsset && (
-                                <form id="allocate-form" onSubmit={handleAllocateSubmit} className="app-form">
+                            {assigningAsset && (
+                                <form id="assign-form" onSubmit={handleAssignSubmit} className="app-form">
                                     <div className="assets-allocate-asset-label">
-                                        Asset: <strong>{allocatingAsset.assetName}</strong>
-                                        {allocatingAsset.assetCode && <span className="assets-allocate-asset-code">{allocatingAsset.assetCode}</span>}
+                                        Asset: <strong>{assigningAsset.assetName}</strong>
+                                        {assigningAsset.assetCode && <span className="assets-allocate-asset-code">{assigningAsset.assetCode}</span>}
                                     </div>
-                                    <div className="app-table-wrapper assets-allocate-modal-table" style={{ marginTop: '12px' }}>
-                                        <div className="app-table-container">
-                                            <table className="app-table">
-                                                <thead>
-                                                    <tr className="app-table-thead-row">
-                                                        <th className="app-table-th">Room *</th>
-                                                        <th className="app-table-th">Floor</th>
-                                                        <th className="app-table-th">Notes</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="app-table-tbody">
-                                                    <tr className="app-table-row">
-                                                        <td className="app-table-td">
-                                                            {roomsLoading ? (
-                                                                <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
-                                                                    <Loader2 className="w-4 h-4 animate-spin" /> Loading rooms...
-                                                                </div>
-                                                            ) : (
-                                                                <SearchableSelect
-                                                                    value={allocateFormData.roomId}
-                                                                    onChange={(id) => {
-                                                                        const room = rooms.find(r => String(r.id) === id);
-                                                                        setAllocateFormData({ ...allocateFormData, roomId: id, floor: room?.floor ?? '' });
-                                                                    }}
-                                                                    options={rooms}
-                                                                    getId={r => String(r.id)}
-                                                                    getLabel={r => `${r.roomNumber} (${r.roomType || 'Standard'})`}
-                                                                    placeholder="Select Room"
-                                                                    required
-                                                                />
-                                                            )}
-                                                        </td>
-                                                        <td className="app-table-td" style={{ width: '90px' }}>
-                                                            <input
-                                                                type="number"
-                                                                value={allocateFormData.floor}
-                                                                disabled
-                                                                className="app-input"
-                                                                placeholder="—"
-                                                            />
-                                                        </td>
-                                                        <td className="app-table-td">
-                                                            <input
-                                                                type="text"
-                                                                value={allocateFormData.notes}
-                                                                onChange={(e) => setAllocateFormData({ ...allocateFormData, notes: e.target.value })}
-                                                                className="app-input"
-                                                                placeholder="Optional notes"
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+
+                                    {/* Mode toggle */}
+                                    <div className="assets-assign-toggle">
+                                        <button
+                                            type="button"
+                                            className={`assets-assign-toggle-btn${assignMode === 'ROOM' ? ' assets-assign-toggle-btn--active' : ''}`}
+                                            onClick={() => setAssignMode('ROOM')}
+                                        >
+                                            <MapPin className="w-4 h-4" /> Room
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`assets-assign-toggle-btn${assignMode === 'STAFF' ? ' assets-assign-toggle-btn--active' : ''}`}
+                                            onClick={() => setAssignMode('STAFF')}
+                                        >
+                                            <Users className="w-4 h-4" /> Staff
+                                        </button>
+                                    </div>
+
+                                    {assignMode === 'ROOM' && (
+                                        <div className="app-form-grid" style={{ marginTop: '16px' }}>
+                                            <div>
+                                                <label className="app-label">Room *</label>
+                                                {roomsLoading ? (
+                                                    <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
+                                                        <Loader2 className="w-4 h-4 animate-spin" /> Loading rooms...
+                                                    </div>
+                                                ) : (
+                                                    <SearchableSelect
+                                                        value={assignFormData.roomId}
+                                                        onChange={(id) => setAssignFormData({ ...assignFormData, roomId: id })}
+                                                        options={rooms}
+                                                        getId={r => String(r.id)}
+                                                        getLabel={r => `${r.roomNumber} (${r.roomType || 'Standard'})`}
+                                                        placeholder="Select Room"
+                                                        required
+                                                    />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="app-label">Notes</label>
+                                                <input
+                                                    type="text"
+                                                    value={assignFormData.notes}
+                                                    onChange={(e) => setAssignFormData({ ...assignFormData, notes: e.target.value })}
+                                                    className="app-input"
+                                                    placeholder="Optional notes"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+
+                                    {assignMode === 'STAFF' && (
+                                        <div className="app-form-grid" style={{ marginTop: '16px' }}>
+                                            <div>
+                                                <label className="app-label">Staff Member *</label>
+                                                {staffLoading ? (
+                                                    <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
+                                                        <Loader2 className="w-4 h-4 animate-spin" /> Loading staff...
+                                                    </div>
+                                                ) : (
+                                                    <SearchableSelect
+                                                        value={assignFormData.staffId}
+                                                        onChange={(id) => {
+                                                            const staff = staffList.find(s => s.userId === id);
+                                                            setAssignFormData({
+                                                                ...assignFormData,
+                                                                staffId: id,
+                                                                staffName: staff ? `${staff.firstName || ''} ${staff.lastName || ''}`.trim() : ''
+                                                            });
+                                                        }}
+                                                        options={staffList}
+                                                        getId={s => s.userId}
+                                                        getLabel={s => `${s.firstName || ''} ${s.lastName || ''}`.trim() + (s.role ? ` (${s.role})` : '')}
+                                                        placeholder="Select Staff"
+                                                        required
+                                                    />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="app-label">Remarks</label>
+                                                <textarea
+                                                    rows="3"
+                                                    value={assignFormData.remarks}
+                                                    onChange={(e) => setAssignFormData({ ...assignFormData, remarks: e.target.value })}
+                                                    className="app-textarea"
+                                                    placeholder="Optional remarks"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </form>
                             )}
                         </div>
 
                         <div className="app-modal-footer">
-                            <button type="button" onClick={handleCloseAllocateModal} className="app-btn app-btn-secondary">
+                            <button type="button" onClick={handleCloseAssignModal} className="app-btn app-btn-secondary">
                                 Cancel
                             </button>
-                            <button type="submit" form="allocate-form" disabled={isAllocateSubmitting || roomsLoading} className="app-btn app-btn-primary">
-                                {isAllocateSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                {isAllocateSubmitting ? 'Allocating...' : 'Allocate Asset'}
+                            <button type="submit" form="assign-form" disabled={isAssignSubmitting || roomsLoading || staffLoading} className="app-btn app-btn-primary">
+                                {isAssignSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isAssignSubmitting ? 'Assigning...' : (assignMode === 'ROOM' ? 'Assign to Room' : 'Assign to Staff')}
                             </button>
                         </div>
                     </div>
