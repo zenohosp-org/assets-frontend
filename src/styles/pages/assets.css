@@ -241,3 +241,25 @@
     border-color: var(--color-black);
     color: var(--color-white);
 }
+
+/* ── Phase 3: replacements for previously-inline styles ── */
+.assets-empty-cell {
+    text-align: center;
+    padding: 80px 24px;
+}
+
+.assets-empty-title {
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.assets-form-grid-spaced {
+    margin-top: 16px;
+}
+
+.assets-loading-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+}
