@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Loader2, Tag } from 'lucide-react';
 import { getAssetCategories, createAssetCategory } from '../api/client';
-import '../styles/common.css';
-import '../styles/buttons.css';
-import '../styles/cards.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
 import '../styles/pages/asset-categories.css';
 
 export default function AssetCategories() {
@@ -75,7 +70,7 @@ export default function AssetCategories() {
                         </div>
                         <div className="asset-category-right">
                             <button type="submit" className="app-btn app-btn-primary" disabled={isSubmitting}>
-                                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-5 w-5" />}
+                                {isSubmitting ? <Loader2 className="app-icon-16 icon-spin" /> : <Plus className="app-icon-20" />}
                                 {isSubmitting ? 'Adding...' : 'Add Category'}
                             </button>
                         </div>
@@ -98,8 +93,8 @@ export default function AssetCategories() {
                                 <tr>
                                     <td colSpan="3" className="app-table-td asset-categories-empty-cell">
                                         <div className="app-empty">
-                                            <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
-                                            <p className="text-sm animate-pulse">Loading categories...</p>
+                                            <Loader2 className="app-icon-24 text-blue icon-spin" />
+                                            <p className="text-sm text-pulse">Loading categories...</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -107,7 +102,7 @@ export default function AssetCategories() {
                                 <tr>
                                     <td colSpan="3" className="app-table-td asset-categories-empty-cell">
                                         <div className="app-empty">
-                                            <Tag className="w-8 h-8 text-slate-300" />
+                                            <Tag className="app-icon-32 text-slate-300" />
                                             <p className="text-sm text-slate-500">No categories yet. Add one above.</p>
                                         </div>
                                     </td>

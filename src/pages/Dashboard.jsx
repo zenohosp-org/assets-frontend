@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package, XCircle } from 'lucide-react';
 import api, { getAssets } from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import '../styles/common.css';
-import '../styles/cards.css';
 import '../styles/pages/dashboard.css';
 
 export default function Dashboard() {

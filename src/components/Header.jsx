@@ -1,5 +1,6 @@
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import '../styles/header.css';
 
 export default function Header() {
     const { user, logout } = useAuth();
@@ -8,29 +9,22 @@ export default function Header() {
     const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}` || 'U';
 
     return (
-        <header className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 shrink-0">
-            <span className="text-sm font-semibold text-slate-700 flex-1">
-                Asset Management
-            </span>
+        <header className="app-header">
+            <span className="app-header-title">Asset Management</span>
 
-            <div className="flex items-center gap-1">
-
-                <div className="flex items-center gap-3 ml-1">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0">
-                        {initials.toUpperCase()}
-                    </div>
-                    <div className="hidden sm:flex flex-col items-start">
-                        <span className="text-sm font-semibold text-slate-900 leading-tight">
-                            {displayName}
-                        </span>
-                        <span className="text-xs text-slate-500">{user?.role}</span>
+            <div className="app-header-right">
+                <div className="app-header-user">
+                    <div className="app-header-avatar">{initials.toUpperCase()}</div>
+                    <div className="app-header-user-meta">
+                        <span className="app-header-user-name">{displayName}</span>
+                        <span className="app-header-user-role">{user?.role}</span>
                     </div>
                     <button
                         onClick={logout}
                         title="Logout"
-                        className="p-1.5 rounded-lg text-slate-600 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
+                        className="app-header-logout"
                     >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut size={16} />
                     </button>
                 </div>
             </div>

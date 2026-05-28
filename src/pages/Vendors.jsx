@@ -1,10 +1,4 @@
 import { useState, useEffect } from 'react';
-import '../styles/common.css';
-import '../styles/buttons.css';
-import '../styles/cards.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
-import '../styles/modals.css';
 import '../styles/pages/vendors.css';
 import { Users, Plus, Edit2, Trash2, X, Search, MoreVertical } from 'lucide-react';
 import { getVendors, createVendor, updateVendor, deleteVendor } from '../api/client';
@@ -220,11 +214,11 @@ export default function Vendors() {
                                         {activeDropdown === v.id && (
                                             <div className="assets-dropdown">
                                                 <button onClick={(e) => { e.stopPropagation(); handleOpenModal(v); }} className="assets-dropdown-item">
-                                                    <Edit2 className="w-4 h-4 text-blue-500" /> Edit Details
+                                                    <Edit2 className="app-icon-16 text-blue" /> Edit Details
                                                 </button>
-                                                <div className="h-px my-1 bg-slate-100"></div>
+                                                <div className="app-divider"></div>
                                                 <button onClick={(e) => { e.stopPropagation(); handleDelete(v.id); }} className="assets-dropdown-item--danger">
-                                                    <Trash2 className="w-4 h-4" /> Delete Vendor
+                                                    <Trash2 className="app-icon-16" /> Delete Vendor
                                                 </button>
                                             </div>
                                         )}

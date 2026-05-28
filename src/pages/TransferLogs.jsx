@@ -1,11 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { getTransferLogs, createTransferLog, getAssets, getDirectoryUsers } from '../api/client';
-import '../styles/common.css';
-import '../styles/buttons.css';
-import '../styles/cards.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
-import '../styles/modals.css';
 import '../styles/pages/transfer-logs.css';
 import { useAuth } from '../context/AuthContext';
 import { History, ArrowRight, Box, Calendar, Search, Plus, X, Loader2, Mail, ChevronDown } from 'lucide-react';
@@ -159,7 +153,7 @@ export default function TransferLogs() {
                 </div>
                 <div className="transfer-logs-actions">
                     <button onClick={handleOpenModal} className="app-btn app-btn-primary">
-                        <Plus className="w-5 h-5" /> Record Transfer
+                        <Plus className="app-icon-20" /> Record Transfer
                     </button>
                     <a href="mailto:support@zenohosp.com" className="transfer-logs-mail-btn" title="Contact ZenoHosp Support">
                         <Mail className="transfer-logs-btn-icon" />
@@ -192,7 +186,7 @@ export default function TransferLogs() {
 
             <div className="app-search-wrapper">
                 <div className="app-search-icon-wrapper">
-                    <Search className="w-5 h-5 text-slate-400" />
+                    <Search className="app-icon-20 text-slate-400" />
                 </div>
                 <input
                     type="text"
@@ -217,7 +211,7 @@ export default function TransferLogs() {
                         <tbody className="app-table-tbody">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="4" className="app-table-td text-center py-8">
+                                    <td colSpan="4" className="app-table-td text-center app-py-8">
                                         <div className="transfer-logs-empty-wrapper">
                                             <Loader2 className="transfer-logs-loader-icon" />
                                             <p className="transfer-logs-loader-text">Fetching audit logs...</p>
@@ -226,7 +220,7 @@ export default function TransferLogs() {
                                 </tr>
                             ) : filteredLogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="app-table-td text-center py-8">
+                                    <td colSpan="4" className="app-table-td text-center app-py-8">
                                         <div className="transfer-logs-empty-wrapper">
                                             <div className="transfer-logs-empty-icon-bg">
                                                 <History className="transfer-logs-empty-icon" />
@@ -241,7 +235,7 @@ export default function TransferLogs() {
                                     <td className="app-table-td">
                                         <div className="transfer-logs-asset-cell">
                                             <div className="transfer-logs-asset-icon-bg">
-                                                <Box className="w-5 h-5" />
+                                                <Box className="app-icon-20" />
                                             </div>
                                             <div>
                                                 <p className="transfer-logs-asset-name">{log.asset?.assetName || 'Unknown Asset'}</p>
@@ -264,7 +258,7 @@ export default function TransferLogs() {
                                     </td>
                                     <td className="app-table-td">
                                         <div className="transfer-logs-date-cell">
-                                            <Calendar className="w-4 h-4 text-slate-400" />
+                                            <Calendar className="app-icon-16 text-slate-400" />
                                             {log.transferDate
                                                 ? new Date(log.transferDate).toLocaleDateString(undefined, {
                                                     year: 'numeric', month: 'short', day: 'numeric',
@@ -294,10 +288,10 @@ export default function TransferLogs() {
                         <div className="app-modal-header">
                             <div>
                                 <h2 className="app-modal-title">Record Asset Transfer</h2>
-                                <p className="text-xs text-slate-500 mt-1">Assign an asset to a user or location</p>
+                                <p className="text-xs text-slate-500 app-mt-1">Assign an asset to a user or location</p>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
 
@@ -305,7 +299,7 @@ export default function TransferLogs() {
                             <form id="transfer-form" onSubmit={handleSubmit} className="app-form">
                                 <div>
                                     <label className="app-label">
-                                        <Box className="w-4 h-4 text-blue-500" /> Select Asset *
+                                        <Box className="app-icon-16 text-blue" /> Select Asset *
                                     </label>
                                     <SearchableSelect
                                         value={formData.asset.assetId}
@@ -335,7 +329,7 @@ export default function TransferLogs() {
                                     </div>
                                     <div>
                                         <label className="app-label">To (Assignee) *</label>
-                                        <div className="relative" ref={userDropdownRef}>
+                                        <div className="app-relative" ref={userDropdownRef}>
                                             <input
                                                 type="text"
                                                 required={!formData.toEntityId}
@@ -349,7 +343,7 @@ export default function TransferLogs() {
                                                 className="app-input"
                                                 placeholder={users.length > 0 ? 'Search staff...' : 'Recipient name'}
                                             />
-                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                            <ChevronDown className="app-search-icon-trailing" />
                                             {userDropdownOpen && filteredUsers.length > 0 && (
                                                 <div className="transfer-logs-dropdown-menu">
                                                     {filteredUsers.map(u => (
@@ -387,7 +381,7 @@ export default function TransferLogs() {
                                 Cancel
                             </button>
                             <button type="submit" form="transfer-form" disabled={isSubmitting} className="app-btn app-btn-primary">
-                                {isSubmitting && <Loader2 className="w-5 h-5 animate-spin mr-2" />}
+                                {isSubmitting && <Loader2 className="app-icon-20 icon-spin app-app-app-mr-2" />}
                                 {isSubmitting ? 'Recording...' : 'Record Transfer'}
                             </button>
                         </div>

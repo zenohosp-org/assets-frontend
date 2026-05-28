@@ -2,12 +2,6 @@ import { useState, useEffect } from 'react';
 import { getMaintenanceRecords, createMaintenanceRecord, completeMaintenanceRecord, getFinanceBankAccounts, createFinanceBankTransaction, getAssets, getVendors } from '../api/client';
 import { Activity, AlertCircle, Wrench, Calendar, Tag, DollarSign, Search, Plus, X, Loader2, Check, XIcon } from 'lucide-react';
 import SearchableSelect from '../components/SearchableSelect';
-import '../styles/common.css';
-import '../styles/buttons.css';
-import '../styles/cards.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
-import '../styles/modals.css';
 import '../styles/pages/maintenance.css';
 
 export default function Maintenance() {
@@ -247,20 +241,20 @@ export default function Maintenance() {
                     <p className="app-page-subtitle">Track health logs, repairs, service costs, and billing for all assets.</p>
                 </div>
                 <button onClick={handleOpenModal} className="app-btn app-btn-primary">
-                    <Wrench className="w-5 h-5" /> Log Service
+                    <Wrench className="app-icon-20" /> Log Service
                 </button>
             </header>
 
             <div className="app-stats-grid">
                 <div className="maintenance-stat-card-orange">
-                    <div className="maintenance-stat-icon-wrapper-orange"><AlertCircle className="w-6 h-6" /></div>
+                    <div className="maintenance-stat-icon-wrapper-orange"><AlertCircle className="app-icon-24" /></div>
                     <div>
                         <p className="maintenance-stat-label-orange">Pending</p>
                         <p className="maintenance-stat-value-orange">{records.filter(r => r.status !== 'COMPLETED').length}</p>
                     </div>
                 </div>
                 <div className="maintenance-stat-card-blue">
-                    <div className="maintenance-stat-icon-wrapper-blue"><DollarSign className="w-6 h-6" /></div>
+                    <div className="maintenance-stat-icon-wrapper-blue"><DollarSign className="app-icon-24" /></div>
                     <div>
                         <p className="maintenance-stat-label-blue">Total Expense</p>
                         <p className="maintenance-stat-value-blue">₹ {records.reduce((sum, r) => sum + (r.cost || r.repairCost || 0), 0).toLocaleString()}</p>
@@ -304,7 +298,7 @@ export default function Maintenance() {
 
             <div className="app-search-wrapper">
                 <div className="app-search-icon-wrapper">
-                    <Search className="w-5 h-5" />
+                    <Search className="app-icon-20" />
                 </div>
                 <input
                     type="text"
@@ -332,15 +326,15 @@ export default function Maintenance() {
                         </thead>
                         <tbody className="app-table-tbody">
                             {loading ? (
-                                <tr><td colSpan={activeTab === 'bills' ? 6 : 7} className="app-table-td text-center py-8">Analyzing maintenance history...</td></tr>
+                                <tr><td colSpan={activeTab === 'bills' ? 6 : 7} className="app-table-td text-center app-py-8">Analyzing maintenance history...</td></tr>
                             ) : (activeTab === 'service' ? serviceRecords : billRecords).length === 0 ? (
-                                <tr><td colSpan={activeTab === 'bills' ? 6 : 7} className="app-table-td text-center py-8">No {activeTab === 'bills' ? 'bills' : 'records'} found.</td></tr>
+                                <tr><td colSpan={activeTab === 'bills' ? 6 : 7} className="app-table-td text-center app-py-8">No {activeTab === 'bills' ? 'bills' : 'records'} found.</td></tr>
                             ) : (activeTab === 'service' ? serviceRecords : billRecords).map((record) => (
                                 <tr key={record.maintenanceId} className="app-table-row">
                                     <td className="app-table-td">
                                         <div className="maintenance-asset-cell">
                                             <div className="maintenance-asset-icon-wrapper">
-                                                <Wrench className="w-5 h-5" />
+                                                <Wrench className="app-icon-20" />
                                             </div>
                                             <div>
                                                 <p className="maintenance-asset-name">{record.asset?.assetName}</p>
@@ -385,7 +379,7 @@ export default function Maintenance() {
                                                     className="app-btn app-btn-primary"
                                                     style={{ padding: '6px 12px', fontSize: '13px' }}
                                                 >
-                                                    <Check className="w-4 h-4" /> Complete
+                                                    <Check className="app-icon-16" /> Complete
                                                 </button>
                                             )}
                                         </td>
@@ -405,7 +399,7 @@ export default function Maintenance() {
                         <div className="app-modal-header">
                             <h2 className="app-modal-title">Log Maintenance / Repair</h2>
                             <button onClick={handleCloseModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
 
@@ -470,7 +464,7 @@ export default function Maintenance() {
                                 Cancel
                             </button>
                             <button type="submit" form="maintenance-form" disabled={isSubmitting} className="app-btn app-btn-primary">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isSubmitting ? 'Saving...' : 'Save Record'}
                             </button>
                         </div>
@@ -486,7 +480,7 @@ export default function Maintenance() {
                         <div className="app-modal-header">
                             <h2 className="app-modal-title">Complete Maintenance & Create Bill</h2>
                             <button onClick={handleCloseCompleteModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
 
@@ -567,7 +561,7 @@ export default function Maintenance() {
                                 disabled={isCompleteSubmitting || isBankAccountsLoading}
                                 className="app-btn app-btn-primary"
                             >
-                                {isCompleteSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isCompleteSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isCompleteSubmitting ? 'Completing...' : 'Complete & Create Bill'}
                             </button>
                         </div>

@@ -3,7 +3,6 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Shield, Globe, Box, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../api/client';
-import '../styles/common.css';
 import '../styles/pages/login.css';
 
 const AUTO_SSO_LAST_ATTEMPT_KEY = 'asset_auto_sso_last_attempt';

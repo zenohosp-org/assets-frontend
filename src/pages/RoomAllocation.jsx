@@ -1,10 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/common.css';
-import '../styles/buttons.css';
-import '../styles/cards.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
-import '../styles/modals.css';
 import '../styles/pages/room-allocation.css';
 import { Plus, Search, X, Loader2, Trash2, ArrowRight, Building2, MoreVertical, Calendar, Package } from 'lucide-react';
 import { getHmsRooms, getAssets, assignAssetToRoom, unassignAssetFromRoom, transferAssetRoom, getTransferLogs } from '../api/client';
@@ -211,7 +205,7 @@ export default function RoomAllocation() {
     if (loading) {
         return (
             <div className="app-page room-alloc-loading-page">
-                <Loader2 className="animate-spin" size={32} />
+                <Loader2 className="icon-spin" size={32} />
             </div>
         );
     }
@@ -246,7 +240,7 @@ export default function RoomAllocation() {
 
             <div className="app-search-wrapper">
                 <div className="app-search-icon-wrapper">
-                    <Search className="w-5 h-5" />
+                    <Search className="app-icon-20" />
                 </div>
                 <input
                     type="text"
@@ -276,7 +270,7 @@ export default function RoomAllocation() {
                                         <td colSpan="4" className="app-table-td room-alloc-empty-cell">
                                             <div className="app-empty">
                                                 <div className="room-alloc-empty-icon">
-                                                    <Building2 className="w-8 h-8" />
+                                                    <Building2 className="app-icon-32" />
                                                 </div>
                                                 <p className="room-alloc-empty-title">No rooms found</p>
                                                 <p className="room-alloc-empty-sub">No rooms match your search criteria.</p>
@@ -296,7 +290,7 @@ export default function RoomAllocation() {
                                             <td className="app-table-td">
                                                 <div className="room-alloc-room-cell">
                                                     <div className="room-alloc-room-icon">
-                                                        <Building2 className="w-5 h-5" />
+                                                        <Building2 className="app-icon-20" />
                                                     </div>
                                                     <div>
                                                         <p className="room-alloc-room-name">{room.roomNumber}</p>
@@ -342,7 +336,7 @@ export default function RoomAllocation() {
                         <div className="room-alloc-panel-header">
                             <div className="room-alloc-panel-title-row">
                                 <div className="room-alloc-room-icon">
-                                    <Building2 className="w-5 h-5" />
+                                    <Building2 className="app-icon-20" />
                                 </div>
                                 <div>
                                     <p className="room-alloc-room-name">{panelRoom.roomNumber}</p>
@@ -396,14 +390,14 @@ export default function RoomAllocation() {
                                                             onClick={(e) => { e.stopPropagation(); handleOpenTransferModal(panelRoom, asset); }}
                                                             className="assets-dropdown-item"
                                                         >
-                                                            <ArrowRight className="w-4 h-4 text-blue-500" /> Transfer Room
+                                                            <ArrowRight className="app-icon-16 text-blue" /> Transfer Room
                                                         </button>
                                                         <div className="room-alloc-dropdown-divider" />
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); handleOpenRemoveModal(panelRoom, asset); }}
                                                             className="assets-dropdown-item--danger"
                                                         >
-                                                            <Trash2 className="w-4 h-4" /> Remove from Room
+                                                            <Trash2 className="app-icon-16" /> Remove from Room
                                                         </button>
                                                     </div>
                                                 )}
@@ -454,7 +448,7 @@ export default function RoomAllocation() {
                         <div className="app-modal-header">
                             <h2 className="app-modal-title">Add Asset to Room</h2>
                             <button onClick={handleCloseAddModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
                         <div className="app-modal-body">
@@ -536,7 +530,7 @@ export default function RoomAllocation() {
                         <div className="app-modal-footer">
                             <button type="button" onClick={handleCloseAddModal} className="app-btn app-btn-secondary">Cancel</button>
                             <button type="submit" form="add-asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isSubmitting ? 'Adding...' : addRows.length === 1 ? 'Add Asset' : `Add ${addRows.length} Assets`}
                             </button>
                         </div>
@@ -552,7 +546,7 @@ export default function RoomAllocation() {
                         <div className="app-modal-header">
                             <h2 className="app-modal-title">Remove Asset from Room</h2>
                             <button onClick={handleCloseRemoveModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
                         <div className="app-modal-body">
@@ -579,7 +573,7 @@ export default function RoomAllocation() {
                         <div className="app-modal-footer">
                             <button type="button" onClick={handleCloseRemoveModal} className="app-btn app-btn-secondary">Cancel</button>
                             <button type="submit" form="remove-asset-form" disabled={isSubmitting} className="app-btn app-btn-danger">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isSubmitting ? 'Removing...' : 'Remove Asset'}
                             </button>
                         </div>
@@ -595,7 +589,7 @@ export default function RoomAllocation() {
                         <div className="app-modal-header">
                             <h2 className="app-modal-title">Transfer Asset to Another Room</h2>
                             <button onClick={handleCloseTransferModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
                         <div className="app-modal-body">
@@ -640,7 +634,7 @@ export default function RoomAllocation() {
                         <div className="app-modal-footer">
                             <button type="button" onClick={handleCloseTransferModal} className="app-btn app-btn-secondary">Cancel</button>
                             <button type="submit" form="transfer-asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isSubmitting ? 'Transferring...' : 'Transfer Asset'}
                             </button>
                         </div>

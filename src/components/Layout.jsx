@@ -6,7 +6,6 @@ import {
     Globe, BarChart2, Package, ArrowUpRight, Tag
 } from 'lucide-react';
 import Header from './Header';
-import '../styles/layout.css';
 
 export default function Layout({ children }) {
     const location = useLocation();

@@ -1,0 +1,27 @@
+.page-spinner-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 240px;
+    width: 100%;
+    color: var(--color-slate-500, #64748b);
+}
+
+.page-spinner-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-primary, #2563eb);
+    animation: page-spinner-rotate 0.9s linear infinite;
+}
+
+.page-spinner-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+@keyframes page-spinner-rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}

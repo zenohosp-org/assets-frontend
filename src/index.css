@@ -1,5 +1,10 @@
 @import './styles/design-system.css';
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './styles/common.css';
+@import './styles/layout.css';
+@import './styles/buttons.css';
+@import './styles/cards.css';
+@import './styles/forms.css';
+@import './styles/tables.css';
+@import './styles/modals.css';
+@import './styles/searchable-select.css';
+@import './styles/utilities.css';

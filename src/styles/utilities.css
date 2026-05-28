@@ -1,0 +1,99 @@
+/* Small set of named utility classes used across pages to replace Tailwind.
+   These are intentionally narrow — colors, spin animation, and a few text helpers. */
+
+@keyframes util-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes util-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+.icon-spin   { animation: util-spin 0.9s linear infinite; }
+.text-pulse  { animation: util-pulse 1.6s ease-in-out infinite; }
+
+.text-blue   { color: #3b82f6; }
+.text-green  { color: #10b981; }
+.text-purple { color: #8b5cf6; }
+.text-rose   { color: #f43f5e; }
+.text-slate-300 { color: #cbd5e1; }
+.text-slate-400 { color: #94a3b8; }
+.text-slate-500 { color: #64748b; }
+.text-slate-600 { color: #475569; }
+.text-slate-700 { color: #334155; }
+.text-slate-900 { color: #0f172a; }
+.bg-slate-50    { background-color: #f8fafc; }
+.bg-slate-100   { background-color: #f1f5f9; }
+
+.text-center { text-align: center; }
+.text-xs     { font-size: 0.75rem; }
+.text-sm     { font-size: 0.875rem; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+
+.app-divider {
+    height: 1px;
+    margin: 4px 0;
+    background-color: #f1f5f9;
+}
+
+.app-empty-cell {
+    text-align: center;
+    padding: 32px 0;
+}
+
+/* Icon size helpers (replace Tailwind w-N h-N) */
+.app-icon-12 { width: 12px; height: 12px; }
+.app-icon-14 { width: 14px; height: 14px; }
+.app-icon-16 { width: 16px; height: 16px; }
+.app-icon-20 { width: 20px; height: 20px; }
+.app-icon-24 { width: 24px; height: 24px; }
+.app-icon-32 { width: 32px; height: 32px; }
+
+/* Spacing helpers */
+.app-mr-2 { margin-right: 8px; }
+.app-mt-1 { margin-top: 4px; }
+.app-gap-1 { gap: 4px; }
+.app-gap-3 { gap: 12px; }
+.app-py-8 { padding-top: 32px; padding-bottom: 32px; }
+
+/* Flex helpers */
+.app-flex          { display: flex; }
+.app-flex-1        { flex: 1; }
+.app-flex-col      { display: flex; flex-direction: column; }
+.app-items-center  { align-items: center; }
+.app-justify-center { justify-content: center; }
+.app-items-start   { align-items: flex-start; }
+
+.app-relative      { position: relative; }
+.app-pointer-none  { pointer-events: none; }
+
+/* Search-icon-in-input positioning (TransferLogs) */
+.app-search-icon-trailing {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* Round border helper */
+.app-rounded-full { border-radius: 9999px; }
+.app-border       { border: 1px solid #e2e8f0; }
+
+.app-cat-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
+    border: 1px solid #f1f5f9;
+    border-radius: 9999px;
+    background: #f8fafc;
+}

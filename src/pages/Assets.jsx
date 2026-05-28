@@ -1,10 +1,4 @@
 import { useState, useEffect } from 'react';
-import '../styles/common.css';
-import '../styles/buttons.css';
-import '../styles/cards.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
-import '../styles/modals.css';
 import '../styles/pages/assets.css';
 import { Plus, Search, MoreVertical, X, Loader2, Edit2, Trash2, Calendar, HardDrive, Mail, MapPin, Users } from 'lucide-react';
 import { getAssets, createAsset, updateAsset, deleteAsset, getAssetCategories, getHmsRooms, assignAssetToRoom, createTransferLog, getDirectoryUsers } from '../api/client';
@@ -259,10 +253,10 @@ export default function Assets() {
                 </div>
                 <div className="app-page-actions">
                     <button className="app-btn app-btn-primary" onClick={() => handleOpenModal()}>
-                        <Plus className="w-5 h-5" /> Add Asset
+                        <Plus className="app-icon-20" /> Add Asset
                     </button>
                     <a href="mailto:support@zenohosp.com" className="app-btn-icon" title="Contact ZenoHosp Support">
-                        <Mail className="w-5 h-5" />
+                        <Mail className="app-icon-20" />
                     </a>
                 </div>
             </header>
@@ -288,7 +282,7 @@ export default function Assets() {
 
             <div className="app-search-wrapper">
                 <div className="app-search-icon-wrapper">
-                    <Search className="w-5 h-5" />
+                    <Search className="app-icon-20" />
                 </div>
                 <input
                     type="text"
@@ -316,8 +310,8 @@ export default function Assets() {
                                 <tr>
                                     <td colSpan="5" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
                                         <div className="app-empty">
-                                            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                                            <p className="text-sm font-medium animate-pulse">Loading asset database...</p>
+                                            <Loader2 className="app-icon-32 text-blue icon-spin" />
+                                            <p className="text-sm font-medium text-pulse">Loading asset database...</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -325,8 +319,8 @@ export default function Assets() {
                                 <tr>
                                     <td colSpan="5" className="app-table-td" style={{ textAlign: 'center', padding: '80px 24px' }}>
                                         <div className="app-empty">
-                                            <div className="flex items-center justify-center w-16 h-16 mb-2 border rounded-full bg-slate-50 border-slate-100">
-                                                <HardDrive className="w-8 h-8 text-slate-300" />
+                                            <div className="app-cat-icon-wrap">
+                                                <HardDrive className="app-icon-32 text-slate-300" />
                                             </div>
                                             <p className="font-medium text-slate-600" style={{ color: '#0f172a' }}>No assets found</p>
                                             <p className="text-sm">We couldn't find any matching assets in the inventory.</p>
@@ -350,11 +344,11 @@ export default function Assets() {
                                     <td className="app-table-td">
                                         <div className="assets-warranty-info">
                                             <div className="assets-warranty-row">
-                                                <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                                                <Calendar className="app-icon-14 text-blue" />
                                                 <span className="font-medium">Warr:</span> {asset.warrantyExpiry || 'None'}
                                             </div>
                                             <div className="assets-warranty-row">
-                                                <Calendar className="w-3.5 h-3.5 text-purple-500" />
+                                                <Calendar className="app-icon-14 text-purple" />
                                                 <span className="font-medium">AMC:</span> {asset.amcExpiry || 'None'}
                                             </div>
                                         </div>
@@ -367,7 +361,7 @@ export default function Assets() {
                                             }}
                                             className="app-btn-icon"
                                         >
-                                            <MoreVertical className="w-5 h-5" />
+                                            <MoreVertical className="app-icon-20" />
                                         </button>
 
                                         {activeDropdown === asset.assetId && (
@@ -376,20 +370,20 @@ export default function Assets() {
                                                     onClick={(e) => { e.stopPropagation(); handleOpenModal(asset); }}
                                                     className="assets-dropdown-item"
                                                 >
-                                                    <Edit2 className="w-4 h-4 text-blue-500" /> Edit Details
+                                                    <Edit2 className="app-icon-16 text-blue" /> Edit Details
                                                 </button>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleOpenAssignModal(asset); }}
                                                     className="assets-dropdown-item"
                                                 >
-                                                    <MapPin className="w-4 h-4 text-green-500" /> Assign / Transfer
+                                                    <MapPin className="app-icon-16 text-green" /> Assign / Transfer
                                                 </button>
-                                                <div className="h-px my-1 bg-slate-100"></div>
+                                                <div className="app-divider"></div>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleDelete(asset.assetId); }}
                                                     className="assets-dropdown-item--danger"
                                                 >
-                                                    <Trash2 className="w-4 h-4" /> Delete Asset
+                                                    <Trash2 className="app-icon-16" /> Delete Asset
                                                 </button>
                                             </div>
                                         )}
@@ -412,7 +406,7 @@ export default function Assets() {
                                 {editingAsset ? 'Edit Asset Details' : 'Add New Asset'}
                             </h2>
                             <button onClick={handleCloseModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
 
@@ -510,7 +504,7 @@ export default function Assets() {
                                 Close
                             </button>
                             <button type="submit" form="asset-form" disabled={isSubmitting} className="app-btn app-btn-primary">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isSubmitting ? 'Saving...' : (editingAsset ? 'Update Asset' : 'Create Asset')}
                             </button>
                         </div>
@@ -527,7 +521,7 @@ export default function Assets() {
                         <div className="app-modal-header">
                             <h2 className="app-modal-title">Assign / Transfer Asset</h2>
                             <button onClick={handleCloseAssignModal} className="app-modal-close">
-                                <X className="w-5 h-5" />
+                                <X className="app-icon-20" />
                             </button>
                         </div>
 
@@ -546,14 +540,14 @@ export default function Assets() {
                                             className={`assets-assign-toggle-btn${assignMode === 'ROOM' ? ' assets-assign-toggle-btn--active' : ''}`}
                                             onClick={() => setAssignMode('ROOM')}
                                         >
-                                            <MapPin className="w-4 h-4" /> Room
+                                            <MapPin className="app-icon-16" /> Room
                                         </button>
                                         <button
                                             type="button"
                                             className={`assets-assign-toggle-btn${assignMode === 'STAFF' ? ' assets-assign-toggle-btn--active' : ''}`}
                                             onClick={() => setAssignMode('STAFF')}
                                         >
-                                            <Users className="w-4 h-4" /> Staff
+                                            <Users className="app-icon-16" /> Staff
                                         </button>
                                     </div>
 
@@ -563,7 +557,7 @@ export default function Assets() {
                                                 <label className="app-label">Room *</label>
                                                 {roomsLoading ? (
                                                     <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
-                                                        <Loader2 className="w-4 h-4 animate-spin" /> Loading rooms...
+                                                        <Loader2 className="app-icon-16 icon-spin" /> Loading rooms...
                                                     </div>
                                                 ) : (
                                                     <SearchableSelect
@@ -596,7 +590,7 @@ export default function Assets() {
                                                 <label className="app-label">Staff Member *</label>
                                                 {staffLoading ? (
                                                     <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}>
-                                                        <Loader2 className="w-4 h-4 animate-spin" /> Loading staff...
+                                                        <Loader2 className="app-icon-16 icon-spin" /> Loading staff...
                                                     </div>
                                                 ) : (
                                                     <SearchableSelect
@@ -638,7 +632,7 @@ export default function Assets() {
                                 Cancel
                             </button>
                             <button type="submit" form="assign-form" disabled={isAssignSubmitting || roomsLoading || staffLoading} className="app-btn app-btn-primary">
-                                {isAssignSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                {isAssignSubmitting && <Loader2 className="app-icon-16 icon-spin" />}
                                 {isAssignSubmitting ? 'Assigning...' : (assignMode === 'ROOM' ? 'Assign to Room' : 'Assign to Staff')}
                             </button>
                         </div>
