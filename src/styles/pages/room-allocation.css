@@ -460,3 +460,7 @@
     color: var(--color-gray-500);
     font-style: italic;
 }
+
+/* ── Phase 4a: replacements for previously-inline styles ── */
+.room-alloc-add-btn--push-right { margin-left: auto; }
+.room-alloc-asset-dropdown { right: 0; top: 28px; }
