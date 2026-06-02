@@ -120,7 +120,7 @@ export default function Layout({ children }) {
                         </li>
 
                         {/* Other Apps */}
-                        <li className="sidebar-section">
+                        <li className="sidebar-section sidebar-apps-section">
                             <div className="sidebar-section-title">Other Apps</div>
                             {[
                                 { label: 'HMS', href: 'https://hms.zenohosp.com', icon: Activity },
