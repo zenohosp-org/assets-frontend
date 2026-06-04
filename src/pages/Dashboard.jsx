@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package, XCircle } from 'lucide-react';
 import api, { getAssets } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import PageHeader from '../components/PageHeader';
 import '../styles/pages/dashboard.css';
 
 export default function Dashboard() {
@@ -97,15 +98,14 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <header className="app-page-title-wrapper">
-                <h1 className="app-page-title">System Overview</h1>
-                {user && (
-                    <p className="app-page-subtitle">Welcome, {user.firstName || user.email}. Real-time health and distribution metrics for institutional assets.</p>
-                )}
-                {!user && !authLoading && (
-                    <p className="app-page-subtitle">Real-time health and distribution metrics for institutional assets.</p>
-                )}
-            </header>
+            <PageHeader
+                title="System Overview"
+                subtitle={
+                    user
+                        ? `Welcome, ${user.firstName || user.email}. Real-time health and distribution metrics for institutional assets.`
+                        : (!authLoading ? 'Real-time health and distribution metrics for institutional assets.' : null)
+                }
+            />
 
             <div className="app-stats-grid">
                 {stats.map((stat) => (

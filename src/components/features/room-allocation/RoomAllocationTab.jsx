@@ -1,5 +1,6 @@
 import '../../../styles/pages/room-allocation.css';
 import { Loader2, Search } from 'lucide-react';
+import PageHeader from '../../PageHeader';
 import { useRoomAllocation } from './hooks/useRoomAllocation';
 import RoomStats from './components/RoomStats';
 import RoomsTable from './components/RoomsTable';
@@ -21,12 +22,10 @@ export default function RoomAllocationTab() {
 
     return (
         <div className="app-page">
-            <div className="app-page-header">
-                <div>
-                    <h1 className="app-page-title">Room Allocation</h1>
-                    <p className="app-page-subtitle">View and manage asset allocation across rooms</p>
-                </div>
-            </div>
+            <PageHeader
+                title="Room Allocation"
+                subtitle="View and manage asset allocation across rooms"
+            />
 
             <RoomStats stats={r.stats} />
 

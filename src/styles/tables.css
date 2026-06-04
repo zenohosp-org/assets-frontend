@@ -1,6 +1,6 @@
 .app-table-wrapper {
     background: var(--color-white);
-    border-radius: 8px;
+    border-radius: 16px;
     border: 1px solid var(--color-gray-200);
     box-shadow: var(--shadow-xs);
     overflow: hidden;
@@ -18,17 +18,17 @@
 }
 
 .app-table-thead-row {
-    background: rgba(219, 219, 219, 50%);
-    border-bottom: 1px solid var(--color-gray-100);
+    background: var(--color-gray-50);
+    border-bottom: 1px solid var(--color-gray-200);
 }
 
 .app-table-th {
-    padding: 10px 16px;
+    padding: 16px 24px;
     font-size: var(--fs-xs);
     font-weight: 700;
-    color: var(--color-gray-500);
+    color: var(--color-gray-400);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 1px;
 }
 
 .app-table-tbody > tr + tr {
@@ -44,7 +44,7 @@
 }
 
 .app-table-td {
-    padding: 13px 20px;
-    font-size: var(--fs-sm);
-    color: var(--color-gray-800);
+    padding: 16px 24px;
+    font-size: 14px;
+    color: var(--color-gray-600);
 }

@@ -3,56 +3,20 @@
     padding: var(--spacing-6);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-8);
+    gap: var(--spacing-6);
     flex: 1;
 }
 
-.app-page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-4);
-}
-
-.app-page-title-wrapper {
-    display: flex;
-    flex-direction: column;
-}
-
-.app-page-title {
-    font-size: var(--fs-xl);
-    line-height: 1.35;
-    font-weight: 700;
-    color: var(--color-gray-900);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.app-page-title-icon {
-    color: var(--color-black);
-}
-
-.app-page-subtitle {
-    margin-top: 2px;
-    font-size: var(--fs-xs);
-    color: var(--color-gray-500);
-}
-
-.app-page-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3);
-}
+/* Page-header rules live in page-header.css (imported by PageHeader.jsx) */
 
 .app-badge {
     display: inline-block;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: var(--fs-xs);
-    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.3px;
 }
 
 .app-badge-gray {

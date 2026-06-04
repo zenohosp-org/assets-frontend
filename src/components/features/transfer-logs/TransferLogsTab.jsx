@@ -1,5 +1,6 @@
 import '../../../styles/pages/transfer-logs.css';
 import { History, Plus, Mail, Search } from 'lucide-react';
+import PageHeader from '../../PageHeader';
 import { useTransferLogs } from './hooks/useTransferLogs';
 import TransferStats from './components/TransferStats';
 import TransferLogsTable from './components/TransferLogsTable';
@@ -10,22 +11,21 @@ export default function TransferLogsTab() {
 
     return (
         <div className="app-page">
-            <header className="app-page-header">
-                <div className="app-page-title-wrapper">
-                    <h1 className="app-page-title">
-                        <History className="app-page-title-icon" /> Transfer History
-                    </h1>
-                    <p className="app-page-subtitle">Audit trail of asset movement within the institution.</p>
-                </div>
-                <div className="transfer-logs-actions">
-                    <button onClick={t.handleOpenModal} className="app-btn app-btn-primary">
-                        <Plus className="app-icon-20" /> Record Transfer
-                    </button>
-                    <a href="mailto:support@zenohosp.com" className="transfer-logs-mail-btn" title="Contact ZenoHosp Support">
-                        <Mail className="transfer-logs-btn-icon" />
-                    </a>
-                </div>
-            </header>
+            <PageHeader
+                icon={History}
+                title="Transfer History"
+                subtitle="Audit trail of asset movement within the institution."
+                actions={
+                    <div className="transfer-logs-actions">
+                        <button onClick={t.handleOpenModal} className="app-btn app-btn-primary">
+                            <Plus className="app-icon-20" /> Record Transfer
+                        </button>
+                        <a href="mailto:support@zenohosp.com" className="transfer-logs-mail-btn" title="Contact ZenoHosp Support">
+                            <Mail className="transfer-logs-btn-icon" />
+                        </a>
+                    </div>
+                }
+            />
 
             <TransferStats stats={t.stats} />
 

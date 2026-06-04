@@ -1,5 +1,6 @@
 import '../../../styles/pages/maintenance.css';
 import { Activity, Wrench, Search } from 'lucide-react';
+import PageHeader from '../../PageHeader';
 import { useMaintenance } from './hooks/useMaintenance';
 import MaintenanceStats from './components/MaintenanceStats';
 import MaintenanceTabs from './components/MaintenanceTabs';
@@ -12,17 +13,16 @@ export default function MaintenanceTab() {
 
     return (
         <div className="app-page">
-            <header className="app-page-header">
-                <div className="app-page-title-wrapper">
-                    <h1 className="app-page-title">
-                        <Activity className="app-page-title-icon" /> Maintenance & Repairs
-                    </h1>
-                    <p className="app-page-subtitle">Track health logs, repairs, service costs, and billing for all assets.</p>
-                </div>
-                <button onClick={m.handleOpenModal} className="app-btn app-btn-primary">
-                    <Wrench className="app-icon-20" /> Log Service
-                </button>
-            </header>
+            <PageHeader
+                icon={Activity}
+                title="Maintenance & Repairs"
+                subtitle="Track health logs, repairs, service costs, and billing for all assets."
+                actions={
+                    <button onClick={m.handleOpenModal} className="app-btn app-btn-primary">
+                        <Wrench className="app-icon-20" /> Log Service
+                    </button>
+                }
+            />
 
             <MaintenanceStats stats={m.stats} />
 

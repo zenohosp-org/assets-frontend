@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Loader2, Tag } from 'lucide-react';
 import { getAssetCategories, createAssetCategory } from '../api/client';
+import PageHeader from '../components/PageHeader';
 import '../styles/pages/asset-categories.css';
 
 export default function AssetCategories() {
@@ -44,12 +45,10 @@ export default function AssetCategories() {
 
     return (
         <div className="app-page">
-            <header className="app-page-header">
-                <div className="app-page-title-wrapper">
-                    <h1 className="app-page-title">Asset Categories</h1>
-                    <p className="app-page-subtitle">Manage categories used to classify assets.</p>
-                </div>
-            </header>
+            <PageHeader
+                title="Asset Categories"
+                subtitle="Manage categories used to classify assets."
+            />
 
             <div className="app-card asset-categories-card">
                 <h2 className="app-card-title">Add Category</h2>

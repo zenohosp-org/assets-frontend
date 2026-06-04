@@ -1,5 +1,6 @@
 import '../../../styles/pages/vendors.css';
 import { Users, Plus, Search } from 'lucide-react';
+import PageHeader from '../../PageHeader';
 import { useVendors } from './hooks/useVendors';
 import VendorsTable from './components/VendorsTable';
 import VendorFormModal from './modals/VendorFormModal';
@@ -9,17 +10,16 @@ export default function VendorsTab() {
 
     return (
         <div className="app-page">
-            <header className="app-page-header">
-                <div className="app-page-title-wrapper">
-                    <h1 className="app-page-title">
-                        <Users className="app-page-title-icon" /> Vendors
-                    </h1>
-                    <p className="app-page-subtitle">Manage service vendors for asset maintenance.</p>
-                </div>
-                <button onClick={() => v.handleOpenModal()} className="app-btn app-btn-primary">
-                    <Plus size={16} /> Add Vendor
-                </button>
-            </header>
+            <PageHeader
+                icon={Users}
+                title="Vendors"
+                subtitle="Manage service vendors for asset maintenance."
+                actions={
+                    <button onClick={() => v.handleOpenModal()} className="app-btn app-btn-primary">
+                        <Plus size={16} /> Add Vendor
+                    </button>
+                }
+            />
 
             <div className="app-search-wrapper">
                 <div className="app-search-icon-wrapper">

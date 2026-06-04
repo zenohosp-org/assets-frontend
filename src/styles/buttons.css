@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: var(--fs-sm);
     font-weight: var(--fw-semibold);
     cursor: pointer;
@@ -18,13 +18,13 @@
 }
 
 .app-btn-primary {
-    background: var(--color-black);
+    background: #0f172a;
     color: var(--color-white);
-    padding: 8px 16px;
+    padding: 9px 18px;
 }
 
 .app-btn-primary:hover:not(:disabled) {
-    background: var(--color-black);
+    background: #1e293b;
 }
 
 .app-btn-primary:active:not(:disabled) {
@@ -35,12 +35,12 @@
     background: var(--color-white);
     color: var(--color-gray-600);
     border: 1px solid var(--color-gray-200);
-    padding: 9px 20px;
+    padding: 8px 16px;
 }
 
 .app-btn-secondary:hover:not(:disabled) {
     background: var(--color-gray-50);
-    border-color: var(--color-gray-300);
+    border-color: #000000;
     color: var(--color-black);
 }
 
@@ -61,7 +61,7 @@
     color: var(--color-white);
     font-weight: var(--fw-bold);
     padding: 9px 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid transparent;
     cursor: pointer;
     font-size: var(--fs-sm);
