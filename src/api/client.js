@@ -137,6 +137,17 @@ export const getMaintenanceRecordsByAsset = (id) => api.get(`/api/maintenance/as
 export const createMaintenanceRecord = (data) => api.post('/api/maintenance', data);
 export const completeMaintenanceRecord = (id, data) => api.patch(`/api/maintenance/${id}/complete`, data);
 
+// ── AMC / CMC Contracts ──
+export const getContracts = () => api.get('/api/amc');
+export const getContractsByAsset = (id) => api.get(`/api/amc/asset/${id}`);
+export const getContractSchedule = () => api.get('/api/amc/schedule');
+export const getChecksByAsset = (id) => api.get(`/api/amc/checks/asset/${id}`);
+export const createContract = (data) => api.post('/api/amc', data);
+export const updateContract = (id, data) => api.put(`/api/amc/${id}`, data);
+export const renewContract = (id, data) => api.patch(`/api/amc/${id}/renew`, data);
+export const cancelContract = (id) => api.patch(`/api/amc/${id}/cancel`);
+export const completeContractCheck = (id, data) => api.post(`/api/amc/${id}/complete-check`, data);
+
 // ── Finance APIs ──
 export const getFinanceBankAccounts = () => api.get('/api/proxy/finance/bank-accounts');
 export const createFinanceBankTransaction = (bankAccountId, data) =>

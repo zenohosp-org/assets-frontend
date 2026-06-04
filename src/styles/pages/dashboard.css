@@ -230,3 +230,22 @@
     text-transform: uppercase;
     color: var(--color-gray-400);
 }
+
+.dashboard-schedule-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 0.5rem;
+    color: #c2410c;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.dashboard-schedule-banner:hover {
+    background: #ffedd5;
+}

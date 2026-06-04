@@ -13,6 +13,7 @@ const RoomAllocation = lazy(() => import('./pages/RoomAllocation'));
 const Vendors = lazy(() => import('./pages/Vendors'));
 const AssetCategories = lazy(() => import('./pages/AssetCategories'));
 const Maintenance = lazy(() => import('./pages/Maintenance'));
+const Contracts = lazy(() => import('./pages/Contracts'));
 const TransfersLogs = lazy(() => import('./pages/TransferLogs'));
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
                                                 <Route path="/rooms" element={<RoomAllocation />} />
                                                 <Route path="/asset-categories" element={<AssetCategories />} />
                                                 <Route path="/maintenance" element={<Maintenance />} />
+                                                <Route path="/contracts" element={<Contracts />} />
                                                 <Route path="/transfers" element={<TransfersLogs />} />
                                                 <Route path="/vendors" element={<Vendors />} />
                                                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

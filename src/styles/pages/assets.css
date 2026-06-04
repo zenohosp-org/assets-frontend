@@ -44,6 +44,19 @@
     letter-spacing: 0.08em;
 }
 
+.assets-maintenance-badge {
+    display: inline-block;
+    margin-top: 0.25rem;
+    padding: 0.0625rem 0.4rem;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #c2410c;
+    background: #ffedd5;
+    border-radius: 0.375rem;
+}
+
 .assets-stat-value--blue   { color: var(--color-black); }
 .assets-stat-value--emerald { color: #059669; }
 .assets-stat-value--purple { color: #9333ea; }

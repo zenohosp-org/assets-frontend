@@ -65,7 +65,10 @@ export function useRoomAllocation() {
     const assetsByRoom = useMemo(() => buildAssetsByRoom(assets), [assets]);
     const stats = useMemo(() => computeStats(rooms, assets, assetsByRoom), [rooms, assets, assetsByRoom]);
     const filteredRooms = useMemo(() => filterRooms(rooms, searchTerm), [rooms, searchTerm]);
-    const availableAssets = useMemo(() => assets.filter(a => !a.roomId), [assets]);
+    const availableAssets = useMemo(
+        () => assets.filter(a => !a.roomId && a.status !== 'MAINTENANCE'),
+        [assets]
+    );
 
     const panelAssets = useMemo(
         () => (panelRoom ? (assetsByRoom[panelRoom.id] || []) : []),

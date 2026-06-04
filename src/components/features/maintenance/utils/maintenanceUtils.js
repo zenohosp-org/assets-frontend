@@ -1,5 +1,6 @@
 export const EMPTY_FORM = {
     assetId: '',
+    amcId: null,
     maintenanceDate: '',
     type: 'MAINTENANCE',
     performedByVendor: null,
@@ -24,12 +25,23 @@ export function generateBillNumber() {
     return `MB-${dateStr}-${random}`;
 }
 
-export function getAssetCoverage(asset) {
-    if (!asset) return { hasAmc: false, hasWarranty: false };
+// Resolve the asset's active AMC/CMC contract from the contracts list (if any)
+export function getActiveContract(asset, contracts = []) {
+    if (!asset) return null;
     const today = new Date().toISOString().split('T')[0];
-    const hasAmc = !!(asset.amcCost > 0 && asset.amcExpiry && asset.amcExpiry >= today);
+    return contracts.find(c =>
+        c.asset?.assetId === asset.assetId &&
+        c.status === 'ACTIVE' &&
+        c.endDate && c.endDate >= today
+    ) || null;
+}
+
+export function getAssetCoverage(asset, contracts = []) {
+    if (!asset) return { hasAmc: false, hasWarranty: false, coverageType: null };
+    const today = new Date().toISOString().split('T')[0];
+    const contract = getActiveContract(asset, contracts);
     const hasWarranty = !!(asset.warrantyExpiry && asset.warrantyExpiry >= today);
-    return { hasAmc, hasWarranty };
+    return { hasAmc: !!contract, hasWarranty, coverageType: contract?.contractType || null };
 }
 
 export function getStatusBadgeClass(status) {

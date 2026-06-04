@@ -4,7 +4,7 @@ import SearchableSelect from '../../../../components/SearchableSelect';
 
 function LogServiceModal({
     open, formData, setFormData, assets, vendors,
-    selectedAssetHasAmc, selectedAssetHasWarranty,
+    selectedAssetHasAmc, selectedAssetHasWarranty, selectedCoverageType,
     onAssetChange, isSubmitting, onClose, onSubmit,
 }) {
     if (!open) return null;
@@ -77,7 +77,12 @@ function LogServiceModal({
                                     className="app-input" placeholder="0.00"
                                 />
                                 {selectedAssetHasAmc && (
-                                    <p className="maintenance-amc-notice">Under AMC — cost auto-filled from contract</p>
+                                    <p className="maintenance-amc-notice">
+                                        Under {selectedCoverageType || 'AMC'} — covered, no charge.
+                                        {selectedCoverageType === 'AMC'
+                                            ? ' Enter cost only for out-of-scope parts/work.'
+                                            : ' Parts and labor are covered; leave cost at 0 unless out-of-scope.'}
+                                    </p>
                                 )}
                                 {formData.type === 'REPAIR' && selectedAssetHasWarranty && (
                                     <p className="maintenance-warranty-notice">

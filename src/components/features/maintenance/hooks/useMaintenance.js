@@ -2,11 +2,11 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     getMaintenanceRecords, createMaintenanceRecord, completeMaintenanceRecord,
     getFinanceBankAccounts, createFinanceBankTransaction,
-    getAssets, getVendors,
+    getAssets, getVendors, getContracts,
 } from '../../../../api/client';
 import {
     EMPTY_FORM, EMPTY_COMPLETE_FORM,
-    generateBillNumber, getAssetCoverage,
+    generateBillNumber, getAssetCoverage, getActiveContract,
     filterRecords, computeStats,
 } from '../utils/maintenanceUtils';
 
@@ -14,6 +14,7 @@ export function useMaintenance() {
     const [records, setRecords] = useState([]);
     const [assets, setAssets] = useState([]);
     const [vendors, setVendors] = useState([]);
+    const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('service');
@@ -23,6 +24,7 @@ export function useMaintenance() {
     const [formData, setFormData] = useState(EMPTY_FORM);
     const [selectedAssetHasAmc, setSelectedAssetHasAmc] = useState(false);
     const [selectedAssetHasWarranty, setSelectedAssetHasWarranty] = useState(false);
+    const [selectedCoverageType, setSelectedCoverageType] = useState(null);
 
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
     const [completingRecord, setCompletingRecord] = useState(null);
@@ -34,12 +36,13 @@ export function useMaintenance() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [mRes, aRes, vRes] = await Promise.all([
-                getMaintenanceRecords(), getAssets(), getVendors(),
+            const [mRes, aRes, vRes, cRes] = await Promise.all([
+                getMaintenanceRecords(), getAssets(), getVendors(), getContracts(),
             ]);
             setRecords(mRes.data || []);
             setAssets(aRes.data || []);
             setVendors(vRes.data || []);
+            setContracts(cRes.data || []);
         } catch (err) {
             console.error('Failed to load maintenance data:', err);
         } finally {
@@ -51,15 +54,19 @@ export function useMaintenance() {
 
     const handleAssetChange = useCallback((assetId) => {
         const asset = assets.find(a => a.assetId === assetId);
-        const { hasAmc, hasWarranty } = getAssetCoverage(asset);
+        const { hasAmc, hasWarranty, coverageType } = getAssetCoverage(asset, contracts);
+        const contract = getActiveContract(asset, contracts);
         setSelectedAssetHasAmc(hasAmc);
         setSelectedAssetHasWarranty(hasWarranty);
+        setSelectedCoverageType(coverageType);
         setFormData(prev => ({
             ...prev,
             assetId,
-            cost: hasAmc ? String(asset.amcCost) : prev.cost,
+            amcId: contract?.id || null,
+            // A covered visit is incrementally ₹0; only out-of-scope work is billed.
+            cost: hasAmc ? '0' : prev.cost,
         }));
-    }, [assets]);
+    }, [assets, contracts]);
 
     const handleOpenModal = useCallback(() => {
         const firstAssetId = assets.length > 0 ? assets[0].assetId : '';
@@ -70,6 +77,7 @@ export function useMaintenance() {
         });
         setSelectedAssetHasAmc(false);
         setSelectedAssetHasWarranty(false);
+        setSelectedCoverageType(null);
         if (firstAssetId) handleAssetChange(firstAssetId);
         setIsModalOpen(true);
     }, [assets, handleAssetChange]);
@@ -78,6 +86,7 @@ export function useMaintenance() {
         setIsModalOpen(false);
         setSelectedAssetHasAmc(false);
         setSelectedAssetHasWarranty(false);
+        setSelectedCoverageType(null);
     }, []);
 
     const handleSubmit = useCallback(async (e) => {
@@ -86,6 +95,7 @@ export function useMaintenance() {
         const payload = {
             ...formData,
             asset: { assetId: formData.assetId },
+            amc: formData.amcId ? { id: formData.amcId } : null,
             cost: formData.cost ? parseFloat(formData.cost) : 0,
             repairCost: formData.cost ? parseFloat(formData.cost) : 0,
         };
@@ -135,25 +145,30 @@ export function useMaintenance() {
         if (!completingRecord) return;
         setIsCompleteSubmitting(true);
         try {
+            const completeCost = completeFormData.cost ? parseFloat(completeFormData.cost) : 0;
             await completeMaintenanceRecord(completingRecord.maintenanceId, {
-                cost: completeFormData.cost ? parseFloat(completeFormData.cost) : 0,
+                cost: completeCost,
                 bankAccountId: completeFormData.bankAccountId,
                 bankAccountName: completeFormData.bankAccountName,
                 billNumber: completeFormData.billNumber,
                 notes: completeFormData.notes,
             });
 
-            try {
-                const description = `Maintenance Bill ${completeFormData.billNumber} - ${completingRecord.asset?.assetName || 'N/A'}`;
-                await createFinanceBankTransaction(completeFormData.bankAccountId, {
-                    type: 'DEBIT',
-                    amount: completeFormData.cost ? parseFloat(completeFormData.cost) : 0,
-                    description,
-                    relatedEntityType: 'EXPENSE',
-                });
-            } catch (financeErr) {
-                console.error('Finance transaction failed:', financeErr);
-                alert('Maintenance marked complete, but finance transaction failed. Please create it manually.');
+            // Only book a finance expense for real out-of-pocket cost.
+            // A contract-covered visit (₹0) is already paid via the contract — no DEBIT.
+            if (completeCost > 0) {
+                try {
+                    const description = `Maintenance Bill ${completeFormData.billNumber} - ${completingRecord.asset?.assetName || 'N/A'}`;
+                    await createFinanceBankTransaction(completeFormData.bankAccountId, {
+                        type: 'DEBIT',
+                        amount: completeCost,
+                        description,
+                        relatedEntityType: 'EXPENSE',
+                    });
+                } catch (financeErr) {
+                    console.error('Finance transaction failed:', financeErr);
+                    alert('Maintenance marked complete, but finance transaction failed. Please create it manually.');
+                }
             }
 
             setIsCompleteModalOpen(false);
@@ -185,7 +200,7 @@ export function useMaintenance() {
         serviceRecords, billRecords,
 
         isModalOpen, formData, setFormData, isSubmitting,
-        selectedAssetHasAmc, selectedAssetHasWarranty,
+        selectedAssetHasAmc, selectedAssetHasWarranty, selectedCoverageType,
         handleAssetChange, handleOpenModal, handleCloseModal, handleSubmit,
 
         isCompleteModalOpen, completingRecord, completeFormData, setCompleteFormData,

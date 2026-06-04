@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Loader2, MoreVertical, Edit2, MapPin, Trash2, Calendar, HardDrive } from 'lucide-react';
+import { Loader2, MoreVertical, Edit2, MapPin, Trash2, Calendar, HardDrive, Activity } from 'lucide-react';
 
 function AssetsTable({
     loading,
@@ -9,6 +9,7 @@ function AssetsTable({
     onEdit,
     onAssign,
     onDelete,
+    onActivity,
 }) {
     return (
         <div className="app-table-wrapper">
@@ -49,6 +50,9 @@ function AssetsTable({
                             <tr key={asset.assetId} className="app-table-row group">
                                 <td className="app-table-td">
                                     <div className="assets-item-title">{asset.assetName}</div>
+                                    {asset.status === 'MAINTENANCE' && (
+                                        <span className="assets-maintenance-badge">In Maintenance</span>
+                                    )}
                                 </td>
                                 <td className="app-table-td">
                                     <span className="assets-type-badge">{asset.category?.name || 'GENERIC'}</span>
@@ -86,6 +90,13 @@ function AssetsTable({
                                                 <Edit2 className="app-icon-16 text-blue" /> Edit Details
                                             </button>
                                             <button
+                                                onClick={(e) => { e.stopPropagation(); onActivity(asset); }}
+                                                className="assets-dropdown-item"
+                                            >
+                                                <Activity className="app-icon-16 text-purple" /> View Activity
+                                            </button>
+                                            <button
+                                                disabled={asset.status === 'MAINTENANCE'}
                                                 onClick={(e) => { e.stopPropagation(); onAssign(asset); }}
                                                 className="assets-dropdown-item"
                                             >

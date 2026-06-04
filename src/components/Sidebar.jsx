@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Box, MapPin, History, Activity,
-    Settings, Layers, Users, Globe, BarChart2, Package, ArrowUpRight, Tag
+    Settings, Layers, Users, Globe, BarChart2, Package, ArrowUpRight, Tag, FileText
 } from 'lucide-react';
 import { SidebarLink, CollapseToggle } from './SidebarItem';
 import '../styles/sidebar.css';
@@ -42,6 +42,7 @@ export default function Sidebar({ open, onNavigate }) {
                         <SidebarLink to="/rooms" icon={MapPin} label="Room Allocation" onNavigate={onNavigate} />
                         <SidebarLink to="/transfers" icon={History} label="Transfer Logs" onNavigate={onNavigate} />
                         <SidebarLink to="/maintenance" icon={Activity} label="Maintenance" onNavigate={onNavigate} />
+                        <SidebarLink to="/contracts" icon={FileText} label="Contracts (AMC/CMC)" onNavigate={onNavigate} />
 
                         {/* Masters collapsible */}
                         <div className="sidebar-subsection">

@@ -56,6 +56,7 @@ export default function MaintenanceTab() {
                 vendors={m.vendors}
                 selectedAssetHasAmc={m.selectedAssetHasAmc}
                 selectedAssetHasWarranty={m.selectedAssetHasWarranty}
+                selectedCoverageType={m.selectedCoverageType}
                 onAssetChange={m.handleAssetChange}
                 isSubmitting={m.isSubmitting}
                 onClose={m.handleCloseModal}

@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import '../../../styles/pages/assets.css';
 import { useAssets } from './hooks/useAssets';
 import AssetsStats from './components/AssetsStats';
 import AssetsToolbar from './components/AssetsToolbar';
 import AssetsTable from './components/AssetsTable';
+import AssetActivityDrawer from './components/AssetActivityDrawer';
 import AssetFormModal from './modals/AssetFormModal';
 import AssignAssetModal from './modals/AssignAssetModal';
 
 export default function AssetsTab() {
+    const [activityAsset, setActivityAsset] = useState(null);
     const {
         categories, loading, filteredAssets, stats,
         searchTerm, setSearchTerm,
@@ -40,7 +43,12 @@ export default function AssetsTab() {
                 onEdit={handleOpenModal}
                 onAssign={handleOpenAssignModal}
                 onDelete={handleDelete}
+                onActivity={setActivityAsset}
             />
+
+            {activityAsset && (
+                <AssetActivityDrawer asset={activityAsset} onClose={() => setActivityAsset(null)} />
+            )}
 
             <AssetFormModal
                 open={isModalOpen}

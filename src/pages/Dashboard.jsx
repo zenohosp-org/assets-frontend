@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package, XCircle } from 'lucide-react';
-import api, { getAssets } from '../api/client';
+import { Box, User, AlertCircle, Activity, TrendingUp, Clock, Package, XCircle, CalendarClock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import api, { getAssets, getContractSchedule } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import PageHeader from '../components/PageHeader';
 import '../styles/pages/dashboard.css';
@@ -13,6 +14,7 @@ export default function Dashboard() {
 
     const [transferLogs, setTransferLogs] = useState([]);
     const [maintenanceRecords, setMaintenanceRecords] = useState([]);
+    const [schedule, setSchedule] = useState([]);
 
     // Validate SSO authentication
     useEffect(() => {
@@ -38,12 +40,14 @@ export default function Dashboard() {
         Promise.all([
             getAssets(),
             api.get('/api/transfers'),
-            api.get('/api/maintenance')
+            api.get('/api/maintenance'),
+            getContractSchedule()
         ])
-            .then(([assetsRes, transfersRes, maintRes]) => {
+            .then(([assetsRes, transfersRes, maintRes, scheduleRes]) => {
                 setAssets(assetsRes.data);
                 setTransferLogs(transfersRes.data);
                 setMaintenanceRecords(maintRes.data);
+                setSchedule(scheduleRes.data || []);
             })
             .catch(err => {
                 console.error(err);
@@ -106,6 +110,15 @@ export default function Dashboard() {
                         : (!authLoading ? 'Real-time health and distribution metrics for institutional assets.' : null)
                 }
             />
+
+            {!loading && schedule.length > 0 && (
+                <Link to="/contracts" className="dashboard-schedule-banner">
+                    <CalendarClock className="app-icon-20" />
+                    <span>
+                        {schedule.length} contract{schedule.length > 1 ? 's' : ''} need attention — checks due or expiring soon.
+                    </span>
+                </Link>
+            )}
 
             <div className="app-stats-grid">
                 {stats.map((stat) => (
