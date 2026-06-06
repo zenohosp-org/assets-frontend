@@ -107,13 +107,9 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem('asset_user');
         setUser(null);
 
-        // Signal other tabs
-        try {
-            localStorage.setItem('sso-logout', `${Date.now()}`);
-            window.dispatchEvent(new Event('sso-logout'));
-        } catch (e) { }
-
-        // Clear cookies on all backends before redirecting
+        // Clear cookies on all backends BEFORE redirecting. The redirect is a full
+        // page navigation that cancels in-flight requests, so it must happen only
+        // after these complete — otherwise the sso_token deletion never lands.
         try {
             await Promise.all([
                 apiLogout(),
@@ -123,6 +119,11 @@ export function AuthProvider({ children }) {
         } catch (e) {
             console.error("SSO logout failed", e);
         }
+
+        // Signal other tabs (storage event fires only in other tabs)
+        try {
+            localStorage.setItem('sso-logout', `${Date.now()}`);
+        } catch (e) { }
 
         window.location.href = '/login?logged_out=1';
     }, []);
