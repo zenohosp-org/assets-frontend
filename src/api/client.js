@@ -141,6 +141,7 @@ export const completeMaintenanceRecord = (id, data) => api.patch(`/api/maintenan
 export const getContracts = () => api.get('/api/amc');
 export const getContractsByAsset = (id) => api.get(`/api/amc/asset/${id}`);
 export const getContractSchedule = () => api.get('/api/amc/schedule');
+export const getAllChecks = () => api.get('/api/amc/checks');
 export const getChecksByAsset = (id) => api.get(`/api/amc/checks/asset/${id}`);
 export const createContract = (data) => api.post('/api/amc', data);
 export const updateContract = (id, data) => api.put(`/api/amc/${id}`, data);

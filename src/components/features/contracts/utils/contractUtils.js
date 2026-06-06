@@ -85,6 +85,32 @@ export function isExpiringSoon(contract) {
     return contract.endDate <= limit.toISOString().split('T')[0];
 }
 
+export function isOverdue(contract) {
+    if (!contract.nextServiceDate) return false;
+    return contract.nextServiceDate < new Date().toISOString().split('T')[0];
+}
+
+// The date a schedule row should sort by (soonest first)
+function dueKey(contract) {
+    return contract.nextServiceDate || contract.endDate || '9999-12-31';
+}
+
+export function sortBySoonest(rows) {
+    return [...rows].sort((a, b) => dueKey(a).localeCompare(dueKey(b)));
+}
+
+export const CLOSED_STATUSES = ['EXPIRED', 'CANCELLED'];
+
+export function getClosedContracts(contracts) {
+    return contracts.filter(c => CLOSED_STATUSES.includes(c.status));
+}
+
+export const CONDITION_LABELS = {
+    GOOD: 'Good',
+    NEEDS_MAINTENANCE: 'Needs Maintenance',
+    NEEDS_REPAIR: 'Needs Repair',
+};
+
 export function filterContracts(contracts, term) {
     if (!term) return contracts;
     const q = term.toLowerCase();

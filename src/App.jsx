@@ -14,6 +14,7 @@ const Vendors = lazy(() => import('./pages/Vendors'));
 const AssetCategories = lazy(() => import('./pages/AssetCategories'));
 const Maintenance = lazy(() => import('./pages/Maintenance'));
 const Contracts = lazy(() => import('./pages/Contracts'));
+const Calibration = lazy(() => import('./pages/Calibration'));
 const TransfersLogs = lazy(() => import('./pages/TransferLogs'));
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
                                                 <Route path="/asset-categories" element={<AssetCategories />} />
                                                 <Route path="/maintenance" element={<Maintenance />} />
                                                 <Route path="/contracts" element={<Contracts />} />
+                                                <Route path="/calibration" element={<Calibration />} />
                                                 <Route path="/transfers" element={<TransfersLogs />} />
                                                 <Route path="/vendors" element={<Vendors />} />
                                                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

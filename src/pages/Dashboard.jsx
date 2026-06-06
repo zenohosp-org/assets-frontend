@@ -112,7 +112,7 @@ export default function Dashboard() {
             />
 
             {!loading && schedule.length > 0 && (
-                <Link to="/contracts" className="dashboard-schedule-banner">
+                <Link to="/calibration" className="dashboard-schedule-banner">
                     <CalendarClock className="app-icon-20" />
                     <span>
                         {schedule.length} contract{schedule.length > 1 ? 's' : ''} need attention — checks due or expiring soon.

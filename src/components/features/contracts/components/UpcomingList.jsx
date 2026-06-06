@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import { Loader2, CalendarClock, ClipboardCheck, RefreshCw } from 'lucide-react';
-import { isCheckDueThisWeek, isExpiringSoon } from '../utils/contractUtils';
+import { sortBySoonest, isCheckDueThisWeek, isOverdue, isExpiringSoon } from '../utils/contractUtils';
 
-function ScheduleList({ loading, rows, onCompleteCheck, onRenew }) {
+function UpcomingList({ loading, rows, onCompleteCheck, onRenew }) {
     if (loading) {
         return <div className="app-empty"><Loader2 className="app-icon-32 text-blue icon-spin" /></div>;
     }
@@ -18,7 +18,8 @@ function ScheduleList({ loading, rows, onCompleteCheck, onRenew }) {
 
     return (
         <div className="schedule-list">
-            {rows.map(c => {
+            {sortBySoonest(rows).map(c => {
+                const overdue = isOverdue(c);
                 const dueThisWeek = isCheckDueThisWeek(c);
                 const expiring = isExpiringSoon(c);
                 return (
@@ -31,9 +32,11 @@ function ScheduleList({ loading, rows, onCompleteCheck, onRenew }) {
                                 </span>
                             </div>
                             <div className="schedule-card-meta">
+                                {c.vendor?.name && <span className="schedule-tag">{c.vendor.name}</span>}
                                 {c.nextServiceDate && (
-                                    <span className={dueThisWeek ? 'schedule-tag schedule-tag--due' : 'schedule-tag'}>
-                                        Check due: {c.nextServiceDate}{dueThisWeek ? ' (this week)' : ''}
+                                    <span className={overdue ? 'schedule-tag schedule-tag--overdue' : dueThisWeek ? 'schedule-tag schedule-tag--due' : 'schedule-tag'}>
+                                        Check due: {c.nextServiceDate}
+                                        {overdue ? ' (overdue)' : dueThisWeek ? ' (this week)' : ''}
                                     </span>
                                 )}
                                 {expiring && (
@@ -62,4 +65,4 @@ function ScheduleList({ loading, rows, onCompleteCheck, onRenew }) {
     );
 }
 
-export default memo(ScheduleList);
+export default memo(UpcomingList);

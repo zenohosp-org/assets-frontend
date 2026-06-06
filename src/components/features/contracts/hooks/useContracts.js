@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-    getContracts, getContractSchedule, createContract, updateContract,
+    getContracts, getContractSchedule, getAllChecks, createContract, updateContract,
     renewContract, cancelContract, completeContractCheck,
     getAssets, getVendors,
 } from '../../../../api/client';
@@ -12,11 +12,11 @@ import {
 export function useContracts() {
     const [contracts, setContracts] = useState([]);
     const [schedule, setSchedule] = useState([]);
+    const [checks, setChecks] = useState([]);
     const [assets, setAssets] = useState([]);
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState('contracts');
 
     // Contract form: mode is 'create' | 'edit' | 'renew'
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -33,11 +33,12 @@ export function useContracts() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [cRes, sRes, aRes, vRes] = await Promise.all([
-                getContracts(), getContractSchedule(), getAssets(), getVendors(),
+            const [cRes, sRes, chRes, aRes, vRes] = await Promise.all([
+                getContracts(), getContractSchedule(), getAllChecks(), getAssets(), getVendors(),
             ]);
             setContracts(cRes.data || []);
             setSchedule(sRes.data || []);
+            setChecks(chRes.data || []);
             setAssets(aRes.data || []);
             setVendors(vRes.data || []);
         } catch (err) {
@@ -134,9 +135,8 @@ export function useContracts() {
     const filteredContracts = useMemo(() => filterContracts(contracts, searchTerm), [contracts, searchTerm]);
 
     return {
-        contracts, schedule, assets, vendors, loading,
+        contracts, schedule, checks, assets, vendors, loading,
         searchTerm, setSearchTerm,
-        activeTab, setActiveTab,
         filteredContracts,
 
         isFormOpen, formMode, formData, setFormData, isSubmitting,
