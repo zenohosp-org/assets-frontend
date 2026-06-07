@@ -1,4 +1,5 @@
 import axios from 'axios';
+import SSOCookieManager from '../utils/ssoManager';
 
 export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'https://api-asset.zenohosp.com';
 export const FINANCE_API_URL = import.meta.env?.VITE_FINANCE_API_URL || 'https://api-finance.zenohosp.com';
@@ -175,4 +176,5 @@ export const createVendor = (data) => api.post('/api/vendors', data);
 export const updateVendor = (id, data) => api.put(`/api/vendors/${id}`, data);
 export const deleteVendor = (id) => api.delete(`/api/vendors/${id}`);
 
+export { SSOCookieManager };
 export default api;

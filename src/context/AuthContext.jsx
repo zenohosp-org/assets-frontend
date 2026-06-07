@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { getMyProfile, logout as apiLogout, logoutFromDirectory, logoutFromInventory } from '../api/client';
+import { getMyProfile, logout as apiLogout, logoutFromDirectory, logoutFromInventory, SSOCookieManager } from '../api/client';
 
 const AuthContext = createContext(null);
 const AUTH_REDIRECT_LOCK_KEY = 'asset_auth_redirect_lock';
@@ -81,6 +81,7 @@ export function AuthProvider({ children }) {
             if (event.key === 'sso-logout') {
                 sessionStorage.removeItem('asset_user');
                 setUser(null);
+                SSOCookieManager.clearToken();
                 window.location.href = '/login?logged_out=1';
             }
         };
@@ -89,6 +90,7 @@ export function AuthProvider({ children }) {
         const handleCustomLogoutEvent = () => {
             sessionStorage.removeItem('asset_user');
             setUser(null);
+            SSOCookieManager.clearToken();
             window.location.href = '/login?logged_out=1';
         };
 
@@ -105,6 +107,7 @@ export function AuthProvider({ children }) {
         // Set flag so the next mount cycle doesn't try to restore session
         localStorage.setItem(LOGOUT_FLAG_KEY, '1');
         sessionStorage.removeItem('asset_user');
+        SSOCookieManager.clearToken();
         setUser(null);
 
         // Clear cookies on all backends BEFORE redirecting. The redirect is a full
