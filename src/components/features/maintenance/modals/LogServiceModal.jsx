@@ -91,6 +91,9 @@ function LogServiceModal({
                                 )}
                             </div>
                         </div>
+                        <p className="maintenance-amc-notice">
+                            Logging maintenance releases this asset from its current room/person back to inventory.
+                        </p>
                         <div>
                             <label className="app-label">Breakdown Details / Notes</label>
                             <textarea
