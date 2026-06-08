@@ -7,9 +7,44 @@ import AssetsTable from './components/AssetsTable';
 import AssetActivityDrawer from './components/AssetActivityDrawer';
 import AssetFormModal from './modals/AssetFormModal';
 import AssignAssetModal from './modals/AssignAssetModal';
+import LogCalibrationModal from '../calibration/modals/LogCalibrationModal';
+import { EMPTY_CALIBRATION_FORM, calibrationToPayload, userDisplayName } from '../calibration/utils/calibrationUtils';
+import { createCalibration } from '../../../api/client';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function AssetsTab() {
+    const { user } = useAuth();
     const [activityAsset, setActivityAsset] = useState(null);
+
+    // Per-asset "Calibrate" quick action
+    const [calibratingAsset, setCalibratingAsset] = useState(null);
+    const [calibForm, setCalibForm] = useState(EMPTY_CALIBRATION_FORM);
+    const [isCalibSubmitting, setIsCalibSubmitting] = useState(false);
+
+    const handleOpenCalibrate = (asset) => {
+        setCalibForm({
+            ...EMPTY_CALIBRATION_FORM,
+            assetId: asset.assetId,
+            calibrationDate: new Date().toISOString().split('T')[0],
+            performedBy: userDisplayName(user),
+        });
+        setCalibratingAsset(asset);
+    };
+
+    const handleCalibrateSubmit = async (e) => {
+        e.preventDefault();
+        setIsCalibSubmitting(true);
+        try {
+            await createCalibration(calibrationToPayload(calibForm));
+            setCalibratingAsset(null);
+        } catch (err) {
+            console.error(err);
+            alert(err.response?.data?.message || err.message || 'Failed to log calibration.');
+        } finally {
+            setIsCalibSubmitting(false);
+        }
+    };
+
     const {
         categories, loading, filteredAssets, stats,
         searchTerm, setSearchTerm,
@@ -44,11 +79,22 @@ export default function AssetsTab() {
                 onAssign={handleOpenAssignModal}
                 onDelete={handleDelete}
                 onActivity={setActivityAsset}
+                onCalibrate={handleOpenCalibrate}
             />
 
             {activityAsset && (
                 <AssetActivityDrawer asset={activityAsset} onClose={() => setActivityAsset(null)} />
             )}
+
+            <LogCalibrationModal
+                open={!!calibratingAsset}
+                lockedAsset={calibratingAsset}
+                formData={calibForm}
+                setFormData={setCalibForm}
+                isSubmitting={isCalibSubmitting}
+                onClose={() => setCalibratingAsset(null)}
+                onSubmit={handleCalibrateSubmit}
+            />
 
             <AssetFormModal
                 open={isModalOpen}

@@ -15,6 +15,12 @@ function MaintenanceTabs({ activeTab, onChange }) {
             >
                 Bills
             </button>
+            <button
+                onClick={() => onChange('amccmc')}
+                className={`maintenance-tab-btn${activeTab === 'amccmc' ? ' maintenance-tab-btn--active' : ''}`}
+            >
+                AMC/CMC Servicing
+            </button>
         </div>
     );
 }

@@ -40,6 +40,7 @@
 .activity-item--allocation { border-left-color: #16a34a; }
 .activity-item--maintenance { border-left-color: #ea580c; }
 .activity-item--check { border-left-color: #7c3aed; }
+.activity-item--calibration { border-left-color: #f59e0b; }
 
 .activity-icon {
     flex-shrink: 0;

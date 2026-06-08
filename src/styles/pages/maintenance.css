@@ -177,6 +177,29 @@
     color: #2563eb;
 }
 
+.servicing-filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.servicing-filter-chip {
+    padding: 6px 14px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.servicing-filter-chip--active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+
 .maintenance-status-badge {
     padding: 4px 8px;
     border-radius: 4px;

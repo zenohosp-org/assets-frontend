@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Loader2, MoreVertical, Edit2, MapPin, Trash2, Calendar, HardDrive, Activity } from 'lucide-react';
+import { Loader2, MoreVertical, Edit2, MapPin, Trash2, Calendar, HardDrive, Activity, Gauge } from 'lucide-react';
 
 function AssetsTable({
     loading,
@@ -10,6 +10,7 @@ function AssetsTable({
     onAssign,
     onDelete,
     onActivity,
+    onCalibrate,
 }) {
     return (
         <div className="app-table-wrapper">
@@ -94,6 +95,12 @@ function AssetsTable({
                                                 className="assets-dropdown-item"
                                             >
                                                 <Activity className="app-icon-16 text-purple" /> View Activity
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onCalibrate(asset); }}
+                                                className="assets-dropdown-item"
+                                            >
+                                                <Gauge className="app-icon-16 text-amber" /> Calibrate
                                             </button>
                                             <button
                                                 disabled={asset.status === 'MAINTENANCE'}

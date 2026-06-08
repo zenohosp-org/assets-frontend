@@ -1,1 +1,1 @@
-export { default } from '../components/features/contracts/CalibrationTab';
+export { default } from '../components/features/calibration/CalibrationPage';

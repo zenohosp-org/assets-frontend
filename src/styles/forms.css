@@ -38,6 +38,12 @@
     border-color: var(--color-black);
 }
 
+.app-input--readonly {
+    background: var(--color-gray-100, #f1f5f9);
+    color: var(--color-gray-600, #475569);
+    cursor: not-allowed;
+}
+
 .app-textarea {
     width: 100%;
     padding: 12px 16px;

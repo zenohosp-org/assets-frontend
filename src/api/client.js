@@ -150,6 +150,11 @@ export const renewContract = (id, data) => api.patch(`/api/amc/${id}/renew`, dat
 export const cancelContract = (id) => api.patch(`/api/amc/${id}/cancel`);
 export const completeContractCheck = (id, data) => api.post(`/api/amc/${id}/complete-check`, data);
 
+// ── Calibration (standalone, not tied to AMC/CMC) ──
+export const getCalibrations = () => api.get('/api/calibration');
+export const getCalibrationsByAsset = (id) => api.get(`/api/calibration/asset/${id}`);
+export const createCalibration = (data) => api.post('/api/calibration', data);
+
 // ── Finance APIs ──
 export const getFinanceBankAccounts = () => api.get('/api/proxy/finance/bank-accounts');
 export const createFinanceBankTransaction = (bankAccountId, data) =>

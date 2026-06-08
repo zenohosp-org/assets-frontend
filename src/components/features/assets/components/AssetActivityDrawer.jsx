@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { X, Loader2, MapPin, Wrench, ClipboardCheck } from 'lucide-react';
-import { getAssetHistory, getMaintenanceRecordsByAsset, getChecksByAsset } from '../../../../api/client';
+import { X, Loader2, MapPin, Wrench, ClipboardCheck, Gauge } from 'lucide-react';
+import { getAssetHistory, getMaintenanceRecordsByAsset, getChecksByAsset, getCalibrationsByAsset } from '../../../../api/client';
 import '../../../../styles/pages/asset-activity.css';
 
 function toTime(value) {
@@ -9,7 +9,7 @@ function toTime(value) {
     return Number.isNaN(t) ? 0 : t;
 }
 
-function buildTimeline(history, maintenance, checks) {
+function buildTimeline(history, maintenance, checks, calibrations) {
     const events = [];
 
     history.forEach(h => events.push({
@@ -32,8 +32,16 @@ function buildTimeline(history, maintenance, checks) {
         kind: 'check',
         time: toTime(c.checkDate || c.createdAt),
         date: c.checkDate || c.createdAt,
-        title: `CMC check — ${c.condition || ''}`,
+        title: `AMC/CMC check — ${c.condition || ''}`,
         detail: [c.notes, c.raisedMaintenanceId ? 'maintenance raised' : null].filter(Boolean).join(' · '),
+    }));
+
+    calibrations.forEach(c => events.push({
+        kind: 'calibration',
+        time: toTime(c.calibrationDate || c.createdAt),
+        date: c.calibrationDate || c.createdAt,
+        title: `Calibration — ${c.result || ''}`,
+        detail: [c.performedBy, c.notes].filter(Boolean).join(' · '),
     }));
 
     return events.sort((a, b) => b.time - a.time);
@@ -43,6 +51,7 @@ const ICONS = {
     allocation: MapPin,
     maintenance: Wrench,
     check: ClipboardCheck,
+    calibration: Gauge,
 };
 
 export default function AssetActivityDrawer({ asset, onClose }) {
@@ -55,12 +64,13 @@ export default function AssetActivityDrawer({ asset, onClose }) {
         (async () => {
             setLoading(true);
             try {
-                const [hRes, mRes, cRes] = await Promise.all([
+                const [hRes, mRes, cRes, calRes] = await Promise.all([
                     getAssetHistory(asset.assetId),
                     getMaintenanceRecordsByAsset(asset.assetId),
                     getChecksByAsset(asset.assetId),
+                    getCalibrationsByAsset(asset.assetId),
                 ]);
-                if (mounted) setEvents(buildTimeline(hRes.data || [], mRes.data || [], cRes.data || []));
+                if (mounted) setEvents(buildTimeline(hRes.data || [], mRes.data || [], cRes.data || [], calRes.data || []));
             } catch (err) {
                 console.error('Failed to load asset activity:', err);
                 if (mounted) setEvents([]);
