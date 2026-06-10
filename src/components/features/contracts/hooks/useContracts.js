@@ -50,10 +50,10 @@ export function useContracts() {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    const handleOpenCreate = useCallback(() => {
+    const handleOpenCreate = useCallback((contractType = 'AMC') => {
         setFormMode('create');
         setEditingId(null);
-        setFormData(EMPTY_CONTRACT_FORM);
+        setFormData({ ...EMPTY_CONTRACT_FORM, contractType });
         setIsFormOpen(true);
     }, []);
 

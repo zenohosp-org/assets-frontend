@@ -12,12 +12,17 @@ export default function ContractsTab() {
         <div className="app-page">
             <PageHeader
                 icon={FileText}
-                title="Contracts (AMC / CMC)"
+                title="AMC / CMC"
                 subtitle="Register and manage maintenance contracts for your assets. Due checks and renewals live under Calibration."
                 actions={
-                    <button onClick={c.handleOpenCreate} className="app-btn app-btn-primary">
-                        <Plus className="app-icon-20" /> New Contract
-                    </button>
+                    <>
+                        <button onClick={() => c.handleOpenCreate('AMC')} className="app-btn app-btn-primary">
+                            <Plus className="app-icon-20" /> Add AMC
+                        </button>
+                        <button onClick={() => c.handleOpenCreate('CMC')} className="app-btn app-btn-primary">
+                            <Plus className="app-icon-20" /> Add CMC
+                        </button>
+                    </>
                 }
             />
 
