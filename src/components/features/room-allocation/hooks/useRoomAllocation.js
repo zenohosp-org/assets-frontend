@@ -77,9 +77,14 @@ export function useRoomAllocation() {
 
     const panelLogs = useMemo(() => {
         if (!panelRoom) return [];
-        const ids = new Set(panelAssets.map(a => a.assetId));
-        return allLogs.filter(log => ids.has(log.asset?.assetId));
-    }, [panelRoom, panelAssets, allLogs]);
+        // Logs encode the room as "ROOM <id>" in from/to entity names (see
+        // AssetService). Match on that so the panel shows every movement in/out
+        // of THIS room — including assets that have since been transferred away.
+        const roomTag = `ROOM ${panelRoom.id}`;
+        return allLogs.filter(log =>
+            log.fromEntityName === roomTag || log.toEntityName === roomTag
+        );
+    }, [panelRoom, allLogs]);
 
     const openPanel = useCallback((room) => setPanelRoom(room), []);
     const closePanel = useCallback(() => setPanelRoom(null), []);
