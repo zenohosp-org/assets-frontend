@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-    LayoutDashboard, Box, MapPin, History, Activity,
+    LayoutDashboard, Box, MapPin, History, Activity, Wrench,
     Settings, Layers, Users, Globe, BarChart2, Package, ArrowUpRight, Tag, FileText, CalendarClock
 } from 'lucide-react';
 import { SidebarLink, CollapseToggle } from './SidebarItem';
@@ -16,6 +16,12 @@ const OTHER_APPS = [
 
 export default function Sidebar({ open, onNavigate }) {
     const location = useLocation();
+    const [allocationOpen, setAllocationOpen] = useState(
+        ['/rooms', '/transfers'].includes(location.pathname)
+    );
+    const [servicingOpen, setServicingOpen] = useState(
+        ['/maintenance', '/calibration', '/contracts'].includes(location.pathname)
+    );
     const [mastersOpen, setMastersOpen] = useState(
         location.pathname.startsWith('/vendors') || location.pathname.startsWith('/asset-categories')
     );
@@ -38,14 +44,43 @@ export default function Sidebar({ open, onNavigate }) {
                     <li className="sidebar-section">
                         <div className="sidebar-section-title">Assets</div>
 
+                        {/* Asset Inventory — the anchor, direct link */}
                         <SidebarLink to="/assets" icon={Box} label="Asset Inventory" onNavigate={onNavigate} />
-                        <SidebarLink to="/rooms" icon={MapPin} label="Room Allocation" onNavigate={onNavigate} />
-                        <SidebarLink to="/transfers" icon={History} label="Transfer Logs" onNavigate={onNavigate} />
-                        <SidebarLink to="/maintenance" icon={Activity} label="Maintenance" onNavigate={onNavigate} />
-                        <SidebarLink to="/contracts" icon={FileText} label="Contracts (AMC/CMC)" onNavigate={onNavigate} />
-                        <SidebarLink to="/calibration" icon={CalendarClock} label="Calibration" onNavigate={onNavigate} />
 
-                        {/* Masters collapsible */}
+                        {/* Allocation collapsible — where the asset physically is */}
+                        <div className="sidebar-subsection">
+                            <CollapseToggle
+                                open={allocationOpen}
+                                onToggle={() => setAllocationOpen(o => !o)}
+                                icon={MapPin}
+                                label="Allocation"
+                            />
+                            {allocationOpen && (
+                                <div className="sidebar-submenu">
+                                    <SidebarLink to="/rooms" icon={MapPin} label="Room Allocation" size={15} submenu onNavigate={onNavigate} />
+                                    <SidebarLink to="/transfers" icon={History} label="Transfer Logs" size={15} submenu onNavigate={onNavigate} />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Servicing collapsible — upkeep & compliance */}
+                        <div className="sidebar-subsection">
+                            <CollapseToggle
+                                open={servicingOpen}
+                                onToggle={() => setServicingOpen(o => !o)}
+                                icon={Wrench}
+                                label="Servicing"
+                            />
+                            {servicingOpen && (
+                                <div className="sidebar-submenu">
+                                    <SidebarLink to="/maintenance" icon={Activity} label="Maintenance" size={15} submenu onNavigate={onNavigate} />
+                                    <SidebarLink to="/calibration" icon={CalendarClock} label="Calibration" size={15} submenu onNavigate={onNavigate} />
+                                    <SidebarLink to="/contracts" icon={FileText} label="Contracts (AMC/CMC)" size={15} submenu onNavigate={onNavigate} />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Masters collapsible — one-time setup, demoted to the bottom */}
                         <div className="sidebar-subsection">
                             <CollapseToggle
                                 open={mastersOpen}
