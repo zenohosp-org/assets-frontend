@@ -113,15 +113,20 @@ export function AuthProvider({ children }) {
         // Clear cookies on all backends BEFORE redirecting. The redirect is a full
         // page navigation that cancels in-flight requests, so it must happen only
         // after these complete — otherwise the sso_token deletion never lands.
-        try {
-            await Promise.all([
-                apiLogout(),
-                logoutFromDirectory(),
-                logoutFromInventory()
-            ]);
-        } catch (e) {
-            console.error("SSO logout failed", e);
-        }
+        // allSettled (not Promise.all): Promise.all short-circuits on the first
+        // rejection — a fast CORS/network failure from the cross-origin directory
+        // or inventory logout rejects immediately, and the redirect below would
+        // then cancel the still-in-flight asset logout before its sso_token
+        // cookie-clear lands, leaving the user logged in. allSettled waits for
+        // all three to complete regardless of individual failures.
+        const results = await Promise.allSettled([
+            apiLogout(),
+            logoutFromDirectory(),
+            logoutFromInventory()
+        ]);
+        results
+            .filter((r) => r.status === 'rejected')
+            .forEach((r) => console.warn('SSO logout call failed:', r.reason));
 
         // Signal other tabs (storage event fires only in other tabs)
         try {
