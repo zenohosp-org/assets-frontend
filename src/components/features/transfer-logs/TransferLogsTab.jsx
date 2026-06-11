@@ -1,6 +1,5 @@
 import '../../../styles/pages/transfer-logs.css';
-import { History, Plus, Mail, Search } from 'lucide-react';
-import PageHeader from '../../PageHeader';
+import { History, Plus, Search } from 'lucide-react';
 import { useTransferLogs } from './hooks/useTransferLogs';
 import TransferStats from './components/TransferStats';
 import TransferLogsTable from './components/TransferLogsTable';
@@ -11,36 +10,38 @@ export default function TransferLogsTab() {
 
     return (
         <div className="app-page">
-            <PageHeader
-                icon={History}
-                title="Transfer History"
-                subtitle="Audit trail of asset movement within the institution."
-                actions={
-                    <div className="transfer-logs-actions">
-                        <button onClick={t.handleOpenModal} className="app-btn app-btn-primary">
-                            <Plus className="app-icon-20" /> Record Transfer
-                        </button>
-                        <a href="mailto:support@zenohosp.com" className="transfer-logs-mail-btn" title="Contact ZenoHosp Support">
-                            <Mail className="transfer-logs-btn-icon" />
-                        </a>
+            <header className="transfer-logs-header">
+                <div className="transfer-logs-head-left">
+                    <div className="transfer-logs-head-icon">
+                        <History size={22} />
                     </div>
-                }
-            />
+                    <div>
+                        <h1 className="transfer-logs-head-title">Transfer Logs</h1>
+                        <p className="transfer-logs-head-sub">
+                            Full audit trail · {t.stats.total} movements recorded
+                        </p>
+                    </div>
+                </div>
+                <div className="transfer-logs-head-actions">
+                    <div className="app-search-wrapper transfer-logs-head-search">
+                        <div className="app-search-icon-wrapper">
+                            <Search className="app-icon-20" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search asset, room or staff…"
+                            className="app-search-input"
+                            value={t.searchTerm}
+                            onChange={(e) => t.setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button onClick={t.handleOpenModal} className="app-btn app-btn-primary">
+                        <Plus className="app-icon-20" /> Record Transfer
+                    </button>
+                </div>
+            </header>
 
             <TransferStats stats={t.stats} />
-
-            <div className="app-search-wrapper">
-                <div className="app-search-icon-wrapper">
-                    <Search className="app-icon-20 text-slate-400" />
-                </div>
-                <input
-                    type="text"
-                    placeholder="Search by asset or person..."
-                    className="app-search-input"
-                    value={t.searchTerm}
-                    onChange={(e) => t.setSearchTerm(e.target.value)}
-                />
-            </div>
 
             <TransferLogsTable loading={t.loading} logs={t.filteredLogs} />
 

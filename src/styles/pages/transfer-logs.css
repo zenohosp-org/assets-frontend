@@ -1,31 +1,3 @@
-.transfer-logs-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.transfer-logs-mail-btn {
-    padding: 10px;
-    color: var(--color-gray-400);
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: 12px;
-    transition: all 150ms ease;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.transfer-logs-mail-btn:hover {
-    color: var(--color-black);
-    background-color: #eff6ff;
-}
-
-.transfer-logs-stat-value-blue   { color: var(--color-black); }
-.transfer-logs-stat-value-emerald { color: #059669; }
-.transfer-logs-stat-value-purple  { color: #9333ea; }
-
 .transfer-logs-empty-cell {
     padding: 80px var(--spacing-6);
     text-align: center;
@@ -72,39 +44,6 @@
 
 .transfer-logs-empty-text {
     font-size: var(--fs-xs);
-}
-
-.transfer-logs-asset-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.transfer-logs-asset-icon-bg {
-    width: 40px;
-    height: 40px;
-    background-color: #eff6ff;
-    border: 1px solid #dbeafe;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-black);
-}
-
-.transfer-logs-asset-name {
-    font-weight: var(--fw-bold);
-    color: var(--color-gray-900);
-    font-size: var(--fs-sm);
-}
-
-.transfer-logs-asset-code {
-    font-size: var(--fs-xs);
-    color: var(--color-gray-400);
-    text-transform: uppercase;
-    font-weight: 900;
-    letter-spacing: -0.05em;
-    margin-top: 2px;
 }
 
 .transfer-logs-movement-cell {
@@ -168,25 +107,6 @@
     flex-shrink: 0;
 }
 
-.transfer-logs-date-cell {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--fs-sm);
-    color: var(--color-gray-600);
-    font-weight: var(--fw-medium);
-    white-space: nowrap;
-}
-
-.transfer-logs-remarks {
-    font-size: var(--fs-sm);
-    color: var(--color-gray-500);
-    max-width: 20rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .transfer-logs-remarks-empty {
     font-style: italic;
     color: var(--color-gray-300);
@@ -248,34 +168,110 @@
     cursor: default;
 }
 
-/* ── Audit Stream (timeline) ── */
+/* ── Page header ── */
+.transfer-logs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+}
+
+.transfer-logs-head-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.transfer-logs-head-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background-color: var(--color-primary-subtle);
+    border: 1px solid #dbeafe;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transfer-logs-head-title {
+    font-size: var(--fs-2xl);
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--color-gray-900);
+}
+
+.transfer-logs-head-sub {
+    margin-top: 4px;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-500);
+}
+
+.transfer-logs-head-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.transfer-logs-head-search {
+    width: 280px;
+}
+
+/* ── Stat card icon badges ── */
+.transfer-logs-stat-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.transfer-logs-stat-ico {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.transfer-logs-stat-ico-blue   { background-color: var(--color-primary-subtle); color: var(--color-primary); }
+.transfer-logs-stat-ico-green  { background-color: var(--color-success-subtle); color: var(--color-success-dark); }
+.transfer-logs-stat-ico-purple { background-color: #f5f3ff; color: #7c3aed; }
+.transfer-logs-stat-ico-amber  { background-color: var(--color-warning-subtle); color: var(--color-warning-dark); }
+
+/* ── Audit Stream (timeline of standalone cards) ── */
 .transfer-stream {
-    padding: 20px 24px 8px;
+    margin-top: 8px;
 }
 
 .transfer-stream-state {
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 16px;
+    box-shadow: var(--shadow-xs);
     padding: 72px var(--spacing-6, 24px);
 }
 
 .transfer-stream-daygroup {
-    margin-bottom: 8px;
+    margin-bottom: 22px;
 }
 
 .transfer-stream-daylabel {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 18px 0 6px;
+    gap: 10px;
+    margin: 0 0 12px;
 }
 
 .transfer-stream-day-tag {
     font-size: var(--fs-xs);
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-primary-dark);
-    background-color: var(--color-primary-subtle);
-    border: 1px solid #dbeafe;
+    color: var(--color-white);
+    background-color: var(--color-gray-900);
     border-radius: 9999px;
     padding: 3px 12px;
 }
@@ -286,31 +282,30 @@
     color: var(--color-gray-400);
 }
 
-.transfer-stream-day-line {
-    flex: 1;
-    height: 1px;
-    background-color: var(--color-gray-100);
-}
-
 .transfer-stream-row {
     display: grid;
-    grid-template-columns: 56px 1fr minmax(120px, 220px);
+    grid-template-columns: 64px 1fr minmax(140px, 240px);
     align-items: center;
-    gap: 20px;
-    padding: 16px 4px;
-    border-bottom: 1px solid var(--color-gray-100);
-    border-radius: 10px;
-    transition: background-color 150ms ease;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    border: 1px solid var(--color-gray-200);
+    background: var(--color-white);
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow 150ms ease, border-color 150ms ease;
 }
 
 .transfer-stream-row:hover {
-    background-color: var(--color-gray-50);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-gray-300);
 }
 
 .transfer-stream-time {
     font-size: var(--fs-sm);
     font-weight: 700;
-    color: var(--color-gray-500);
+    color: var(--color-gray-600);
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
 }
 
@@ -318,31 +313,72 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 0;
 }
 
 .transfer-stream-asset {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+}
+
+.transfer-stream-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.transfer-stream-name {
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--color-gray-900);
+}
+
+.transfer-stream-code {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--color-gray-400);
 }
 
 .transfer-stream-meta {
     text-align: right;
+    min-width: 0;
+}
+
+.transfer-stream-remark {
+    font-size: var(--fs-sm);
+    font-style: italic;
+    color: var(--color-gray-500);
 }
 
 @media (max-width: 768px) {
-    .transfer-stream {
-        padding: 16px;
+    .transfer-logs-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .transfer-logs-head-actions {
+        flex-wrap: wrap;
+    }
+
+    .transfer-logs-head-search {
+        flex: 1;
+        width: auto;
     }
 
     .transfer-stream-row {
-        grid-template-columns: 48px 1fr;
+        grid-template-columns: 52px 1fr;
         gap: 12px;
     }
 
     .transfer-stream-meta {
         grid-column: 1 / -1;
         text-align: left;
-        padding-left: 60px;
+        padding-left: 64px;
     }
 }

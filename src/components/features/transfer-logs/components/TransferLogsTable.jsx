@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Box, ArrowRight, Loader2, History } from 'lucide-react';
+import { ArrowRight, Loader2, History } from 'lucide-react';
 
 const startOfDay = (date) => {
     const d = new Date(date);
@@ -70,13 +70,12 @@ function TransferLogsTable({ loading, logs }) {
     const groups = groupByDay(logs);
 
     return (
-        <div className="app-table-wrapper transfer-stream">
+        <div className="transfer-stream">
             {groups.map(group => (
                 <div className="transfer-stream-daygroup" key={group.key}>
                     <div className="transfer-stream-daylabel">
                         <span className="transfer-stream-day-tag">{dayLabel(group.date)}</span>
                         <span className="transfer-stream-day-count">{group.logs.length} movements</span>
-                        <span className="transfer-stream-day-line" />
                     </div>
 
                     {group.logs.map(log => (
@@ -85,13 +84,9 @@ function TransferLogsTable({ loading, logs }) {
 
                             <div className="transfer-stream-body">
                                 <div className="transfer-stream-asset">
-                                    <div className="transfer-logs-asset-icon-bg">
-                                        <Box className="app-icon-20" />
-                                    </div>
-                                    <div>
-                                        <p className="transfer-logs-asset-name">{log.asset?.assetName || 'Unknown Asset'}</p>
-                                        <p className="transfer-logs-asset-code">{log.asset?.assetCode || 'NO CODE'}</p>
-                                    </div>
+                                    <span className="transfer-stream-dot" />
+                                    <span className="transfer-stream-name">{log.asset?.assetName || 'Unknown Asset'}</span>
+                                    <span className="transfer-stream-code">{log.asset?.assetCode || 'NO CODE'}</span>
                                 </div>
 
                                 <div className="transfer-logs-movement-cell">
@@ -108,7 +103,7 @@ function TransferLogsTable({ loading, logs }) {
                             </div>
 
                             <div className="transfer-stream-meta">
-                                <p className="transfer-logs-remarks">
+                                <p className="transfer-stream-remark">
                                     {log.remarks || <span className="transfer-logs-remarks-empty">No remarks provided</span>}
                                 </p>
                             </div>
