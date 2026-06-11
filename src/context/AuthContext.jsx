@@ -105,20 +105,23 @@ export function AuthProvider({ children }) {
 
     const logout = useCallback(async () => {
         // Set flag so the next mount cycle doesn't try to restore session
+        // Mark logout so the next mount stays logged out, and signal other tabs.
         localStorage.setItem(LOGOUT_FLAG_KEY, '1');
-        sessionStorage.removeItem('asset_user');
-        SSOCookieManager.clearToken();
-        setUser(null);
+        try {
+            localStorage.setItem('sso-logout', `${Date.now()}`);
+        } catch (e) { }
 
-        // Clear cookies on all backends BEFORE redirecting. The redirect is a full
-        // page navigation that cancels in-flight requests, so it must happen only
-        // after these complete — otherwise the sso_token deletion never lands.
-        // allSettled (not Promise.all): Promise.all short-circuits on the first
-        // rejection — a fast CORS/network failure from the cross-origin directory
-        // or inventory logout rejects immediately, and the redirect below would
-        // then cancel the still-in-flight asset logout before its sso_token
-        // cookie-clear lands, leaving the user logged in. allSettled waits for
-        // all three to complete regardless of individual failures.
+        // Do NOT call setUser(null) here. Clearing user before the backend call
+        // makes ProtectedRoute client-navigate to a bare /login, whose auto-SSO
+        // effect immediately fires a full-page OAuth2 redirect — that cancels the
+        // in-flight logout request (so the sso_token cookie is never cleared) and
+        // silently re-authenticates against the still-valid Directory session.
+        //
+        // Instead, keep the session mounted, clear the server-side cookie first,
+        // then do a single hard redirect WITH logged_out=1 (which suppresses the
+        // Login page's auto-SSO). allSettled (not Promise.all) guarantees our own
+        // apiLogout() completes even if the cross-origin directory/inventory calls
+        // fail, since Promise.all would short-circuit on the first rejection.
         const results = await Promise.allSettled([
             apiLogout(),
             logoutFromDirectory(),
@@ -128,10 +131,8 @@ export function AuthProvider({ children }) {
             .filter((r) => r.status === 'rejected')
             .forEach((r) => console.warn('SSO logout call failed:', r.reason));
 
-        // Signal other tabs (storage event fires only in other tabs)
-        try {
-            localStorage.setItem('sso-logout', `${Date.now()}`);
-        } catch (e) { }
+        sessionStorage.removeItem('asset_user');
+        SSOCookieManager.clearToken();
 
         window.location.href = '/login?logged_out=1';
     }, []);
