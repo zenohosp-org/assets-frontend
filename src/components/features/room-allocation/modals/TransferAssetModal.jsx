@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { X, Loader2 } from 'lucide-react';
 
 function TransferAssetModal({
-    open, selectedAsset, selectedRoom, rooms,
-    formData, setFormData, isSubmitting, onClose, onSubmit,
+    open, selectedAsset, selectedRoom, rooms, beds,
+    formData, setFormData, onChangeRoom, isSubmitting, onClose, onSubmit,
 }) {
     if (!open || !selectedAsset) return null;
 
@@ -32,7 +32,7 @@ function TransferAssetModal({
                                 <select
                                     required
                                     value={formData.toRoomId}
-                                    onChange={(e) => setFormData({ ...formData, toRoomId: e.target.value })}
+                                    onChange={(e) => onChangeRoom(e.target.value)}
                                     className="app-input"
                                 >
                                     <option value="">Select room</option>
@@ -43,6 +43,22 @@ function TransferAssetModal({
                                                 {room.roomNumber} ({room.roomType || 'Standard'})
                                             </option>
                                         ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="app-label">Bed</label>
+                                <select
+                                    value={formData.toBedId}
+                                    onChange={(e) => setFormData({ ...formData, toBedId: e.target.value })}
+                                    className="app-input"
+                                    disabled={!formData.toRoomId || beds.length === 0}
+                                >
+                                    <option value="">Whole room</option>
+                                    {beds.map(bed => (
+                                        <option key={bed.id} value={bed.id}>
+                                            Bed {bed.bedNumber}{bed.occupied ? ' (occupied)' : ''}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="room-alloc-modal-full-col">

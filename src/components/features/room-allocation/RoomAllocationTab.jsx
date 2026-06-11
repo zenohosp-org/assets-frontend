@@ -56,6 +56,7 @@ export default function RoomAllocationTab() {
                     panelRoom={r.panelRoom}
                     panelAssets={r.panelAssets}
                     panelLogs={r.panelLogs}
+                    panelBedsById={r.panelBedsById}
                     availableAssets={r.availableAssets}
                     activeDropdown={r.activeDropdown}
                     onToggleDropdown={r.toggleDropdown}
@@ -71,6 +72,7 @@ export default function RoomAllocationTab() {
                 selectedRoom={r.selectedRoom}
                 addRows={r.addRows}
                 availableAssets={r.availableAssets}
+                beds={r.addBeds}
                 isSubmitting={r.isSubmitting}
                 onClose={r.handleCloseAddModal}
                 onSubmit={r.handleAddAssetSubmit}
@@ -94,8 +96,10 @@ export default function RoomAllocationTab() {
                 selectedAsset={r.selectedAsset}
                 selectedRoom={r.selectedRoom}
                 rooms={r.rooms}
+                beds={r.transferBeds}
                 formData={r.transferFormData}
                 setFormData={r.setTransferFormData}
+                onChangeRoom={r.handleTransferRoomChange}
                 isSubmitting={r.isSubmitting}
                 onClose={r.handleCloseTransferModal}
                 onSubmit={r.handleTransferAssetSubmit}

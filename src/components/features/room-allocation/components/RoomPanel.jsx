@@ -5,6 +5,7 @@ function RoomPanel({
     panelRoom,
     panelAssets,
     panelLogs,
+    panelBedsById,
     availableAssets,
     activeDropdown,
     onToggleDropdown,
@@ -56,7 +57,14 @@ function RoomPanel({
                             <div key={asset.assetId} className="room-alloc-panel-asset-row">
                                 <div className="room-alloc-asset-dot" />
                                 <div className="room-alloc-panel-asset-info">
-                                    <p className="room-alloc-asset-name">{asset.assetName}</p>
+                                    <p className="room-alloc-asset-name">
+                                        {asset.assetName}
+                                        {asset.bedId && (
+                                            <span className="room-alloc-asset-bed-tag">
+                                                Bed {panelBedsById[asset.bedId] || asset.bedId}
+                                            </span>
+                                        )}
+                                    </p>
                                     <p className="room-alloc-asset-code">{asset.assetCode || 'NO CODE'}</p>
                                 </div>
                                 <div className="room-alloc-panel-asset-actions">

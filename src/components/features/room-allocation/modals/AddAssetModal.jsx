@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { X, Plus, Loader2 } from 'lucide-react';
 
 function AddAssetModal({
-    open, selectedRoom, addRows, availableAssets, isSubmitting,
+    open, selectedRoom, addRows, availableAssets, beds, isSubmitting,
     onClose, onSubmit, onAddRow, onRemoveRow, onUpdateRow,
 }) {
     if (!open || !selectedRoom) return null;
@@ -34,6 +34,7 @@ function AddAssetModal({
                                         <tr className="app-table-thead-row">
                                             <th className="app-table-th">#</th>
                                             <th className="app-table-th">Asset *</th>
+                                            <th className="app-table-th">Bed</th>
                                             <th className="app-table-th">Notes</th>
                                             <th className="app-table-th"></th>
                                         </tr>
@@ -56,6 +57,21 @@ function AddAssetModal({
                                                             {rowAvailable.map(a => (
                                                                 <option key={a.assetId} value={a.assetId}>
                                                                     {a.assetName} ({a.assetCode || 'N/A'})
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </td>
+                                                    <td className="app-table-td">
+                                                        <select
+                                                            value={row.bedId}
+                                                            onChange={(e) => onUpdateRow(i, 'bedId', e.target.value)}
+                                                            className="app-input room-alloc-modal-bed-select"
+                                                            disabled={beds.length === 0}
+                                                        >
+                                                            <option value="">Whole room</option>
+                                                            {beds.map(bed => (
+                                                                <option key={bed.id} value={bed.id}>
+                                                                    Bed {bed.bedNumber}{bed.occupied ? ' (occupied)' : ''}
                                                                 </option>
                                                             ))}
                                                         </select>

@@ -26,6 +26,6 @@ export function filterRooms(rooms, term) {
     );
 }
 
-export const EMPTY_ADD_ROW = { assetId: '', notes: '' };
+export const EMPTY_ADD_ROW = { assetId: '', bedId: '', notes: '' };
 export const EMPTY_REMOVE_FORM = { notes: '' };
-export const EMPTY_TRANSFER_FORM = { toRoomId: '', reason: '' };
+export const EMPTY_TRANSFER_FORM = { toRoomId: '', toBedId: '', reason: '' };

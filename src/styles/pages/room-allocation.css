@@ -160,6 +160,17 @@
     font-size: var(--fs-sm);
 }
 
+.room-alloc-asset-bed-tag {
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    vertical-align: middle;
+}
+
 .room-alloc-asset-code {
     font-size: var(--fs-xs);
     color: var(--color-gray-400);
@@ -239,6 +250,7 @@
 }
 
 .room-alloc-modal-asset-select { min-width: 180px; }
+.room-alloc-modal-bed-select   { min-width: 130px; }
 .room-alloc-modal-floor-col    { width: 90px; }
 .room-alloc-modal-remove-col   { width: 36px; }
 

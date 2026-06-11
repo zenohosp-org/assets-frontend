@@ -162,6 +162,7 @@ export const createFinanceBankTransaction = (bankAccountId, data) =>
 
 // ── Room Allocation ──
 export const getHmsRooms = () => api.get('/api/proxy/hms/rooms');
+export const getHmsRoomBeds = (roomId) => api.get(`/api/proxy/hms/rooms/${roomId}/beds`);
 export const assignAssetToRoom = (assetId, data) => api.post(`/api/assets/${assetId}/assign-room`, data);
 export const unassignAssetFromRoom = (assetId, data) => api.post(`/api/assets/${assetId}/unassign-room`, data);
 export const transferAssetRoom = (assetId, data) => api.post(`/api/assets/${assetId}/transfer`, data);

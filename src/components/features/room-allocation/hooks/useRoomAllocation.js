@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-    getHmsRooms, getAssets, assignAssetToRoom,
+    getHmsRooms, getHmsRoomBeds, getAssets, assignAssetToRoom,
     unassignAssetFromRoom, transferAssetRoom, getTransferLogs,
 } from '../../../../api/client';
 import {
@@ -28,6 +28,11 @@ export function useRoomAllocation() {
     const [addRows, setAddRows] = useState([EMPTY_ADD_ROW]);
     const [removeFormData, setRemoveFormData] = useState(EMPTY_REMOVE_FORM);
     const [transferFormData, setTransferFormData] = useState(EMPTY_TRANSFER_FORM);
+
+    // Beds for the room currently in play, fetched on demand from HMS.
+    const [addBeds, setAddBeds] = useState([]);       // beds of the room being added to
+    const [transferBeds, setTransferBeds] = useState([]); // beds of the chosen destination room
+    const [panelBeds, setPanelBeds] = useState([]);   // beds of the open panel's room (for display)
 
     const refetchAssetsAndLogs = useCallback(async () => {
         const [assetsRes, logsRes] = await Promise.all([getAssets(), getTransferLogs()]);
@@ -86,24 +91,48 @@ export function useRoomAllocation() {
         );
     }, [panelRoom, allLogs]);
 
-    const openPanel = useCallback((room) => setPanelRoom(room), []);
-    const closePanel = useCallback(() => setPanelRoom(null), []);
+    const openPanel = useCallback(async (room) => {
+        setPanelRoom(room);
+        setPanelBeds([]);
+        try {
+            const res = await getHmsRoomBeds(room.id);
+            setPanelBeds(res.data || []);
+        } catch (err) {
+            console.error('Failed to load beds for room:', err);
+        }
+    }, []);
+    const closePanel = useCallback(() => { setPanelRoom(null); setPanelBeds([]); }, []);
+
+    // bedId -> bedNumber for the open panel, so asset rows can show "Bed 3".
+    const panelBedsById = useMemo(() => {
+        const map = {};
+        for (const bed of panelBeds) map[bed.id] = bed.bedNumber;
+        return map;
+    }, [panelBeds]);
     const toggleDropdown = useCallback((id) => {
         setActiveDropdown(prev => (prev === id ? null : id));
     }, []);
 
     // Add Asset modal
-    const handleOpenAddModal = useCallback((room, e) => {
+    const handleOpenAddModal = useCallback(async (room, e) => {
         e?.stopPropagation();
         setSelectedRoom(room);
         setAddRows([{ ...EMPTY_ADD_ROW }]);
+        setAddBeds([]);
         setIsAddModalOpen(true);
+        try {
+            const res = await getHmsRoomBeds(room.id);
+            setAddBeds(res.data || []);
+        } catch (err) {
+            console.error('Failed to load beds for room:', err);
+        }
     }, []);
 
     const handleCloseAddModal = useCallback(() => {
         setIsAddModalOpen(false);
         setSelectedRoom(null);
         setAddRows([{ ...EMPTY_ADD_ROW }]);
+        setAddBeds([]);
     }, []);
 
     const addRow = useCallback(() => setAddRows(prev => [...prev, { ...EMPTY_ADD_ROW }]), []);
@@ -122,6 +151,7 @@ export function useRoomAllocation() {
             await Promise.all(addRows.map(row =>
                 assignAssetToRoom(row.assetId, {
                     roomId: parseInt(selectedRoom.id, 10),
+                    bedId: row.bedId ? parseInt(row.bedId, 10) : null,
                     notes: row.notes,
                 })
             ));
@@ -172,6 +202,7 @@ export function useRoomAllocation() {
         setSelectedRoom(room);
         setSelectedAsset(asset);
         setTransferFormData(EMPTY_TRANSFER_FORM);
+        setTransferBeds([]);
         setIsTransferModalOpen(true);
     }, []);
 
@@ -180,6 +211,20 @@ export function useRoomAllocation() {
         setSelectedRoom(null);
         setSelectedAsset(null);
         setTransferFormData(EMPTY_TRANSFER_FORM);
+        setTransferBeds([]);
+    }, []);
+
+    // Destination room drives which beds are available; reset the bed pick on change.
+    const handleTransferRoomChange = useCallback(async (roomId) => {
+        setTransferFormData(prev => ({ ...prev, toRoomId: roomId, toBedId: '' }));
+        setTransferBeds([]);
+        if (!roomId) return;
+        try {
+            const res = await getHmsRoomBeds(roomId);
+            setTransferBeds(res.data || []);
+        } catch (err) {
+            console.error('Failed to load beds for room:', err);
+        }
     }, []);
 
     const handleTransferAssetSubmit = useCallback(async (e) => {
@@ -189,6 +234,7 @@ export function useRoomAllocation() {
         try {
             await transferAssetRoom(selectedAsset.assetId, {
                 toRoomId: parseInt(transferFormData.toRoomId, 10),
+                toBedId: transferFormData.toBedId ? parseInt(transferFormData.toBedId, 10) : null,
                 reason: transferFormData.reason,
             });
             await refetchAssetsAndLogs();
@@ -207,10 +253,10 @@ export function useRoomAllocation() {
         filteredRooms, assetsByRoom, availableAssets,
         activeDropdown, toggleDropdown,
 
-        panelRoom, panelAssets, panelLogs,
+        panelRoom, panelAssets, panelLogs, panelBedsById,
         openPanel, closePanel,
 
-        isAddModalOpen, selectedRoom, addRows,
+        isAddModalOpen, selectedRoom, addRows, addBeds,
         handleOpenAddModal, handleCloseAddModal,
         addRow, removeRow, updateRow,
         handleAddAssetSubmit,
@@ -219,8 +265,8 @@ export function useRoomAllocation() {
         removeFormData, setRemoveFormData,
         handleOpenRemoveModal, handleCloseRemoveModal, handleRemoveAssetSubmit,
 
-        isTransferModalOpen,
-        transferFormData, setTransferFormData,
+        isTransferModalOpen, transferBeds,
+        transferFormData, setTransferFormData, handleTransferRoomChange,
         handleOpenTransferModal, handleCloseTransferModal, handleTransferAssetSubmit,
 
         isSubmitting,
