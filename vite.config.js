@@ -8,22 +8,17 @@ export default defineConfig({
         port: 3001,
         proxy: {
             '/api/auth': {
-                target: 'http://localhost:9000',
+                target: 'https://api-directory.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/api': {
-                target: 'http://localhost:8081',
+                target: 'https://api-asset.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             },
             '/oauth2': {
-                target: 'http://localhost:8081',
-                changeOrigin: true,
-                secure: false,
-            },
-            '/login/oauth2': {
-                target: 'http://localhost:8081',
+                target: 'https://api-asset.zenohosp.com',
                 changeOrigin: true,
                 secure: false,
             }

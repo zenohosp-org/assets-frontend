@@ -1,0 +1,149 @@
+.contract-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.contract-tab {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.contract-tab--active {
+    background: #0f172a;
+    color: #fff;
+    border-color: #0f172a;
+}
+
+.contract-tab-badge {
+    background: #f97316;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    padding: 0 0.4rem;
+    line-height: 1.25rem;
+    min-width: 1.25rem;
+    text-align: center;
+}
+
+.contract-type-badge {
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    padding: 0.0625rem 0.4rem;
+    border-radius: 0.375rem;
+    text-transform: uppercase;
+}
+.contract-type-badge--amc { color: #1d4ed8; background: #dbeafe; }
+.contract-type-badge--cmc { color: #7c3aed; background: #ede9fe; }
+
+.contract-status {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    padding: 0.0625rem 0.4rem;
+    border-radius: 0.375rem;
+    text-transform: uppercase;
+}
+.contract-status--active { color: #059669; background: #d1fae5; }
+.contract-status--expired { color: #64748b; background: #e2e8f0; }
+.contract-status--cancelled { color: #dc2626; background: #fee2e2; }
+
+.contract-actions {
+    display: inline-flex;
+    gap: 0.25rem;
+    justify-content: flex-end;
+}
+
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.schedule-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background: #fff;
+}
+
+.schedule-card-title {
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.schedule-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.375rem;
+}
+
+.schedule-tag {
+    font-size: 0.75rem;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.375rem;
+}
+.schedule-tag--due { color: #c2410c; background: #ffedd5; }
+.schedule-tag--overdue { color: #b91c1c; background: #fee2e2; font-weight: 700; }
+.schedule-tag--expiring { color: #b91c1c; background: #fee2e2; }
+
+.schedule-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.app-btn-sm {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+}
+
+.past-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.past-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 0.625rem;
+}
+
+.past-empty-line {
+    font-size: 0.8125rem;
+    color: #94a3b8;
+}
+
+.check-condition {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    padding: 0.0625rem 0.4rem;
+    border-radius: 0.375rem;
+    text-transform: uppercase;
+}
+.check-condition--good { color: #059669; background: #d1fae5; }
+.check-condition--needs_maintenance { color: #c2410c; background: #ffedd5; }
+.check-condition--needs_repair { color: #dc2626; background: #fee2e2; }

@@ -1,0 +1,384 @@
+.transfer-logs-empty-cell {
+    padding: 80px var(--spacing-6);
+    text-align: center;
+}
+
+.transfer-logs-empty-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--color-gray-400);
+}
+
+.transfer-logs-loader-text {
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-sm);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.transfer-logs-empty-icon-bg {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-gray-50);
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-gray-100);
+    margin-bottom: 8px;
+}
+
+.transfer-logs-empty-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-gray-300);
+}
+
+.transfer-logs-empty-title {
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-600);
+    font-size: var(--fs-sm);
+}
+
+.transfer-logs-empty-text {
+    font-size: var(--fs-xs);
+}
+
+.transfer-logs-movement-cell {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.transfer-logs-movement-box {
+    padding: 6px 12px;
+    background-color: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.transfer-logs-movement-box-blue {
+    padding: 6px 12px;
+    background-color: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.transfer-logs-movement-label {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.transfer-logs-movement-label-blue {
+    font-size: var(--fs-xs);
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.transfer-logs-movement-value {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-700);
+}
+
+.transfer-logs-movement-value-blue {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--color-black);
+}
+
+.transfer-logs-movement-arrow {
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-300);
+    flex-shrink: 0;
+}
+
+.transfer-logs-remarks-empty {
+    font-style: italic;
+    color: var(--color-gray-300);
+}
+
+.transfer-logs-form-input-bg {
+    background-color: var(--color-gray-50);
+}
+
+.transfer-logs-dropdown-menu {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    margin-top: 4px;
+    width: 100%;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    max-height: 208px;
+    overflow-y: auto;
+}
+
+.transfer-logs-dropdown-item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    transition: background-color 150ms ease;
+    border-bottom: 1px solid var(--color-gray-50);
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+}
+
+.transfer-logs-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.transfer-logs-dropdown-item:hover {
+    background-color: #eff6ff;
+}
+
+.transfer-logs-dropdown-name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-900);
+}
+
+.transfer-logs-dropdown-role {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
+}
+
+.transfer-logs-input-readonly {
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-500);
+    cursor: default;
+}
+
+/* ── Page header ── */
+.transfer-logs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+}
+
+.transfer-logs-head-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.transfer-logs-head-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background-color: var(--color-primary-subtle);
+    border: 1px solid #dbeafe;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transfer-logs-head-title {
+    font-size: var(--fs-2xl);
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--color-gray-900);
+}
+
+.transfer-logs-head-sub {
+    margin-top: 4px;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-500);
+}
+
+.transfer-logs-head-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.transfer-logs-head-search {
+    width: 280px;
+}
+
+/* ── Stat card icon badges ── */
+.transfer-logs-stat-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.transfer-logs-stat-ico {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.transfer-logs-stat-ico-blue   { background-color: var(--color-primary-subtle); color: var(--color-primary); }
+.transfer-logs-stat-ico-green  { background-color: var(--color-success-subtle); color: var(--color-success-dark); }
+.transfer-logs-stat-ico-purple { background-color: #f5f3ff; color: #7c3aed; }
+.transfer-logs-stat-ico-amber  { background-color: var(--color-warning-subtle); color: var(--color-warning-dark); }
+
+/* ── Audit Stream (timeline of standalone cards) ── */
+.transfer-stream {
+    margin-top: 8px;
+}
+
+.transfer-stream-state {
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 16px;
+    box-shadow: var(--shadow-xs);
+    padding: 72px var(--spacing-6, 24px);
+}
+
+.transfer-stream-daygroup {
+    margin-bottom: 22px;
+}
+
+.transfer-stream-daylabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+}
+
+.transfer-stream-day-tag {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--color-white);
+    background-color: var(--color-gray-900);
+    border-radius: 9999px;
+    padding: 3px 12px;
+}
+
+.transfer-stream-day-count {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-gray-400);
+}
+
+.transfer-stream-row {
+    display: grid;
+    grid-template-columns: 64px 1fr minmax(140px, 240px);
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    border: 1px solid var(--color-gray-200);
+    background: var(--color-white);
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.transfer-stream-row:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-gray-300);
+}
+
+.transfer-stream-time {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--color-gray-600);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.transfer-stream-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.transfer-stream-asset {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.transfer-stream-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.transfer-stream-name {
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--color-gray-900);
+}
+
+.transfer-stream-code {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--color-gray-400);
+}
+
+.transfer-stream-meta {
+    text-align: right;
+    min-width: 0;
+}
+
+.transfer-stream-remark {
+    font-size: var(--fs-sm);
+    font-style: italic;
+    color: var(--color-gray-500);
+}
+
+@media (max-width: 768px) {
+    .transfer-logs-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .transfer-logs-head-actions {
+        flex-wrap: wrap;
+    }
+
+    .transfer-logs-head-search {
+        flex: 1;
+        width: auto;
+    }
+
+    .transfer-stream-row {
+        grid-template-columns: 52px 1fr;
+        gap: 12px;
+    }
+
+    .transfer-stream-meta {
+        grid-column: 1 / -1;
+        text-align: left;
+        padding-left: 64px;
+    }
+}

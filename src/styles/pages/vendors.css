@@ -1,0 +1,126 @@
+.vendors-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.vendors-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-sm);
+}
+
+.vendors-checkbox-input {
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    accent-color: var(--color-black);
+}
+
+.vendors-checkbox-input:focus {
+    box-shadow: 0 0 0 2px rgb(59 130 246 / 0.4);
+}
+
+.vendors-checkbox-text {
+    text-transform: capitalize;
+}
+
+.vendors-list-title {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-medium);
+}
+
+.vendors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vendors-list-item {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.vendors-list-item-name {
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-sm);
+}
+
+.vendors-list-item-gst {
+    font-size: var(--fs-xs);
+    color: #6b7280;
+}
+
+.vendors-list-item-details {
+    margin-top: 4px;
+    font-size: var(--fs-sm);
+    color: #4b5563;
+}
+
+.vendors-empty {
+    font-size: var(--fs-sm);
+    color: #6b7280;
+    font-style: italic;
+}
+
+.vendors-table-name {
+    font-weight: var(--fw-bold);
+    color: var(--color-gray-900);
+    font-size: var(--fs-sm);
+}
+
+.vendors-table-subtext {
+    font-size: var(--fs-xs);
+    color: var(--color-gray-400);
+    margin-top: 2px;
+}
+
+.vendors-table-text {
+    font-size: var(--fs-sm);
+    color: var(--color-gray-600);
+}
+
+.vendors-table-mono {
+    font-size: var(--fs-sm);
+    font-family: var(--font-mono);
+    color: var(--color-gray-600);
+}
+
+.vendors-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* ── Phase 4d: replacements for previously-inline styles ── */
+.vendors-actions-th { text-align: right; }
+.vendors-actions-td { position: relative; }
+
+.vendors-form-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.vendors-state-hint {
+    color: #94a3b8;
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.vendors-input-locked {
+    background-color: #f8fafc;
+    cursor: default;
+}
+
+.vendors-active-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #334155;
+    cursor: pointer;
+}

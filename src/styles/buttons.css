@@ -1,0 +1,81 @@
+.app-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    border-radius: 10px;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+    white-space: nowrap;
+}
+
+.app-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.app-btn-primary {
+    background: #0f172a;
+    color: var(--color-white);
+    padding: 9px 18px;
+}
+
+.app-btn-primary:hover:not(:disabled) {
+    background: #1e293b;
+}
+
+.app-btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.app-btn-secondary {
+    background: var(--color-white);
+    color: var(--color-gray-600);
+    border: 1px solid var(--color-gray-200);
+    padding: 8px 16px;
+}
+
+.app-btn-secondary:hover:not(:disabled) {
+    background: var(--color-gray-50);
+    border-color: #000000;
+    color: var(--color-black);
+}
+
+.app-btn-icon {
+    background: transparent;
+    color: var(--color-gray-400);
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.app-btn-icon:hover {
+    color: var(--color-gray-900);
+    background: var(--color-gray-100);
+}
+
+.app-btn-danger {
+    background-color: var(--color-error);
+    color: var(--color-white);
+    font-weight: var(--fw-bold);
+    padding: 9px 20px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    transition: background-color var(--transition-fast);
+}
+
+.app-btn-danger:hover {
+    background-color: var(--color-error-dark);
+}
+
+.app-btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

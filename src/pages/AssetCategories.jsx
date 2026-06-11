@@ -1,69 +1,125 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Plus } from 'lucide-react';
+import { Plus, Loader2, Tag } from 'lucide-react';
+import { getAssetCategories, createAssetCategory } from '../api/client';
+import PageHeader from '../components/PageHeader';
+import '../styles/pages/asset-categories.css';
 
 export default function AssetCategories() {
     const [categories, setCategories] = useState([]);
     const [categoryName, setCategoryName] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         fetchCategories();
     }, []);
 
     const fetchCategories = () => {
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-        axios.get('/api/asset-categories', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        setLoading(true);
+        getAssetCategories()
             .then(res => setCategories(res.data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('Error fetching categories:', err);
+                setError('Failed to load categories');
+            })
+            .finally(() => setLoading(false));
     };
 
-    const handleCreateCategory = (e) => {
+    const handleCreateCategory = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('asset_jwt');
-        if (!token) return;
-
-        axios.post('/api/asset-categories', {
-            name: categoryName,
-            hospitalId: localStorage.getItem('hospital_id')
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(() => {
-                fetchCategories();
-                setCategoryName('');
-            })
-            .catch(err => alert("Error: " + (err.response?.data?.message || err.message)));
+        if (isSubmitting) return;
+        setError('');
+        setIsSubmitting(true);
+        try {
+            await createAssetCategory({ name: categoryName });
+            setCategoryName('');
+            fetchCategories();
+        } catch (err) {
+            console.error('Error creating category:', err);
+            setError(err.response?.data?.message || err.message || 'Failed to create category');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-8">
-            <h1 className="text-2xl font-bold mb-6">Asset Categories</h1>
+        <div className="app-page">
+            <PageHeader
+                title="Asset Categories"
+                subtitle="Manage categories used to classify assets."
+            />
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <h2 className="text-xl font-semibold mb-4">Add Asset Category</h2>
-                <form onSubmit={handleCreateCategory} className="space-y-4 mb-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
-                        <input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} required placeholder="e.g. Imaging, Lab Equipment"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <div className="app-card asset-categories-card">
+                <h2 className="app-card-title">Add Category</h2>
+                {error && <div className="app-error">{error}</div>}
+                <form onSubmit={handleCreateCategory} className="app-form asset-categories-form">
+                    <div className="asset-categories-input-wrapper">
+                        <div>
+                            <label className="app-label">Category Name</label>
+                            <input
+                                type="text"
+                                value={categoryName}
+                                onChange={e => setCategoryName(e.target.value)}
+                                required
+                                placeholder="e.g. Imaging, Lab Equipment"
+                                className="app-input"
+                                disabled={isSubmitting}
+                            />
+                        </div>
+                        <div className="asset-category-right">
+                            <button type="submit" className="app-btn app-btn-primary" disabled={isSubmitting}>
+                                {isSubmitting ? <Loader2 className="app-icon-16 icon-spin" /> : <Plus className="app-icon-20" />}
+                                {isSubmitting ? 'Adding...' : 'Add Category'}
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" className="w-full md:w-auto bg-purple-600 outline-none text-white py-2 px-6 rounded-md hover:bg-purple-700 transition duration-150 ease-in-out flex items-center justify-center">
-                        <Plus className="h-5 w-5 mr-2" /> Add Category
-                    </button>
                 </form>
+            </div>
 
-                <h3 className="text-lg font-medium mb-2 border-b pb-2">Existing Categories</h3>
-                <ul className="space-y-2">
-                    {categories.map(c => (
-                        <li key={c.id} className="p-3 bg-gray-50 rounded-md font-medium flex justify-between items-center">
-                            {c.name}
-                        </li>
-                    ))}
-                    {categories.length === 0 && <p className="text-sm text-gray-500 italic">No categories found.</p>}
-                </ul>
+            <div className="app-table-wrapper">
+                <div className="app-table-container">
+                    <table className="app-table">
+                        <thead>
+                            <tr className="app-table-thead-row">
+                                <th className="app-table-th">#</th>
+                                <th className="app-table-th">Category Name</th>
+                                <th className="app-table-th">Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody className="app-table-tbody">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="3" className="app-table-td asset-categories-empty-cell">
+                                        <div className="app-empty">
+                                            <Loader2 className="app-icon-24 text-blue icon-spin" />
+                                            <p className="text-sm text-pulse">Loading categories...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : categories.length === 0 ? (
+                                <tr>
+                                    <td colSpan="3" className="app-table-td asset-categories-empty-cell">
+                                        <div className="app-empty">
+                                            <Tag className="app-icon-32 text-slate-300" />
+                                            <p className="text-sm text-slate-500">No categories yet. Add one above.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : categories.map((c, i) => (
+                                <tr key={c.id} className="app-table-row">
+                                    <td className="app-table-td asset-categories-index">{i + 1}</td>
+                                    <td className="app-table-td">
+                                        <span className="asset-categories-name">{c.name}</span>
+                                    </td>
+                                    <td className="app-table-td asset-categories-date">
+                                        {c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

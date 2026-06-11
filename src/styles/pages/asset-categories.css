@@ -1,0 +1,48 @@
+.asset-categories-card {
+    margin-bottom: 24px;
+}
+
+.asset-categories-form {
+    margin-bottom: 0;
+}
+
+.asset-categories-input-wrapper {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: end;
+}
+
+.asset-category-right {
+    display: flex;
+    align-items: flex-end;
+}
+
+.asset-category-right .app-btn {
+    height: 44px;
+    padding: 0 24px;
+    white-space: nowrap;
+    gap: 8px;
+}
+
+.asset-categories-empty-cell {
+    text-align: center;
+    padding: 60px 24px;
+}
+
+.asset-categories-index {
+    width: 48px;
+    color: var(--color-gray-400);
+    font-size: var(--fs-xs);
+}
+
+.asset-categories-name {
+    font-weight: var(--fw-semibold);
+    color: var(--color-gray-800);
+    font-size: var(--fs-sm);
+}
+
+.asset-categories-date {
+    color: var(--color-gray-400);
+    font-size: var(--fs-xs);
+}

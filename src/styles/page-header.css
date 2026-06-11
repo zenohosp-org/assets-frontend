@@ -1,0 +1,41 @@
+/* src/styles/page-header.css — page title area (extracted from common.css) */
+
+.app-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+}
+
+.app-page-title-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-page-title {
+    font-size: var(--fs-2xl);
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--color-gray-900);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-page-title-icon {
+    color: var(--color-black);
+}
+
+.app-page-subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-gray-500);
+}
+
+.app-page-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
